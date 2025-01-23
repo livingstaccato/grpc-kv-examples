@@ -4,6 +4,7 @@
 CERT_DIR="./certs"
 DAYS=365
 RSA_BITS=2048
+ECDSA_CURVE="secp521r1"
 
 # Create certificate directory
 mkdir -p "$CERT_DIR"
@@ -14,6 +15,7 @@ generate_certificate() {
     local cn=$2
     local san=$3
     local org=$4
+    local algo=$5
 
     echo "Generating certificate for $name"
 
@@ -23,7 +25,7 @@ generate_certificate() {
 default_bits        = $RSA_BITS
 distinguished_name  = req_distinguished_name
 req_extensions      = req_ext
-x509_extensions     = v3_ca
+x509_extensions     = v3_ext
 prompt              = no
 
 [req_distinguished_name]
@@ -33,21 +35,33 @@ CN = $cn
 [req_ext]
 subjectAltName = @alt_names
 
-[v3_ca]
+[v3_ext]
+basicConstraints = critical, CA:FALSE
 subjectAltName = @alt_names
+extendedKeyUsage = TLS Web Client Authentication, TLS Web Server Authentication
+keyUsage = critical, Digital Signature, Key Encipherment, Key Agreement
+subjectKeyIdentifier = hash
 
 [alt_names]
 DNS.1 = $cn
 IP.1  = 127.0.0.1
 EOF
 
-    # Generate private key
-    openssl genrsa -out "$CERT_DIR/$name.key" $RSA_BITS
+    key_file="$CERT_DIR/$name.key"
+
+    if [[ $algo == "rsa" ]]; then
+        openssl genrsa -out "$key_file" $RSA_BITS
+    elif [[ $algo == "ecdsa" ]]; then
+        openssl ecparam -name $ECDSA_CURVE -genkey -noout -out "$key_file"
+    else
+        echo "Unsupported algorithm: $algo"
+        exit 1
+    fi
 
     # Generate certificate signing request (CSR) and self-signed certificate
     openssl req -x509 -new -nodes \
         -key "$CERT_DIR/$name.key" \
-        -sha256 \
+        -sha512 \
         -days $DAYS \
         -config "$CERT_DIR/$name.cnf" \
         -out "$CERT_DIR/$name.crt"
@@ -56,7 +70,10 @@ EOF
 }
 
 # Generate certificates
-generate_certificate "rsa-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-mtls-client"
-generate_certificate "rsa-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-mtls-server"
+generate_certificate "rsa-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-mtls-client" "rsa"
+generate_certificate "rsa-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-mtls-server" "rsa"
+
+generate_certificate "ec-mtls-client" "localhost" "localhost,127.0.0.1" "ec-mtls-client" "ecdsa"
+generate_certificate "ec-mtls-server" "localhost" "localhost,127.0.0.1" "ec-mtls-server" "ecdsa"
 
 echo "All certificates generated successfully in $CERT_DIR."
