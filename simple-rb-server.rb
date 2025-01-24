@@ -128,8 +128,15 @@ class Server
     inspect_certificate(@client_cert, 'Client') if @client_cert
 
     @logger.info '🔒 Creating gRPC credentials...'
-    key_pairs = [[@server_key, @server_cert]]
-    @creds = GRPC::Core::ServerCredentials.new(key_pairs, @client_cert, true)
+    key_pairs = [[
+      @server_key,
+      @server_cert
+    ].map { |pem| pem.encode('ASCII') }]
+    @creds = GRPC::Core::ServerCredentials.new(
+      key_pairs,
+      @client_cert&.encode('ASCII'),
+      true
+    )
     @logger.info '🔒 ✅ Credentials created'
   rescue StandardError => e
     @logger.error "🔒 ❌ Credentials setup failed: #{e.message}"
