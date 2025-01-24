@@ -52,7 +52,7 @@ class Server
 
   def initialize
     @logger = Logger.new($stdout, level: :debug)
-    @logger.formatter = ->(severity, time, _, msg) { "#{time.iso8601(3)} - #{msg}\n" }
+    @logger.formatter = ->(severity, time, _, msg) { "#{time.strftime('%Y-%m-%d %H:%M:%S.%3N')} - #{msg}\n" }
   end
 
   def start
