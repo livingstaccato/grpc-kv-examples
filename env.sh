@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ALGO=rsa-
-#ALGO=ec-
+#ALGO=rsa-
+ALGO=ec-
 
 export PLUGIN_CLIENT_CERT="$(cat ./certs/${ALGO}mtls-client.crt)"
 export PLUGIN_CLIENT_KEY="$(cat ./certs/${ALGO}mtls-client.key)"
