@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 require 'grpc'
@@ -39,7 +38,6 @@ end
 
 class Server
   GRPC_OPTIONS = {
-    'grpc.ssl_target_name_override' => 'localhost',
     'grpc.max_send_message_length' => 100 * 1024 * 1024,
     'grpc.max_receive_message_length' => 100 * 1024 * 1024,
     'grpc.keepalive_time_ms' => 5000,
@@ -52,7 +50,7 @@ class Server
 
   def initialize
     @logger = Logger.new($stdout, level: :debug)
-    @logger.formatter = ->(severity, time, _, msg) { "#{time.strftime('%Y-%m-%d %H:%M:%S.%3N')} - #{msg}\n" }
+    @logger.formatter = ->(_, time, _, msg) { "#{time.strftime('%Y-%m-%d %H:%M:%S.%3N')} - #{msg}\n" }
   end
 
   def start
@@ -82,17 +80,10 @@ class Server
     @logger.debug "🔐 📊 Cert lengths - Server: #{cert_lengths[:server]}, " \
                  "Key: #{cert_lengths[:key]}, Client: #{cert_lengths[:client]}"
 
-    key_cert_pairs = [
-      {
-        private_key: @server_key,
-        cert_chain: @server_cert
-      }
-    ]
-    
     @creds = GRPC::Core::ServerCredentials.new(
-      key_cert_pairs,
-      @client_cert,
-      true  # require client auth
+      [[@server_key.encode('ASCII'), @server_cert.encode('ASCII')]],
+      @client_cert&.encode('ASCII'),
+      true
     )
 
     @logger.info '🔒 ✅ Credentials created'
