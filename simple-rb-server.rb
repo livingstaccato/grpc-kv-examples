@@ -40,7 +40,6 @@ end
 
 class Server
   GRPC_OPTIONS = {
-    'grpc.max_receive_message_length' => 100 * 1024 * 1024,
     'grpc.keepalive_time_ms' => 5000,
     'grpc.keepalive_timeout_ms' => 1000,
     'grpc.keepalive_permit_without_calls' => 1,
