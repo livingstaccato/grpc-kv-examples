@@ -128,10 +128,8 @@ class Server
     inspect_certificate(@client_cert, 'Client') if @client_cert
 
     @logger.info '🔒 Creating gRPC credentials...'
-    key_pairs = [[
-      @server_key,
-      @server_cert
-    ].map { |pem| pem.encode('ASCII') }]
+    pair = [@server_key, @server_cert]
+    key_pairs = [pair]
 
     @creds = GRPC::Core::ServerCredentials.new(
       key_pairs,
