@@ -132,7 +132,7 @@ class Server
     key_pairs = [pair]
 
     @creds = GRPC::Core::ServerCredentials.new(
-      [key_pairs],
+      1234,
       @client_cert&.encode('ASCII'),
       true
     )
