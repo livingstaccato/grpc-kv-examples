@@ -1,0 +1,49 @@
+-----BEGIN CERTIFICATE-----
+MIICTzCCAbCgAwIBAgIQf2IE5RRWCNcP9HWgqhk7WTAKBggqhkjOPQQDBDAoMRIwEAYDVQQKEwlIYXNoaUNvcnAxEjAQBgNVBAMTCWxvY2FsaG9zdDAgFw0yNTAxMjQyMjQ1MTdaGA8yMDU1MDEyNTEwNDU0N1owKDESMBAGA1UEChMJSGFzaGlDb3JwMRIwEAYDVQQDEwlsb2NhbGhvc3QwgZswEAYHKoZIzj0CAQYFK4EEACMDgYYABAB123djAFYnoHwJha2qPNVwz16KBe1ghCbhDDB+zXQD+pxpzyjlQSZAaXXX5CPYPabItRl1hDz15PVT+O2gmZaYAgFFHE46UOf66L15gIamZDSLIaPG1aO+toKQ0k/z4cRyIaF/KQVt1nIY57dnf/s9UsZ5qozNNtSxS1dNUaCn825akqN3MHUwDgYDVR0PAQH/BAQDAgKsMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTAexl2922N5yNFFNPr6P2sc18UNTAUBgNVHREEDTALgglsb2NhbGhvc3QwCgYIKoZIzj0EAwQDgYwAMIGIAkIBoqU7rOGvp/GfzHZVlPhqMIpHiwAigLqr1FZXzenC0aL68H/sh8cKvie92sUEUeJK2S+U5Y4Ho11XTyze/NDF0gsCQgHS0MjwmqvWp/kpBamG8Gk6qK6RK90FwbH1L05yMe7hhDqNBieZ70g76QzFdGFfNM3GXWg7ZCMAjCX5YqtpQHHUWw==
+-----END CERTIFICATE-----
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            7f:62:04:e5:14:56:08:d7:0f:f4:75:a0:aa:19:3b:59
+    Signature Algorithm: ecdsa-with-SHA512
+        Issuer: O=HashiCorp, CN=localhost
+        Validity
+            Not Before: Jan 24 22:45:17 2025 GMT
+            Not After : Jan 25 10:45:47 2055 GMT
+        Subject: O=HashiCorp, CN=localhost
+        Subject Public Key Info:
+            Public Key Algorithm: id-ecPublicKey
+                Public-Key: (521 bit)
+                pub: 
+                    04:00:75:db:77:63:00:56:27:a0:7c:09:85:ad:aa:
+                    3c:d5:70:cf:5e:8a:05:ed:60:84:26:e1:0c:30:7e:
+                    cd:74:03:fa:9c:69:cf:28:e5:41:26:40:69:75:d7:
+                    e4:23:d8:3d:a6:c8:b5:19:75:84:3c:f5:e4:f5:53:
+                    f8:ed:a0:99:96:98:02:01:45:1c:4e:3a:50:e7:fa:
+                    e8:bd:79:80:86:a6:64:34:8b:21:a3:c6:d5:a3:be:
+                    b6:82:90:d2:4f:f3:e1:c4:72:21:a1:7f:29:05:6d:
+                    d6:72:18:e7:b7:67:7f:fb:3d:52:c6:79:aa:8c:cd:
+                    36:d4:b1:4b:57:4d:51:a0:a7:f3:6e:5a:92
+                ASN1 OID: secp521r1
+                NIST CURVE: P-521
+        X509v3 extensions:
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment, Key Agreement, Certificate Sign
+            X509v3 Extended Key Usage: 
+                TLS Web Client Authentication, TLS Web Server Authentication
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+            X509v3 Subject Key Identifier: 
+                C0:7B:19:76:F7:6D:8D:E7:23:45:14:D3:EB:E8:FD:AC:73:5F:14:35
+            X509v3 Subject Alternative Name: 
+                DNS:localhost
+    Signature Algorithm: ecdsa-with-SHA512
+         30:81:88:02:42:01:a2:a5:3b:ac:e1:af:a7:f1:9f:cc:76:55:
+         94:f8:6a:30:8a:47:8b:00:22:80:ba:ab:d4:56:57:cd:e9:c2:
+         d1:a2:fa:f0:7f:ec:87:c7:0a:be:27:bd:da:c5:04:51:e2:4a:
+         d9:2f:94:e5:8e:07:a3:5d:57:4f:2c:de:fc:d0:c5:d2:0b:02:
+         42:01:d2:d0:c8:f0:9a:ab:d6:a7:f9:29:05:a9:86:f0:69:3a:
+         a8:ae:91:2b:dd:05:c1:b1:f5:2f:4e:72:31:ee:e1:84:3a:8d:
+         06:27:99:ef:48:3b:e9:0c:c5:74:61:5f:34:cd:c6:5d:68:3b:
+         64:23:00:8c:25:f9:62:ab:69:40:71:d4:5b
