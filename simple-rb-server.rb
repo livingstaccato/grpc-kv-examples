@@ -132,6 +132,7 @@ class Server
       @server_key,
       @server_cert
     ].map { |pem| pem.encode('ASCII') }]
+
     @creds = GRPC::Core::ServerCredentials.new(
       key_pairs,
       @client_cert&.encode('ASCII'),
