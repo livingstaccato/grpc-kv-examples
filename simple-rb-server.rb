@@ -83,9 +83,9 @@ class Server
                  "Key: #{cert_lengths[:key]}, Client: #{cert_lengths[:client]}"
 
     @creds = GRPC::Core::ServerCredentials.new(
-      private_key: @server_key,
-      cert_chain: @server_cert,
-      root_certs: @client_cert
+      [[@server_key, @server_cert]],
+      @client_cert,
+      true  # require client auth
     )
 
     @logger.info '🔒 ✅ Credentials created'
