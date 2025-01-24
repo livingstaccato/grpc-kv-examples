@@ -58,4 +58,16 @@ openssl s_client -connect localhost:50051 \
 ---
 ```
 
-For the rb-server it's the same diff - Server Temp Key
+```
+[I]➜ diff py-server.txt rb-server.txt 
+41c41
+< SSL handshake has read 1170 bytes and written 737 bytes
+---
+> SSL handshake has read 1116 bytes and written 737 bytes
+55c55
+<     Start Time: 1737756825
+---
+>     Start Time: 1737756648
+```
+
+No. Fucking. Way. It's the CA FALSE?!@#$?!@#$?
