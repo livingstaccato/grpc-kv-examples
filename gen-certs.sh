@@ -71,10 +71,10 @@ EOF
 }
 
 # Generate certificates
-generate_certificate "rsa-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-mtls-client" "rsa"
-generate_certificate "rsa-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-mtls-server" "rsa"
+#generate_certificate "rsa-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-mtls-client" "rsa"
+#generate_certificate "rsa-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-mtls-server" "rsa"
 
-generate_certificate "ec-mtls-client" "localhost" "localhost,127.0.0.1" "ec-mtls-client" "ecdsa"
-generate_certificate "ec-mtls-server" "localhost" "localhost,127.0.0.1" "ec-mtls-server" "ecdsa"
+generate_certificate "ec-${ECDSA_CURVE}-mtls-client" "localhost" "localhost,127.0.0.1" "ec-mtls-client" "ecdsa"
+generate_certificate "ec-${ECDSA_CURVE}-mtls-server" "localhost" "localhost,127.0.0.1" "ec-mtls-server" "ecdsa"
 
 echo "All certificates generated successfully in $CERT_DIR."
