@@ -62,6 +62,7 @@ def serve():
         futures.ThreadPoolExecutor(max_workers=10),
         options=[
             ('grpc.ssl_target_name_override', 'localhost'),
+            #('grpc.use_local_subchannel_pool', 1),
         ]
     )
 
