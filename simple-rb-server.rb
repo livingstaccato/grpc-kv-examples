@@ -82,8 +82,15 @@ class Server
     @logger.debug "🔐 📊 Cert lengths - Server: #{cert_lengths[:server]}, " \
                  "Key: #{cert_lengths[:key]}, Client: #{cert_lengths[:client]}"
 
+    key_cert_pairs = [
+      {
+        private_key: @server_key,
+        cert_chain: @server_cert
+      }
+    ]
+    
     @creds = GRPC::Core::ServerCredentials.new(
-      [[@server_key, @server_cert]],
+      key_cert_pairs,
       @client_cert,
       true  # require client auth
     )
