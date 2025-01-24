@@ -384,3 +384,5 @@ vendor
 
 # do not store certificates.
 certs
+
+logs/
