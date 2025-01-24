@@ -1,4 +1,4 @@
-[I]➜ echo $PLUGIN_CLIENT_CERT | ossl-x509-read 
+
 Certificate:
     Data:
         Version: 3 (0x2)
@@ -13,7 +13,7 @@ Certificate:
         Subject Public Key Info:
             Public Key Algorithm: id-ecPublicKey
                 Public-Key: (521 bit)
-                pub: 
+                pub:
                     04:00:67:0a:b5:57:06:da:71:0f:c2:a3:3a:5c:b4:
                     b7:7e:45:8f:65:31:93:3a:31:7a:9e:45:95:fd:3d:
                     84:e7:68:5a:34:81:4d:6a:d5:3d:9a:7a:4e:8a:6b:
@@ -28,13 +28,13 @@ Certificate:
         X509v3 extensions:
             X509v3 Key Usage: critical
                 Digital Signature, Key Encipherment, Key Agreement, Certificate Sign
-            X509v3 Extended Key Usage: 
+            X509v3 Extended Key Usage:
                 TLS Web Client Authentication, TLS Web Server Authentication
             X509v3 Basic Constraints: critical
                 CA:TRUE
-            X509v3 Subject Key Identifier: 
+            X509v3 Subject Key Identifier:
                 05:F3:2D:AC:D0:11:2D:7E:F8:6B:DA:1E:63:A5:39:76:60:F9:61:C9
-            X509v3 Subject Alternative Name: 
+            X509v3 Subject Alternative Name:
                 DNS:localhost
     Signature Algorithm: ecdsa-with-SHA512
          30:81:87:02:41:05:af:ed:fa:e2:51:a5:8e:36:a4:94:59:27:
@@ -45,3 +45,7 @@ Certificate:
          27:25:db:c1:d4:b2:e7:da:a9:ec:aa:3b:a9:05:ea:f8:eb:a0:
          4e:21:72:94:f5:6e:7e:4e:03:9b:50:7c:e6:74:02:ca:e3:79:
          f1:50:0f:87:94:4d:02:e3:0f:93:0d:0b
+
+-----BEGIN CERTIFICATE-----
+MIICTzCCAbCgAwIBAgIQf2IE5RRWCNcP9HWgqhk7WTAKBggqhkjOPQQDBDAoMRIwEAYDVQQKEwlIYXNoaUNvcnAxEjAQBgNVBAMTCWxvY2FsaG9zdDAgFw0yNTAxMjQyMjQ1MTdaGA8yMDU1MDEyNTEwNDU0N1owKDESMBAGA1UEChMJSGFzaGlDb3JwMRIwEAYDVQQDEwlsb2NhbGhvc3QwgZswEAYHKoZIzj0CAQYFK4EEACMDgYYABAB123djAFYnoHwJha2qPNVwz16KBe1ghCbhDDB+zXQD+pxpzyjlQSZAaXXX5CPYPabItRl1hDz15PVT+O2gmZaYAgFFHE46UOf66L15gIamZDSLIaPG1aO+toKQ0k/z4cRyIaF/KQVt1nIY57dnf/s9UsZ5qozNNtSxS1dNUaCn825akqN3MHUwDgYDVR0PAQH/BAQDAgKsMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTAexl2922N5yNFFNPr6P2sc18UNTAUBgNVHREEDTALgglsb2NhbGhvc3QwCgYIKoZIzj0EAwQDgYwAMIGIAkIBoqU7rOGvp/GfzHZVlPhqMIpHiwAigLqr1FZXzenC0aL68H/sh8cKvie92sUEUeJK2S+U5Y4Ho11XTyze/NDF0gsCQgHS0MjwmqvWp/kpBamG8Gk6qK6RK90FwbH1L05yMe7hhDqNBieZ70g76QzFdGFfNM3GXWg7ZCMAjCX5YqtpQHHUWw==
+-----END CERTIFICATE-----
