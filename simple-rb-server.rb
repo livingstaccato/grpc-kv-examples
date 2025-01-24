@@ -40,8 +40,6 @@ end
 
 class Server
   GRPC_OPTIONS = {
-    'grpc.ssl_handshake_timeout_ms' => 5000,
-    'grpc.http2.max_pings_without_data' => 0
   }.freeze
 
   def initialize
