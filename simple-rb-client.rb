@@ -6,6 +6,12 @@ require 'openssl'
 require_relative 'proto/kv_pb'
 require_relative 'proto/kv_services_pb'
 
+LOGGER = Logger.new($stdout).tap do |log|
+  log.formatter = proc do |severity, datetime, _, msg|
+    "#{datetime.strftime('%Y-%m-%d %H:%M:%S.%L')} #{severity}: #{msg}\n"
+  end
+end
+
 class CertificateLogger
   def self.log_cert_info(cert, prefix)
     LOGGER.info "🔍 #{prefix} Certificate Details: 📋"
@@ -24,12 +30,6 @@ class CertificateLogger
 end
 
 class GrpcClient
-  LOGGER = Logger.new($stdout).tap do |log|
-    log.formatter = proc do |severity, datetime, _, msg|
-      "#{datetime.strftime('%Y-%m-%d %H:%M:%S.%L')} #{severity}: #{msg}\n"
-    end
-  end
-
   def self.get_trusted_server_cert(addr)
     LOGGER.info "🌐 Dialing server to fetch certificate 🔄"
     
@@ -80,16 +80,21 @@ class GrpcClient
     end
 
     LOGGER.info "🔐 Creating certificate objects... 🔄"
-    client_key = OpenSSL::PKey::RSA.new(@client_key)
-    client_cert = OpenSSL::X509::Certificate.new(@client_cert)
-    server_cert = OpenSSL::X509::Certificate.new(@server_cert)
+    begin
+      client_key = OpenSSL::PKey.read(@client_key)
+      client_cert = OpenSSL::X509::Certificate.new(@client_cert)
+      server_cert = OpenSSL::X509::Certificate.new(@server_cert)
+    rescue => e
+      LOGGER.error "Failed to load certificates: #{e.message}"
+      raise
+    end
     
     CertificateLogger.log_cert_info(client_cert, "Client")
     
     @creds = GRPC::Core::ChannelCredentials.new(
       @server_cert,
-      @client_key.to_pem,
-      @client_cert
+      client_key.to_pem,
+      client_cert.to_pem
     )
 
     @channel_args = {
@@ -139,7 +144,7 @@ if __FILE__ == $0
     client = GrpcClient.new
     client.run
   rescue => e
-    LOGGER.fatal "❌ Fatal error: #{e.message} ⛔"
+    LOGGER.error "❌ Fatal error: #{e.message} ⛔"
     exit 1
   end
 end
