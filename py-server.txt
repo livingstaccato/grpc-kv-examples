@@ -1,0 +1,58 @@
+[I]➜ openssl s_client -connect localhost:50051 \
+  -cert <(echo "$PLUGIN_CLIENT_CERT") \
+  -key <(echo "$PLUGIN_CLIENT_KEY") \
+  -CAfile <(echo "$PLUGIN_SERVER_CERT") \
+  -servername localhost
+CONNECTED(00000020)
+depth=0 O = ec-mtls-server, CN = localhost
+verify error:num=20:unable to get local issuer certificate
+verify return:1
+depth=0 O = ec-mtls-server, CN = localhost
+verify error:num=21:unable to verify the first certificate
+verify return:1
+8674476608:error:1404B0FB:SSL routines:ST_CONNECT:unknown pkey type:/AppleInternal/Library/BuildRoots/b11baf73-9ee0-11ef-b7b4-7aebe1f78c73/Library/Caches/com.apple.xbs/Sources/libressl/libressl-3.3/ssl/ssl_sigalgs.c:335:
+---
+Certificate chain
+ 0 s:/O=ec-mtls-server/CN=localhost
+   i:/O=ec-mtls-server/CN=localhost
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIICUjCCAbSgAwIBAgIJANy6tl4MBRKdMAoGCCqGSM49BAMEMC0xFzAVBgNVBAoM
+DmVjLW10bHMtc2VydmVyMRIwEAYDVQQDDAlsb2NhbGhvc3QwHhcNMjUwMTIzMTgz
+MzA2WhcNMjYwMTIzMTgzMzA2WjAtMRcwFQYDVQQKDA5lYy1tdGxzLXNlcnZlcjES
+MBAGA1UEAwwJbG9jYWxob3N0MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQB5ixu
+2ptdaXgNweVwU6nN4m1RoC18dWkWWcAnQR5UF1FTF9LBBToW9VBTFj9NqIuzfJlV
+7rIcnE6qu03d1vF7FsgApO4neaWdQYxvOZvqQGpRXi5NpzzUWnaXNvrOCL8xDjA7
+U2iPijOPJxO6Unk+GPxDki6Hg01YunBKf7ghJM4c+4ijejB4MAwGA1UdEwEB/wQC
+MAAwGgYDVR0RBBMwEYIJbG9jYWxob3N0hwR/AAABMB0GA1UdJQQWMBQGCCsGAQUF
+BwMCBggrBgEFBQcDATAOBgNVHQ8BAf8EBAMCA6gwHQYDVR0OBBYEFM4vTlNi/je2
+bBtIJEtpwu7A0LH+MAoGCCqGSM49BAMEA4GLADCBhwJCAYnyzEGH6fHP/8J376iH
+yENS13T3PsXfhVXDz2he9MCnl+7EEkjf7bNG7H7VamyZMM5CbKIlt0THDxP4r5wR
+oUbSAkEhfN8pKaRkDNOvsSfv9ePNwWNXK9upoIGNquKeV5zWkJa/+UBLT3LoPtve
+a6IwGEt5del1lExGyczPqhFIH32aMA==
+-----END CERTIFICATE-----
+subject=/O=ec-mtls-server/CN=localhost
+issuer=/O=ec-mtls-server/CN=localhost
+---
+No client certificate CA names sent
+Server Temp Key: ECDH, P-256, 256 bits
+---
+SSL handshake has read 1170 bytes and written 737 bytes
+---
+New, TLSv1/SSLv3, Cipher is AEAD-CHACHA20-POLY1305-SHA256
+Server public key is 521 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : AEAD-CHACHA20-POLY1305-SHA256
+    Session-ID: 
+    Session-ID-ctx: 
+    Master-Key: 
+    Start Time: 1737756825
+    Timeout   : 7200 (sec)
+    Verify return code: 21 (unable to verify the first certificate)
+---
