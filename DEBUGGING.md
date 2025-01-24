@@ -57,3 +57,5 @@ openssl s_client -connect localhost:50051 \
 55c55
 ---
 ```
+
+For the rb-server it's the same diff - Server Temp Key
