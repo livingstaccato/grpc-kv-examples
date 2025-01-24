@@ -100,6 +100,7 @@ def create_channel_credentials(certs: dict):
         ('grpc.keepalive_permit_without_calls', 1),
         ('grpc.http2.min_time_between_pings_ms', 10000),
         ('grpc.ssl_handshake_timeout_ms', 5000),
+        ('grpc.ssl_common_algorithms', 'ECDSA+SHA256:RSA+SHA256'),
     ]
 
     return credentials, options
