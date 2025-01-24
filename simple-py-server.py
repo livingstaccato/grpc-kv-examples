@@ -62,14 +62,6 @@ def serve():
         futures.ThreadPoolExecutor(max_workers=10),
         options=[
             ('grpc.ssl_target_name_override', 'localhost'),
-            ('grpc.max_send_message_length', 100 * 1024 * 1024),
-            ('grpc.max_receive_message_length', 100 * 1024 * 1024),
-            ('grpc.keepalive_time_ms', 5000),
-            ('grpc.keepalive_timeout_ms', 1000),
-            ('grpc.keepalive_permit_without_calls', 1),
-            ('grpc.http2.min_time_between_pings_ms', 5000),
-            ('grpc.ssl_handshake_timeout_ms', 5000),
-            ('grpc.http2.max_pings_without_data', 0),
         ]
     )
 
