@@ -127,7 +127,7 @@ class Server
     @creds = GRPC::Core::ServerCredentials.new(
       nil,
       [key_cert_pair],
-      true
+      nil # require client auth?
     )
     @logger.info '🔒 ✅ Credentials created'
   rescue StandardError => e
