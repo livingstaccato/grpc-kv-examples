@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
-
 # frozen_string_literal: true
 
 require 'grpc'
 require 'logger'
+require 'openssl'
 require_relative 'proto/kv_pb'
 require_relative 'proto/kv_services_pb'
 
@@ -63,32 +63,78 @@ class Server
     run_server
   rescue StandardError => e
     @logger.fatal "🔒 ❌ Server setup failed: #{e.message}"
+    @logger.fatal "   #{e.backtrace.join("\n   ")}"
     raise
   end
 
   private
+
+  def inspect_certificate(pem_data, name)
+    cert = OpenSSL::X509::Certificate.new(pem_data)
+    @logger.info "🔍 #{name} Certificate Details:"
+    @logger.info "    Subject: #{cert.subject}"
+    @logger.info "    Issuer: #{cert.issuer}"
+    @logger.info "    Valid From: #{cert.not_before}"
+    @logger.info "    Valid Until: #{cert.not_after}"
+    @logger.info "    Serial Number: #{cert.serial}"
+    @logger.info "    Version: #{cert.version}"
+    
+    cert.extensions.each do |ext|
+      case ext.oid
+      when 'keyUsage'
+        @logger.info "    Key Usage: #{ext.value}"
+      when 'extendedKeyUsage'
+        @logger.info "    Extended Key Usage: #{ext.value}"
+      when 'subjectAltName'
+        @logger.info "    Subject Alt Names: #{ext.value}"
+      end
+    end
+
+    key = cert.public_key
+    case key
+    when OpenSSL::PKey::RSA
+      @logger.info "    Public Key: RSA #{key.n.num_bits} bits"
+    when OpenSSL::PKey::EC
+      @logger.info "    Public Key: EC #{key.group.curve_name}"
+    end
+    @logger.info "    Signature Algorithm: #{cert.signature_algorithm}"
+  rescue StandardError => e
+    @logger.error "    Error inspecting certificate: #{e.message}"
+  end
+
+  def inspect_private_key(pem_data, name)
+    key = OpenSSL::PKey.read(pem_data)
+    @logger.info "🔑 #{name} Key Details:"
+    case key
+    when OpenSSL::PKey::RSA
+      @logger.info "    Type: RSA"
+      @logger.info "    Size: #{key.n.num_bits} bits"
+    when OpenSSL::PKey::EC
+      @logger.info "    Type: EC"
+      @logger.info "    Curve: #{key.group.curve_name}"
+    end
+  rescue StandardError => e
+    @logger.error "    Error inspecting key: #{e.message}"
+  end
 
   def setup_credentials
     @server_cert = ENV.fetch('PLUGIN_SERVER_CERT') { raise '🔐 ❌ Missing server certificate' }
     @server_key = ENV.fetch('PLUGIN_SERVER_KEY') { raise '🔐 ❌ Missing server key' }
     @client_cert = ENV.fetch('PLUGIN_CLIENT_CERT', nil)
 
-    cert_lengths = {
-      server: @server_cert.length,
-      key: @server_key.length,
-      client: @client_cert&.length || 0
-    }
+    @logger.info '🔐 Loading certificates...'
+    inspect_certificate(@server_cert, 'Server')
+    inspect_private_key(@server_key, 'Server')
+    inspect_certificate(@client_cert, 'Client') if @client_cert
 
-    @logger.debug "🔐 📊 Cert lengths - Server: #{cert_lengths[:server]}, " \
-                 "Key: #{cert_lengths[:key]}, Client: #{cert_lengths[:client]}"
-
-    @creds = GRPC::Core::ServerCredentials.new(
-      [[@server_key.encode('ASCII'), @server_cert.encode('ASCII')]],
-      @client_cert&.encode('ASCII'),
-      true
-    )
-
+    @logger.info '🔒 Creating gRPC credentials...'
+    key_pairs = [[@server_key, @server_cert]]
+    @creds = GRPC::Core::ServerCredentials.new(key_pairs, @client_cert, true)
     @logger.info '🔒 ✅ Credentials created'
+  rescue StandardError => e
+    @logger.error "🔒 ❌ Credentials setup failed: #{e.message}"
+    @logger.error "   #{e.backtrace.join("\n   ")}"
+    raise
   end
 
   def setup_server
@@ -98,8 +144,9 @@ class Server
   end
 
   def bind_port
-    @server.add_http2_port('[::]:50051', @creds)
-    @logger.info '🌐 ✅ Port bound'
+    port = '[::]:50051'
+    @server.add_http2_port(port, @creds)
+    @logger.info "🌐 ✅ Port bound to #{port}"
   rescue StandardError => e
     @logger.error "🌐 ❌ Port binding failed: #{e.message}"
     raise
