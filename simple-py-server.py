@@ -49,7 +49,7 @@ def serve():
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
             root_certificates=client_cert.encode(),
-            require_client_auth=None,
+            require_client_auth=None, # as of 2025-01-24 @ 13:19 if this is enabled then it fucks with SSL stuff.
         )
 
         logger.info("🔒 ✅ Credentials created")
