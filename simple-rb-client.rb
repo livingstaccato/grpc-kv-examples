@@ -3,6 +3,7 @@
 require 'grpc'
 require 'logger'
 require 'openssl'
+require_relative 'proto/kv_pb'
 require_relative 'proto/kv_services_pb'
 
 class CertificateLogger
