@@ -15,3 +15,7 @@
 Ugh. But why didn't it work on my Linux machine?
 
 Hmm.
+
+## `go-plugin`
+
+`mtls.go`:22 is generating a P521 key. So… we can't use anything less. Wonderful.
