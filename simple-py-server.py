@@ -48,9 +48,10 @@ def serve():
 
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
-            client_cert.encode() if client_cert else server_cert.encode(),
+            root_certificates=client_cert.encode(),
             require_client_auth=True
         )
+
         logger.info("🔒 ✅ Credentials created")
 
     except Exception as e:
