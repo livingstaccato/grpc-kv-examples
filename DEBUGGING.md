@@ -71,3 +71,12 @@ openssl s_client -connect localhost:50051 \
 ```
 
 No. Fucking. Way. It's the CA FALSE?!@#$?!@#$?
+
+
+
+## Verifying OpenSSL Version
+
+```
+ruby -ropenssl -e 'puts OpenSSL::OPENSSL_LIBRARY_VERSION'
+python -c "import ssl; print(ssl.OPENSSL_VERSION)"
+```
