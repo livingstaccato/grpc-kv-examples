@@ -4,7 +4,8 @@
 CERT_DIR="./certs"
 DAYS=365
 RSA_BITS=2048
-ECDSA_CURVE="secp521r1"
+#ECDSA_CURVE="secp521r1"
+ECDSA_CURVE="secp256r1"
 
 # Create certificate directory
 mkdir -p "$CERT_DIR"
