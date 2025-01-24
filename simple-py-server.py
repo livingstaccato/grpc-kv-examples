@@ -70,7 +70,6 @@ def serve():
             ('grpc.http2.min_time_between_pings_ms', 5000),
             ('grpc.ssl_handshake_timeout_ms', 5000),
             ('grpc.http2.max_pings_without_data', 0),
-            ('grpc.ssl_common_algorithms', 'ECDSA+SHA256:RSA+SHA256'),
         ]
     )
 
