@@ -40,7 +40,6 @@ end
 
 class Server
   GRPC_OPTIONS = {
-    'grpc.keepalive_timeout_ms' => 1000,
     'grpc.keepalive_permit_without_calls' => 1,
     'grpc.http2.min_time_between_pings_ms' => 5000,
     'grpc.ssl_handshake_timeout_ms' => 5000,
