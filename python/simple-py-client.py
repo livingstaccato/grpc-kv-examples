@@ -54,7 +54,7 @@ def main():
         ]
 
         # Server endpoint
-        server_endpoint = os.getenv('PLUGIN_SERVER_ENDPOINT', 'localhost:50051')
+        server_endpoint = os.getenv('PLUGIN_PYTHON_SERVER_ENDPOINT', 'localhost:50051')
         logger.info(f"🌐 Connecting to server: {server_endpoint}")
 
         # Create channel with timeout
