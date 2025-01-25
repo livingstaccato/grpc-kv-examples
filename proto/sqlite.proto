@@ -165,6 +165,17 @@ message TransactionStateResponse {
   Status status = 3; // Status of the request
 }
 
+// Explain query plan messages
+message ExplainQueryRequest {
+  string connection_id = 1; // Connection identifier
+  string query = 2; // SQL query string
+}
+
+message ExplainQueryResponse {
+  repeated string steps = 1; // Steps in the query execution plan
+  Status status = 2; // Status of the explain query request
+}
+
 // Connection management messages
 message ConnectionRequest {
   string database_path = 1; // Path to the SQLite database or connection string
@@ -174,4 +185,3 @@ message ConnectionResponse {
   string connection_id = 1; // Identifier for the new connection
   Status status = 2; // Status of the connection creation
 }
-
