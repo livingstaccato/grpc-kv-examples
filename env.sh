@@ -67,12 +67,19 @@ alias ossl-server='openssl s_server \
     -Verify 2'
 
 # Client/Server aliases with proper directory handling
+alias go-build="(cd ${BASE_PATH}/go/bin; \
+  go build ../simple-go-client.go; \
+  go build ../simple-go-server.go)"
+
 alias go-client="(cd ${BASE_PATH} && source env.sh && ./go/build/simple-go-client)"
 alias go-server="(cd ${BASE_PATH} && source env.sh && ./go/build/simple-go-server)"
+
 alias py-client="(cd ${BASE_PATH} && source env.sh && ./python/simple-py-client.py)"
 alias py-server="(cd ${BASE_PATH} && source env.sh && ./python/simple-py-server.py)"
+
 alias rb-client="(cd ${BASE_PATH} && source env.sh && ./ruby/simple-rb-client.rb)"
 alias rb-server="(cd ${BASE_PATH} && source env.sh && ./ruby/simple-rb-server.rb)"
+
 alias cs-build="(cd ${BASE_PATH}/csharp && dotnet build)"
 alias cs-client="(cd ${BASE_PATH}/csharp && dotnet run)"
 
