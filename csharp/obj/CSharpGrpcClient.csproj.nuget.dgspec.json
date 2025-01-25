@@ -62,6 +62,10 @@
             "Microsoft.Extensions.Logging": {
               "target": "Package",
               "version": "[9.0.1, )"
+            },
+            "Microsoft.Extensions.Logging.Console": {
+              "target": "Package",
+              "version": "[9.0.1, )"
             }
           },
           "imports": [
