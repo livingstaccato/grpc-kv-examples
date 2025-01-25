@@ -47,4 +47,31 @@ class Program
         try
         {
             // Use 'using' so that GrpcClientHelper is disposed of properly
-            using var clientHelper = new GrpcClientHelper(_loggerFactory, clientCert,
+            using var clientHelper = new GrpcClientHelper(_loggerFactory, clientCert, clientKey, serverCert, serverEndpoint);
+            using var channel = clientHelper.Channel;
+
+            // Create a client
+            // 👥 Creating gRPC client...
+            logger.LogDebug("👥 Creating gRPC client...");
+            var client = new KV.KVClient(channel);
+
+            // Send a Get request
+            // 📡 Sending Get request...
+            logger.LogDebug("📡 Sending Get request...");
+            var response = await client.GetAsync(new GetRequest { Key = "test" });
+
+            // ✨ Response: {response.Value}
+            logger.LogInformation("✨ Response: {response.Value}", response.Value);
+        }
+        catch (Exception ex)
+        {
+            // ❌ Error: {ex.Message}
+            logger.LogError(ex, "❌ Error");
+        }
+        finally
+        {
+            // Dispose the logger factory
+            _loggerFactory.Dispose();
+        }
+    }
+}
