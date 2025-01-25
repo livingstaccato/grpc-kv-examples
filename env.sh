@@ -54,6 +54,8 @@ alias py-server="${BASE_PATH}/python/simple-py-server.py"
 alias rb-client="${BASE_PATH}/ruby/simple-rb-client.rb"
 alias rb-server="${BASE_PATH}/ruby/simple-rb-server.rb"
 
-alias cs-build="(cd ${BASE_PATH}/csharp; dotnet build)"
-alias cs-client="(cd ${BASE_PATH}/csharp; dotnet run)"
+alias cs-build="(cd ${BASE_PATH}; source env.sh; cd csharp; dotnet build)"
+alias cs-client="(cd ${BASE_PATH}; source env.sh; cd csharp; dotnet run)"
 #alias cs-server="${BASE_PATH}/ruby/simple-rb-server.rb"
+
+echo "✅ Setup the environment."
