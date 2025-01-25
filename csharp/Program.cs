@@ -9,6 +9,7 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Proto;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace CSharpGrpcClient
 {
@@ -18,7 +19,7 @@ namespace CSharpGrpcClient
 
         static async Task Main(string[] args)
         {
-            // Setup our logger
+            // setup our logger
             using var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
@@ -29,7 +30,7 @@ namespace CSharpGrpcClient
 
             // 🔧 Setting up environment variables...
             _logger.LogDebug("🔧 Setting up environment variables...");
-            // Load environment variables
+            // Load environment variables (consider using a more robust method for production)
             var clientCert = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_CERT");
             var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY");
             var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT");
@@ -75,11 +76,11 @@ namespace CSharpGrpcClient
 
                                 // 🔍 Check if the server's certificate matches the expected one...
                                 _logger.LogDebug("🔍 Check if the server's certificate matches the expected one...");
+                                
+                                // Important: Use CreateFromPem to load the server certificate string
+                                var serverCertObj = X509Certificate2.CreateFromPem(serverCert);
 
-                                var remoteCert = new X509Certificate2(certificate);
-                                var serverCertObj = new X509Certificate2(Encoding.UTF8.GetBytes(serverCert));
-
-                                if (!remoteCert.Equals(serverCertObj))
+                                if (!certificate.Equals(serverCertObj))
                                 {
                                     // ❌ Server's certificate does not match expected certificate.
                                     _logger.LogError("❌ Server's certificate does not match expected certificate.");
