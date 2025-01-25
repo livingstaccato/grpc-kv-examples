@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "ytjxe/TznFk=",
+  "dgSpecHash": "IkYHGzNjsdA=",
   "success": true,
   "projectFilePath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
   "expectedPackageFiles": [
     "/Users/tim.perkins/.nuget/packages/google.protobuf/3.29.3/google.protobuf.3.29.3.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/grpc.core.api/2.67.0/grpc.core.api.2.67.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/grpc.net.client/2.67.0/grpc.net.client.2.67.0.nupkg.sha512",
+    "/Users/tim.perkins/.nuget/packages/grpc.net.clientfactory/2.67.0/grpc.net.clientfactory.2.67.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/grpc.net.common/2.67.0/grpc.net.common.2.67.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/grpc.tools/2.69.0/grpc.tools.2.69.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.configuration/9.0.1/microsoft.extensions.configuration.9.0.1.nupkg.sha512",
@@ -14,6 +15,7 @@
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.configuration.binder/9.0.1/microsoft.extensions.configuration.binder.9.0.1.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.dependencyinjection/9.0.1/microsoft.extensions.dependencyinjection.9.0.1.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.1/microsoft.extensions.dependencyinjection.abstractions.9.0.1.nupkg.sha512",
+    "/Users/tim.perkins/.nuget/packages/microsoft.extensions.http/6.0.0/microsoft.extensions.http.6.0.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.logging/9.0.1/microsoft.extensions.logging.9.0.1.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.logging.abstractions/9.0.1/microsoft.extensions.logging.abstractions.9.0.1.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.logging.configuration/9.0.1/microsoft.extensions.logging.configuration.9.0.1.nupkg.sha512",
