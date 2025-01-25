@@ -101,7 +101,7 @@ public class GrpcClientHelper : IDisposable
 
     public GrpcChannel Channel => _channel;
 
-    private X509Certificate2 LoadCertificate(string certPem, string keyPem = null)
+    private X509Certificate2 LoadCertificate(string certPem, string? keyPem = null)
     {
         try
         {
