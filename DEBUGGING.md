@@ -49,12 +49,7 @@ library confirm that they should support `secp521r1`.
 ## Verifying Certificates
 
 ```
-openssl ecparam -name secp521r1 \
-    -genkey \
-    -noout \
-    -in ec-secp521r1-mtls-client.key \
-\
-| openssl req -new \
+openssl req -new \
     -key ec-secp521r1-mtls-client.key \
     -x509 \
     -nodes \
