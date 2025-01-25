@@ -1,14 +1,20 @@
 #!/bin/sh
 
+# TODO: Make sure to notify if what is set is what's different than the default.
+
 # Base configuration
 BASE_PATH=$(pwd)
-DEFAULT_PLUGIN_HOST="localhost"
-DEFAULT_PLUGIN_PORT="50051"
+
+local DEFAULT_PLUGIN_HOST="localhost"
+local DEFAULT_PLUGIN_PORT="50051"
+
+local DEFAULT_PLUGIN_ALGO="ec-secp256r1"
+
 PLUGIN_HOST=${PLUGIN_HOST:-${DEFAULT_PLUGIN_HOST}}
 PLUGIN_PORT=${PLUGIN_PORT:-${DEFAULT_PLUGIN_PORT}}
 
 # TLS algorithm configuration
-PLUGIN_ALGO=${PLUGIN_ALGO:-"ec-secp256r1"}
+PLUGIN_ALGO=${PLUGIN_ALGO:-${DEFAULT_PLUGIN_ALGO}}
 local PLUGIN_CLIENT_ALGO="${PLUGIN_CLIENT_ALGO:-${PLUGIN_ALGO}}"
 local PLUGIN_SERVER_ALGO="${PLUGIN_SERVER_ALGO:-${PLUGIN_ALGO}}"
 
@@ -29,6 +35,7 @@ fi
 
 PLUGIN_CLIENT_CERT="$(cat ${PLUGIN_CLIENT_CERT_FILE})"
 PLUGIN_CLIENT_KEY="$(cat ${PLUGIN_CLIENT_KEY_FILE})"
+
 PLUGIN_SERVER_CERT="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.crt)"
 PLUGIN_SERVER_KEY="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.key)"
 
