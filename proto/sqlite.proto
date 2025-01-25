@@ -103,3 +103,18 @@ message ColumnInfo {
   bool primary_key = 4;            // True if the column is part of the primary key.
   string default_value = 5;        // Default value for the column (if any).
 }
+
+message PrepareStatementRequest {
+  string query = 1;
+}
+
+message PrepareStatementResponse {
+  string statement_id = 1; // Unique ID for the prepared statement
+  TransactionResponse.Status status = 2;
+  string error_message = 3;
+}
+
+message ExecutePreparedStatementRequest {
+  string statement_id = 1;
+  repeated Parameter params = 2;
+}
