@@ -1,12 +1,12 @@
 using System;
 using System.Net.Security;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using Grpc.Net.Client.Configuration;
-using System.Net.Http;
 
 namespace CSharpGrpcClient;
 
@@ -76,7 +76,7 @@ public class GrpcClientHelper
 
             // 🎯🔍 Check if the server's certificate matches the expected one
             _logger.LogDebug("🎯🔍 Comparing server certificate with expected certificate...");
-            
+
             // Handle null certificate
             if (certificate == null)
             {
@@ -101,9 +101,16 @@ public class GrpcClientHelper
             return true;
         };
 
+        // Create an HttpClient with the configured handler
+        var httpClient = new HttpClient(httpClientHandler)
+        {
+            // 🚀2️⃣ Specify HTTP/2 version
+            DefaultRequestVersion = new Version(2, 0)
+        };
+
         var channelOptions = new GrpcChannelOptions
         {
-            HttpHandler = new GrpcWebHandler(httpClientHandler),
+            HttpClient = httpClient,
             ServiceConfig = new ServiceConfig
             {
                 MethodConfigs =
