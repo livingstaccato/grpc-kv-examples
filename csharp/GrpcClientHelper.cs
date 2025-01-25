@@ -51,7 +51,7 @@ public class GrpcClientHelper
 
         // Create an HttpClientHandler
         var httpClientHandler = new HttpClientHandler();
-        httpClientHandler.SslProtocols = System.Security.Authentication.SslProtocols.Tls13;
+        httpClientHandler.SslProtocols = System.Security.Authentication.SslProtocols.Tls13; // Force TLS 1.3
         httpClientHandler.ServerCertificateCustomValidationCallback = (httpRequestMessage, certificate, cetChain, policyErrors) =>
         {
             // 🔎🛡️ Basic certificate validation
