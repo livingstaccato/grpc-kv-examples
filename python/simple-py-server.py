@@ -8,7 +8,12 @@ import time
 import os
 import ssl
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s')
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s.%(msecs)03d %(levelname)s %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 logger = logging.getLogger(__name__)
 
 class KVServicer(kv_pb2_grpc.KVServicer):
@@ -27,11 +32,24 @@ class KVServicer(kv_pb2_grpc.KVServicer):
 
     def _log_request_details(self, context):
         try:
-            logger.debug(f"🔎 🌐 Peer: {context.peer()}")
-            for k, v in context.auth_context().items():
-                logger.debug(f"🔎 🔒 Auth {k}: {v}")
+            logger.debug(f"  🔎 🌐 Peer: {context.peer()}")
+
+            # Get the SSL object and log details if available
+            ssl_obj = context._sslobject  # Access the internal _sslobject
+            if ssl_obj:
+                logger.debug("  🔐 SSL details:")
+                logger.debug(f"    Version: {ssl_obj.version()}")
+                cipher = ssl_obj.cipher()
+                logger.debug(f"    Cipher: {cipher[0]} (protocol: {cipher[1]}, bits: {cipher[2]})")
+            else:
+                logger.warning("  ⚠️ No SSL object found in the context.")
+            
+            logger.debug("  🔒 Metadata:")
+            for k, v in context.invocation_metadata():
+                logger.debug(f"      {k}: {v}")
+
         except Exception as e:
-            logger.error(f"🔎 ❌ Logging error: {e}")
+            logger.error(f"  ❌ Logging error: {e}")
 
 def serve():
     logger.info("🚀 🔄 Server starting")
@@ -46,10 +64,11 @@ def serve():
 
         logger.debug(f"🔐 📊 Cert lengths - Server: {len(server_cert)}, Key: {len(server_key)}, Client: {len(client_cert) if client_cert else 0}")
 
+        # Create SSL context
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
-            root_certificates=client_cert.encode(),
-            require_client_auth=True,
+            root_certificates=client_cert.encode() if client_cert else None,
+            require_client_auth=True if client_cert else False
         )
 
         logger.info("🔒 ✅ Credentials created")
