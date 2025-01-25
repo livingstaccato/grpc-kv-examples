@@ -4,8 +4,8 @@
 require 'grpc'
 require 'logger'
 require 'openssl'
-require_relative '../proto/kv_pb'
-require_relative '../proto/kv_services_pb'
+require_relative 'proto/kv_pb'
+require_relative 'proto/kv_services_pb'
 
 # KVService implements the gRPC service definition for the key-value store.
 class KVService < Proto::KV::Service
