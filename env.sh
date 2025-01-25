@@ -125,6 +125,7 @@ function get_key_size() {
 }
 
 get_key_size "${PLUGIN_CLIENT_KEY_FILE}"
+echo $(get_key_size "${PLUGIN_CLIENT_KEY_FILE}")
 
 #PLUGIN_CLIENT_KEY_SIZE=$(get_key_size ${PLUGIN_CLIENT_KEY_FILE})
 
