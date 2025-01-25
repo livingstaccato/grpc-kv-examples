@@ -58,8 +58,38 @@ PLUGIN_SERVER_ENDPOINT="tcp:${PLUGIN_HOST}:${PLUGIN_PORT}"
 PLUGIN_PYTHON_SERVER_ENDPOINT="${PLUGIN_HOST}:${PLUGIN_PORT}"
 PLUGIN_CS_SERVER_ENDPOINT="https://${PLUGIN_HOST}:${PLUGIN_PORT}"
 
+
+function get_key_size() {
+    openssl req -new \
+        -key $1 \
+        -x509 \
+        -nodes \
+        -days 365 \
+        -subj "/CN=test.com" \
+    \
+    | openssl x509 -noout -text \
+    | grep Public-Key \
+    | sed -E 's/[^0-9]+//g'
+}
+
+PLUGIN_CLIENT_KEY_SIZE=$(echo $(get_key_size "${PLUGIN_CLIENT_KEY_FILE}"))
+PLUGIN_SERVER_KEY_SIZE=$(echo $(get_key_size "${PLUGIN_SERVER_KEY_FILE}"))
+
+# Export all necessary environment variables
+export PLUGIN_HOST \
+    PLUGIN_PORT \
+    PLUGIN_ALGO \
+    PLUGIN_CLIENT_CERT \
+    PLUGIN_CLIENT_KEY \
+    PLUGIN_SERVER_CERT \
+    PLUGIN_SERVER_KEY \
+    PLUGIN_SERVER_ENDPOINT \
+    PLUGIN_PYTHON_SERVER_ENDPOINT \
+    PLUGIN_CS_SERVER_ENDPOINT
+
+
 # Path configuration
-export PYTHONPATH="${BASE_PATH}/python:${BASE_PATH}:${PYTHONPATH}"
+export PYTHONPATH="${BASE_PATH}/python:${PYTHONPATH}"
 
 # OpenSSL aliases
 alias ossl-client='openssl s_client -connect localhost:50051 \
@@ -96,35 +126,6 @@ alias rb-server="(cd ${BASE_PATH} && source env.sh && ./ruby/simple-rb-server.rb
 
 alias cs-build="(cd ${BASE_PATH}  && source env.sh && cd ./csharp && dotnet build)"
 alias cs-client="(cd ${BASE_PATH} && source env.sh && cd ./csharp && dotnet run)"
-
-# Export all necessary environment variables
-export PLUGIN_HOST \
-    PLUGIN_PORT \
-    PLUGIN_ALGO \
-    PLUGIN_CLIENT_CERT \
-    PLUGIN_CLIENT_KEY \
-    PLUGIN_SERVER_CERT \
-    PLUGIN_SERVER_KEY \
-    PLUGIN_SERVER_ENDPOINT \
-    PLUGIN_PYTHON_SERVER_ENDPOINT \
-    PLUGIN_CS_SERVER_ENDPOINT \
-    PYTHONPATH
-
-function get_key_size() {
-    openssl req -new \
-        -key $1 \
-        -x509 \
-        -nodes \
-        -days 365 \
-        -subj "/CN=test.com" \
-    \
-    | openssl x509 -noout -text \
-    | grep Public-Key \
-    | sed -E 's/[^0-9]+//g'
-}
-
-PLUGIN_CLIENT_KEY_SIZE=$(echo $(get_key_size "${PLUGIN_CLIENT_KEY_FILE}"))
-PLUGIN_SERVER_KEY_SIZE=$(echo $(get_key_size "${PLUGIN_SERVER_KEY_FILE}"))
 
 echo ""
 echo "🔐 TLS Configuration:"
