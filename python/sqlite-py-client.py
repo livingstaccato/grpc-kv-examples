@@ -79,8 +79,16 @@ def main():
     channel = grpc.insecure_channel('[::]:50051')
     client = SQLiteClient(channel)
 
+    print("Let's add a test user first")
+    client.execute_update("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)")
+    client.execute_update("INSERT INTO users (name) VALUES (?)", ["Test User"])
+
+    # Now try querying
+    print("\nNow querying:")
+    print(client.execute_query("SELECT * FROM users"))
+
     # Example queries
-    print(client.execute_query("SELECT * FROM users WHERE id = ?", [1]))
+    #print(client.execute_query("SELECT * FROM users WHERE id = ?", [1]))
     print(client.execute_update("INSERT INTO users (name) VALUES (?)", ["Alice"]))
 
 if __name__ == '__main__':
