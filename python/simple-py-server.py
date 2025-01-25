@@ -6,7 +6,6 @@ from concurrent import futures
 from proto import kv_pb2, kv_pb2_grpc
 import time
 import os
-import ssl
 import asyncio
 from certificate_helper import log_cert_info, load_certificates_from_env, load_pem_certificate
 
@@ -101,4 +100,3 @@ async def serve():
 
 if __name__ == '__main__':
     asyncio.run(serve())
-    
