@@ -8,13 +8,14 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Proto;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Serilog;
 
 namespace CSharpGrpcClient
 {
     class Program
     {
-        private static Serilog.ILogger? _logger;
+        private static Microsoft.Extensions.Logging.ILogger? _logger;
 
         static async Task Main(string[] args)
         {
@@ -35,6 +36,7 @@ namespace CSharpGrpcClient
             var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY");
             var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT");
             var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_SERVER_ENDPOINT") ?? "https://localhost:50051";
+            var serverNameOverride = Environment.GetEnvironmentVariable("GRPC_SSL_TARGET_NAME_OVERRIDE") ?? "localhost";
 
             // 🔍 Logging environment variables for debugging...
             _logger.LogDebug("🔍 PLUGIN_CLIENT_CERT: {clientCert}", !string.IsNullOrEmpty(clientCert) ? "<present>" : "<not set>");
