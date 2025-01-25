@@ -36,6 +36,17 @@ fi
 PLUGIN_CLIENT_CERT="$(cat ${PLUGIN_CLIENT_CERT_FILE})"
 PLUGIN_CLIENT_KEY="$(cat ${PLUGIN_CLIENT_KEY_FILE})"
 
+# Load certificates
+if [ ! -f "${PLUGIN_SERVER_CERT_FILE}" ]; then
+    echo "❌ Error: Server certificate not found at ${PLUGIN_SERVER_CERT_FILE}"
+    exit 1
+fi
+
+if [ ! -f "${PLUGIN_SERVER_KEY_FILE}" ]; then
+    echo "❌ Error: Server key not found at ${PLUGIN_SERVER_KEY_FILE}"
+    exit 1
+fi
+
 PLUGIN_SERVER_CERT="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.crt)"
 PLUGIN_SERVER_KEY="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.key)"
 
