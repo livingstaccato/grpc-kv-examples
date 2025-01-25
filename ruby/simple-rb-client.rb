@@ -3,8 +3,8 @@
 require 'grpc'
 require 'logger'
 require 'openssl'
-require_relative '../proto/kv_pb'
-require_relative '../proto/kv_services_pb'
+require_relative 'proto/kv_pb'
+require_relative 'proto/kv_services_pb'
 
 LOGGER = Logger.new($stdout).tap do |log|
   log.formatter = proc do |severity, datetime, _, msg|
