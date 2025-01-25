@@ -58,6 +58,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[2.69.0, )"
+            },
+            "Microsoft.Extensions.Logging": {
+              "target": "Package",
+              "version": "[9.0.1, )"
             }
           },
           "imports": [
