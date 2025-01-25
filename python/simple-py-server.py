@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class KVServicer(kv_pb2_grpc.KVServicer):
     def __init__(self):
         logger.info("🔧 🚀 Initializing KVServicer")
-        
+
     def Put(self, request, context):
         logger.info(f"📝 📥 Put request - Key: {request.key}")
         self._log_request_details(context)
@@ -68,7 +68,7 @@ def serve():
     )
 
     kv_pb2_grpc.add_KVServicer_to_server(KVServicer(), server)
-    
+
     try:
         server.add_secure_port('[::]:50051', server_credentials)
         logger.info("🌐 ✅ Port bound")
