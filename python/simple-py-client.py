@@ -52,6 +52,8 @@ def main():
         # Channel options matching Go client
         options = [
             ('grpc.ssl_target_name_override', 'localhost'),
+            ('grpc.default_authority', 'localhost'),
+            ('grpc.min_tls_version', '1.3'),
             ('grpc.use_local_subchannel_pool', 1),
         ]
 
