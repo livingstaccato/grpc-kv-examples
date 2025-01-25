@@ -14,7 +14,7 @@ namespace CSharpGrpcClient
 {
     class Program
     {
-        private static ILogger? _logger;
+        private static Serilog.ILogger? _logger;
 
         static async Task Main(string[] args)
         {
