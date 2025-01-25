@@ -3,7 +3,8 @@
 import grpc
 import warnings
 
-import proto.sqlite_pb2 as sqlite__pb2
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
+import sqlite_pb2 as sqlite__pb2
 
 GRPC_GENERATED_VERSION = '1.68.0'
 GRPC_VERSION = grpc.__version__
@@ -26,7 +27,8 @@ if _version_not_supported:
 
 
 class SQLiteStoreStub(object):
-    """Missing associated documentation comment in .proto file."""
+    """Service definition for interacting with an SQLite database
+    """
 
     def __init__(self, channel):
         """Constructor.
@@ -54,13 +56,40 @@ class SQLiteStoreStub(object):
                 request_serializer=sqlite__pb2.SchemaRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.SchemaResponse.FromString,
                 _registered_method=True)
+        self.PrepareStatement = channel.unary_unary(
+                '/proto.SQLiteStore/PrepareStatement',
+                request_serializer=sqlite__pb2.PrepareStatementRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.PrepareStatementResponse.FromString,
+                _registered_method=True)
+        self.ExecutePreparedStatement = channel.unary_unary(
+                '/proto.SQLiteStore/ExecutePreparedStatement',
+                request_serializer=sqlite__pb2.ExecutePreparedStatementRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.QueryResponse.FromString,
+                _registered_method=True)
+        self.BeginTransaction = channel.unary_unary(
+                '/proto.SQLiteStore/BeginTransaction',
+                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=sqlite__pb2.TransactionResponse.FromString,
+                _registered_method=True)
+        self.CommitTransaction = channel.unary_unary(
+                '/proto.SQLiteStore/CommitTransaction',
+                request_serializer=sqlite__pb2.TransactionRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.TransactionResponse.FromString,
+                _registered_method=True)
+        self.RollbackTransaction = channel.unary_unary(
+                '/proto.SQLiteStore/RollbackTransaction',
+                request_serializer=sqlite__pb2.TransactionRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.TransactionResponse.FromString,
+                _registered_method=True)
 
 
 class SQLiteStoreServicer(object):
-    """Missing associated documentation comment in .proto file."""
+    """Service definition for interacting with an SQLite database
+    """
 
     def ExecuteQuery(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Query execution
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -78,6 +107,38 @@ class SQLiteStoreServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetSchema(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PrepareStatement(self, request, context):
+        """Statement preparation and execution
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ExecutePreparedStatement(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def BeginTransaction(self, request, context):
+        """Transaction management
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CommitTransaction(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def RollbackTransaction(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -106,6 +167,31 @@ def add_SQLiteStoreServicer_to_server(servicer, server):
                     request_deserializer=sqlite__pb2.SchemaRequest.FromString,
                     response_serializer=sqlite__pb2.SchemaResponse.SerializeToString,
             ),
+            'PrepareStatement': grpc.unary_unary_rpc_method_handler(
+                    servicer.PrepareStatement,
+                    request_deserializer=sqlite__pb2.PrepareStatementRequest.FromString,
+                    response_serializer=sqlite__pb2.PrepareStatementResponse.SerializeToString,
+            ),
+            'ExecutePreparedStatement': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExecutePreparedStatement,
+                    request_deserializer=sqlite__pb2.ExecutePreparedStatementRequest.FromString,
+                    response_serializer=sqlite__pb2.QueryResponse.SerializeToString,
+            ),
+            'BeginTransaction': grpc.unary_unary_rpc_method_handler(
+                    servicer.BeginTransaction,
+                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    response_serializer=sqlite__pb2.TransactionResponse.SerializeToString,
+            ),
+            'CommitTransaction': grpc.unary_unary_rpc_method_handler(
+                    servicer.CommitTransaction,
+                    request_deserializer=sqlite__pb2.TransactionRequest.FromString,
+                    response_serializer=sqlite__pb2.TransactionResponse.SerializeToString,
+            ),
+            'RollbackTransaction': grpc.unary_unary_rpc_method_handler(
+                    servicer.RollbackTransaction,
+                    request_deserializer=sqlite__pb2.TransactionRequest.FromString,
+                    response_serializer=sqlite__pb2.TransactionResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'proto.SQLiteStore', rpc_method_handlers)
@@ -115,7 +201,8 @@ def add_SQLiteStoreServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class SQLiteStore(object):
-    """Missing associated documentation comment in .proto file."""
+    """Service definition for interacting with an SQLite database
+    """
 
     @staticmethod
     def ExecuteQuery(request,
@@ -215,6 +302,141 @@ class SQLiteStore(object):
             '/proto.SQLiteStore/GetSchema',
             sqlite__pb2.SchemaRequest.SerializeToString,
             sqlite__pb2.SchemaResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def PrepareStatement(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/PrepareStatement',
+            sqlite__pb2.PrepareStatementRequest.SerializeToString,
+            sqlite__pb2.PrepareStatementResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ExecutePreparedStatement(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/ExecutePreparedStatement',
+            sqlite__pb2.ExecutePreparedStatementRequest.SerializeToString,
+            sqlite__pb2.QueryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def BeginTransaction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/BeginTransaction',
+            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            sqlite__pb2.TransactionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CommitTransaction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/CommitTransaction',
+            sqlite__pb2.TransactionRequest.SerializeToString,
+            sqlite__pb2.TransactionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def RollbackTransaction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/RollbackTransaction',
+            sqlite__pb2.TransactionRequest.SerializeToString,
+            sqlite__pb2.TransactionResponse.FromString,
             options,
             channel_credentials,
             insecure,
