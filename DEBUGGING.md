@@ -116,6 +116,18 @@ curves.each do |(name, comment)|
 end
 ```
 
+```
+#!/usr/bin/env ruby
+
+require 'openssl'
+
+ssl_context = OpenSSL::SSL::SSLContext.new
+ssl_context.ecdh_curves = 'secp521r1'
+ssl_context.ciphers = 'ECDHE-ECDSA-AES256-GCM-SHA384'
+
+puts ssl_context
+```
+
 ##
 
 ```
