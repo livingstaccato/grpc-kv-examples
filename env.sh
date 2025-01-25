@@ -12,11 +12,6 @@ PLUGIN_ALGO=${PLUGIN_ALGO:-"ec-secp256r1"}
 PLUGIN_CLIENT_ALGO="${PLUGIN_CLIENT_ALGO:-${PLUGIN_ALGO}}"
 PLUGIN_SERVER_ALGO="${PLUGIN_SERVER_ALGO:-${PLUGIN_ALGO}}"
 
-echo "🔐 TLS Configuration:"
-echo "   • Algorithm: ${PLUGIN_ALGO}"
-echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO}"
-echo "   • Server Algorithm: ${PLUGIN_SERVER_ALGO}"
-
 # Certificate paths
 PLUGIN_CLIENT_CERT_FILE="${BASE_PATH}/certs/${PLUGIN_CLIENT_ALGO}-mtls-client.crt"
 PLUGIN_CLIENT_KEY_FILE="${BASE_PATH}/certs/${PLUGIN_CLIENT_ALGO}-mtls-client.key"
@@ -89,7 +84,11 @@ export PLUGIN_HOST \
     PLUGIN_CS_SERVER_ENDPOINT \
     PYTHONPATH
 
-# Status report
+echo ""
+echo "🔐 TLS Configuration:"
+echo "   • Algorithm: ${PLUGIN_ALGO}"
+echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO}"
+echo "   • Server Algorithm: ${PLUGIN_SERVER_ALGO}"
 echo ""
 echo "📊 Environment Status:"
 echo "   • Client Cert Size: $(echo "$PLUGIN_CLIENT_CERT" | wc -c | tr -d ' ') bytes"
