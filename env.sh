@@ -118,7 +118,9 @@ openssl req -new \
     -days 365 \
     -subj "/CN=test.com" \
 \
-| openssl x509 -noout -text | grep Public-Key
+| openssl x509 -noout -text \
+| grep Public-Key \
+| sed -E 's/[^0-9+]\([0-9]+) .*\)$/\1/g'
 }
 
 echo ""
