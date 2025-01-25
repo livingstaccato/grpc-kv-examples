@@ -126,7 +126,7 @@ function get_key_size() {
 echo ""
 echo "🔐 TLS Configuration:"
 echo "   • Algorithm: ${PLUGIN_ALGO}"
-echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO}"
+echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO} $(get_key_size <<< ${PLUG_CLIENT_KEY})"
 echo "   • Server Algorithm: ${PLUGIN_SERVER_ALGO}"
 echo ""
 echo "📊 Environment Status:"
