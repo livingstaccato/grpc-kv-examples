@@ -92,10 +92,10 @@ export PLUGIN_HOST \
 # Status report
 echo ""
 echo "📊 Environment Status:"
-echo "   • Client Cert Size: $(echo "$PLUGIN_CLIENT_CERT" | wc -c) bytes"
-echo "   • Client Key Size: $(echo "$PLUGIN_CLIENT_KEY" | wc -c) bytes"
+echo "   • Client Cert Size: $(echo "$PLUGIN_CLIENT_CERT" | wc -c | tr -d ' ') bytes"
+echo "   • Client Key Size: $(echo "$PLUGIN_CLIENT_KEY" | wc -c | tr -d ' ') bytes"
 echo "   • Server Cert Size: $(echo "$PLUGIN_SERVER_CERT" | wc -c | tr -d ' ') bytes"
-echo "   • Server Key Size: $(echo "$PLUGIN_SERVER_KEY" | wc -c) bytes"
+echo "   • Server Key Size: $(echo "$PLUGIN_SERVER_KEY" | wc -c | tr -d ' ') bytes"
 echo ""
 echo "🌐 Network Configuration:"
 echo "   • Host: ${PLUGIN_HOST}"
