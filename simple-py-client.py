@@ -93,7 +93,6 @@ def create_channel_credentials(certs: dict):
     # Channel options matching Go client
     options = [
         ('grpc.ssl_target_name_override', 'localhost'),
-        ('grpc.default_authority', 'localhost'),
     ]
 
     return credentials, options
