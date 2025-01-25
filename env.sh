@@ -9,8 +9,8 @@ ALGO=${ALGO:-"secp256r1"}
 # ALGO=ec-secp384r1- # this works
 # ALGO=ec-secp521r1- # this does not on Python 3.13 and Ruby 3.4 on macOS 15.2
 
-export PLUGIN_HOST="localhost"
-export PLUGIN_PORT="50051"
+export PLUGIN_HOST=${PLUGIN_HOST:-"localhost"}
+export PLUGIN_PORT=${PLUGIN_PORT:-"50051"}
 
 export PLUGIN_SERVER_ENDPOINT="tcp:${PLUGIN_HOST}:${PLUGIN_POST}"
 export PLUGIN_PYTHON_SERVER_ENDPOINT="${PLUGIN_HOST}:${PLUGIN_PORT}"
@@ -73,5 +73,7 @@ export PLUGIN_HOST \
 
 export PYTHONPATH
 
+echo "gRPC Host: ${PLUGIN_HOST}"
+echo "gRPC Port: ${PLUGIN_PORT}"
 echo "🔑 Using ${ALGO}"
 echo "✅ Setup the environment."
