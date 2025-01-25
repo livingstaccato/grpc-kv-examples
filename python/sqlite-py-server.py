@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sqlite3
 from concurrent import futures
 import grpc
