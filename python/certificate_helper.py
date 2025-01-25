@@ -64,6 +64,7 @@ def load_certificates_from_env() -> dict:
 
     required_vars = {
         "PLUGIN_SERVER_CERT": "Server certificate",
+        "PLUGIN_SERVER_KEY": "Server key",
         "PLUGIN_CLIENT_CERT": "Client certificate",
         "PLUGIN_CLIENT_KEY": "Client private key"
     }
