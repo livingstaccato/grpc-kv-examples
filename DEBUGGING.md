@@ -1,5 +1,9 @@
-* OpenSSL
+# OpenSSL
 
+## Summary
+
+* The OpenSSL versions are modern, and support the `secp521r1` curve.
+* Both Python and Ruby verify that they support the `secp521r1` curve.
 
 ## Verifying OpenSSL Version
 
