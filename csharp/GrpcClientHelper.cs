@@ -47,7 +47,7 @@ public class GrpcClientHelper : IDisposable
         // 🔄🔗 Configure HTTP client handler
         _logger.LogDebug("🔄🔗 Configuring HTTP client handler...");
         var httpClientHandler = new HttpClientHandler();
-        httpClientHandler.SslProtocols = SslProtocols.Tls13; // 🎯2️⃣ Force TLS 1.3
+        httpClientHandler.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13; // Allow both TLS 1.2 and 1.3
         httpClientHandler.ServerCertificateCustomValidationCallback = ValidateServerCertificate;
         _logger.LogDebug("🔄🔗 HTTP Client Handler created");
 
