@@ -205,3 +205,7 @@ No. Fucking. Way. It's the CA FALSE?!@#$?!@#$?
 
 [gRPC PHP README](https://github.com/grpc/grpc/blob/master/src/php/README.md)
 
+
+# Security
+
+https://security.stackexchange.com/questions/100991/why-is-secp521r1-no-longer-supported-in-chrome-others
