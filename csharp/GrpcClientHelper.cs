@@ -53,6 +53,19 @@ public class GrpcClientHelper : IDisposable
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
         // remove this line: GrpcChannel.EnableTracing = true;
 
+        // 🔄🔗 Configure channel options
+        _logger.LogDebug("🔄🔗 Configuring gRPC channel options...");
+
+        // Create an HttpClientHandler
+        var httpClientHandler = new HttpClientHandler();
+        _logger.LogDebug("🔄🔗 HTTP Client Handler created");
+
+        httpClientHandler.SslProtocols = SslProtocols.Tls13; // 🎯2️⃣ Force TLS 1.3
+        _logger.LogDebug("🔄🔗 TLS 1.3 forced");
+
+        httpClientHandler.ServerCertificateCustomValidationCallback = ValidateServerCertificate;
+        _logger.LogDebug("🔄🔗 Server Certificate Custom Validation Callback Set");
+
         // Create an HttpClient with the configured handler
         _httpClient = new HttpClient(httpClientHandler)
         {
