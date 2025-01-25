@@ -1,0 +1,68 @@
+syntax = "proto3";
+package proto;
+
+service SQLiteStore {
+  rpc ExecuteQuery(QueryRequest) returns (QueryResponse);
+  rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse);
+  rpc BatchExecute(BatchRequest) returns (BatchResponse);
+  rpc GetSchema(SchemaRequest) returns (SchemaResponse);
+}
+
+message QueryRequest {
+  string query = 1;
+  repeated Parameter params = 2;
+}
+
+message Parameter {
+  oneof value {
+    int64 int_value = 1;
+    double float_value = 2;
+    string string_value = 3;
+    bytes blob_value = 4;
+    bool null_value = 5;
+  }
+}
+
+message QueryResponse {
+  repeated RowSet rows = 1;
+  repeated string column_names = 2;
+  repeated string column_types = 3;
+  int32 rows_affected = 4;
+}
+
+message RowSet {
+  repeated Parameter values = 1;
+}
+
+message UpdateRequest {
+  string query = 1;
+  repeated Parameter params = 2;
+}
+
+message UpdateResponse {
+  int32 rows_affected = 1;
+  int64 last_insert_id = 2;
+}
+
+message BatchRequest {
+  repeated QueryRequest queries = 1;
+}
+
+message BatchResponse {
+  repeated QueryResponse results = 1;
+}
+
+message SchemaRequest {
+  string table_name = 1;
+}
+
+message SchemaResponse {
+  repeated ColumnInfo columns = 1;
+}
+
+message ColumnInfo {
+  string name = 1;
+  string type = 2;
+  bool nullable = 3;
+  bool primary_key = 4;
+}
