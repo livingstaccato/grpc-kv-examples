@@ -3,6 +3,7 @@
 import os
 import grpc
 import logging
+import ssl
 import time
 from datetime import datetime, timezone
 from cryptography import x509
@@ -28,6 +29,9 @@ def create_channel_credentials(certs: dict):
 
     log_cert_info(server_cert, "Server")
     log_cert_info(client_cert, "Client")
+
+    ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
+    ssl_context.set_ciphers('ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384')
 
     # Create gRPC credentials
     credentials = grpc.ssl_channel_credentials(
