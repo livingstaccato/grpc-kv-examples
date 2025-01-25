@@ -1,5 +1,7 @@
 #!/bin/sh
 
+BASE_PATH=$(pwd)
+
 #ALGO=rsa-
 #ALGO=ec-secp256r1- # this works
 #ALGO=ec-secp384r1- # this works
@@ -33,3 +35,12 @@ alias ossl-server='openssl s_server \
     -verify_return_error \
     -Verify 2
 '
+
+alias go-client="${BASE_PATH}/go/build/simple-go-client"
+alias go-server="${BASE_PATH}/go/build/simple-go-server"
+
+alias py-client="${BASE_PATH}/python/simple-py-client.py"
+alias py-server="${BASE_PATH}/python/simple-py-server.py"
+
+alias rb-client="${BASE_PATH}/python/simple-rb-client.rb"
+alias rb-server="${BASE_PATH}/python/simple-rb-server.rb"
