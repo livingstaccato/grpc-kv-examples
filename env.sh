@@ -23,3 +23,11 @@ alias ossl-connect-check='openssl s_client -connect localhost:50051 \
 alias ossl-check-server-cert='openssl crl2pkcs7 -nocrl -certfile <(echo "$PLUGIN_SERVER_CERT") | \
     openssl pkcs7 -print_certs -text -noout
 '
+
+alias ossl-server='openssl s_server \
+    -cert <(echo "$PLUGIN_SERVER_CERT") \
+    -key <(echo "$PLUGIN_SERVER_KEY") \
+    -accept 50051 \
+    -verify_return_error \
+    -Verify 2
+'
