@@ -73,10 +73,8 @@ alias cs-client="(cd ${BASE_PATH}/csharp && dotnet run)"
 export PLUGIN_HOST \
     PLUGIN_PORT \
     PLUGIN_ALGO \
-    PLUGIN_CLIENT_ALGO \
     PLUGIN_CLIENT_CERT \
     PLUGIN_CLIENT_KEY \
-    PLUGIN_SERVER_ALGO \
     PLUGIN_SERVER_CERT \
     PLUGIN_SERVER_KEY \
     PLUGIN_SERVER_ENDPOINT \
