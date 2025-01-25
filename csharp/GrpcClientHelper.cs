@@ -51,7 +51,7 @@ public class GrpcClientHelper : IDisposable
         _logger.LogDebug("🔧 Setting up HTTP/2 and gRPC tracing...");
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
-        GrpcChannel.EnableTracing = true;
+        // remove this line: GrpcChannel.EnableTracing = true;
 
         // Create an HttpClient with the configured handler
         _httpClient = new HttpClient(httpClientHandler)
@@ -116,7 +116,7 @@ public class GrpcClientHelper : IDisposable
         }
     }
 
-    private bool ValidateServerCertificate(HttpRequestMessage message, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    private bool ValidateServerCertificate(HttpRequestMessage message, X509Certificate2? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
     {
         // 🔎🛡️ Basic certificate validation
         _logger.LogDebug("🔎🛡️ Performing basic SSL/TLS policy checks...");
