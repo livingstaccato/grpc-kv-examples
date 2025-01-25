@@ -1,6 +1,7 @@
 {
     "require": {
         "grpc/grpc": "^1.57",
-        "monolog/monolog": "^3.8"
+        "monolog/monolog": "^3.8",
+        "google/protobuf": "^4.29"
     }
 }
