@@ -17,6 +17,12 @@ service SQLiteStore {
 
   // Retrieves schema information for a specified table.
   rpc GetSchema(SchemaRequest) returns (SchemaResponse);
+
+  // Prepares a statement for execution.
+  rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse);
+
+  // Executes a prepared statement with provided parameters.
+  rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (QueryResponse);
 }
 
 // Request message for executing a query.
