@@ -1,3 +1,14 @@
+# Simple gRPC Key/Value Client/Server
+
+# Goals
+
+* Support the ciphers and curves that are required to support the
+  HashiCorp `go-plugin`. Currently, `go-plugin` forces P-521 key. All gRPC
+  clients, and servers, must support P-521.
+
+* Client/Servers work with insecure channels.
+
+
 # System Configuration
 
 * macOS 15.2
