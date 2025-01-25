@@ -162,7 +162,7 @@ class Server
     @logger.debug "🔑 Key Cert Pair: #{key_cert_pair.inspect}"
 
     @creds = GRPC::Core::ServerCredentials.new(
-      nil,
+      @client_cert,
       [key_cert_pair],
       true # require client auth?
     )
