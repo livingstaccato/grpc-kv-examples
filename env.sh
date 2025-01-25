@@ -25,12 +25,12 @@ PLUGIN_CLIENT_KEY_FILE="${BASE_PATH}/certs/${PLUGIN_CLIENT_ALGO}-mtls-client.key
 # Load certificates
 if [ ! -f "${PLUGIN_CLIENT_CERT_FILE}" ]; then
     echo "❌ Error: Client certificate not found at ${PLUGIN_CLIENT_CERT_FILE}"
-    exit 1
+    return
 fi
 
 if [ ! -f "${PLUGIN_CLIENT_KEY_FILE}" ]; then
     echo "❌ Error: Client key not found at ${PLUGIN_CLIENT_KEY_FILE}"
-    exit 1
+    return
 fi
 
 PLUGIN_CLIENT_CERT="$(cat ${PLUGIN_CLIENT_CERT_FILE})"
