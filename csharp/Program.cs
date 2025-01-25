@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -28,11 +30,12 @@ namespace CSharpGrpcClient
 
             // 🔧 Setting up environment variables...
             _logger.LogDebug("🔧 Setting up environment variables...");
-            // Load environment variables
+            // Load environment variables (consider using a more robust method for production)
             var clientCert = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_CERT");
             var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY");
             var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT");
             var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_SERVER_ENDPOINT") ?? "https://localhost:50051";
+            var serverNameOverride = Environment.GetEnvironmentVariable("GRPC_SSL_TARGET_NAME_OVERRIDE") ?? "localhost";
 
             // 🔍 Logging environment variables for debugging...
             _logger.LogDebug("🔍 PLUGIN_CLIENT_CERT: {clientCert}", !string.IsNullOrEmpty(clientCert) ? "<present>" : "<not set>");
@@ -80,13 +83,22 @@ namespace CSharpGrpcClient
                                 // 🔍 Check if the server's certificate matches the expected one...
                                 _logger.LogDebug("🔍 Check if the server's certificate matches the expected one...");
 
+                                // Handle null certificate
+                                if (certificate == null)
+                                {
+                                    _logger.LogError("❌ Server certificate is null.");
+                                    return false;
+                                }
                                 var remoteCert = new X509Certificate2(certificate);
                                 var serverCertObj = X509Certificate2.CreateFromPem(serverCert);
 
-                                if (!remoteCert.Equals(serverCertObj))
+                                // Compare certificate thumbprints
+                                if (remoteCert.Thumbprint != serverCertObj.Thumbprint)
                                 {
                                     // ❌ Server's certificate does not match expected certificate.
                                     _logger.LogError("❌ Server's certificate does not match expected certificate.");
+                                    _logger.LogDebug("🔍 Expected server cert thumbprint: {serverThumbprint}", serverCertObj.Thumbprint);
+                                    _logger.LogDebug("🔍 Received server cert thumbprint: {remoteThumbprint}", remoteCert.Thumbprint);
                                     return false;
                                 }
 
