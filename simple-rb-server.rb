@@ -124,6 +124,7 @@ class Server
       private_key: @server_key,
       cert_chain: @server_cert
     }
+    @logger.info "Key Cert Pair: #{key_cert_pair.inspect}"
     @creds = GRPC::Core::ServerCredentials.new(
       nil,
       [key_cert_pair],
