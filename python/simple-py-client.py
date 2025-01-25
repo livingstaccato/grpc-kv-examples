@@ -20,25 +20,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def create_channel_credentials(certs: dict):
-    # Configure SSL context with explicit curves
-    ssl_context = ssl.create_default_context()
-    ssl_context.minimum_version = ssl.TLSVersion.TLSv1_3
-        # Set ciphers that support ECDSA with P-521
-    ssl_context.set_ciphers('ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305')
-
-    ssl_context.verify_mode = ssl.CERT_REQUIRED
-
-    # Create credentials with SSL context
-    credentials = grpc.ssl_channel_credentials(
-        root_certificates=certs["PLUGIN_SERVER_CERT"].encode(),
-        private_key=certs["PLUGIN_CLIENT_KEY"].encode(),
-        certificate_chain=certs["PLUGIN_CLIENT_CERT"].encode(),
-        ssl_context=ssl_context
-    )
-
-    return credentials
-
-def Xcreate_channel_credentials(certs: dict):
     """Create gRPC channel credentials with detailed logging"""
     logger.info("🔒 Creating channel credentials...")
 
@@ -48,9 +29,6 @@ def Xcreate_channel_credentials(certs: dict):
 
     log_cert_info(server_cert, "Server")
     log_cert_info(client_cert, "Client")
-
-    ssl_context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
-    ssl_context.set_ciphers('ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384')
 
     # Create gRPC credentials
     credentials = grpc.ssl_channel_credentials(
