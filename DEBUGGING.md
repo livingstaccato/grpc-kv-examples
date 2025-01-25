@@ -86,6 +86,15 @@ print(ssl_ctx.get_ciphers())
 
 ... 
 ```
+---
+
+```
+import ssl
+print(ssl.OPENSSL_VERSION)
+ctx = ssl.create_default_context()
+ctx.set_ciphers('ECDHE-ECDSA-AES256-GCM-SHA384')
+print(ctx.get_ciphers())
+```
 
 ## Fetch Ruby Curves
 
