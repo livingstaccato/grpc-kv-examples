@@ -1,68 +1,99 @@
+
 syntax = "proto3";
+
 package proto;
 
+// Service definition for interacting with an SQLite database.
+// Provides methods for executing queries, updates, batch operations, and schema inspection.
 service SQLiteStore {
+  // Executes a query and returns results (e.g., SELECT statements).
   rpc ExecuteQuery(QueryRequest) returns (QueryResponse);
+
+  // Executes an update statement (e.g., INSERT, UPDATE, DELETE) and returns metadata.
   rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse);
+
+  // Executes multiple queries in a single batch and returns the results.
   rpc BatchExecute(BatchRequest) returns (BatchResponse);
+
+  // Retrieves schema information for a specified table.
   rpc GetSchema(SchemaRequest) returns (SchemaResponse);
 }
 
+// Request message for executing a query.
 message QueryRequest {
-  string query = 1;
-  repeated Parameter params = 2;
+  string query = 1;                  // SQL query string.
+  repeated Parameter params = 2;     // List of parameters for the query.
 }
 
+// Represents a parameter for prepared statements.
+// Uses a `oneof` construct to handle different data types.
 message Parameter {
   oneof value {
-    int64 int_value = 1;
-    double float_value = 2;
-    string string_value = 3;
-    bytes blob_value = 4;
-    bool null_value = 5;
+    int64 int_value = 1;             // Integer value.
+    double float_value = 2;          // Floating-point value.
+    string string_value = 3;         // UTF-8 encoded string value.
+    bytes blob_value = 4;            // Binary data (e.g., blobs).
   }
+  bool is_null = 5;                  // Explicit null indicator. True if the value is NULL.
 }
 
 message QueryResponse {
-  repeated RowSet rows = 1;
+  repeated Row rows = 1;
   repeated string column_names = 2;
   repeated string column_types = 3;
-  int32 rows_affected = 4;
+  int64 rows_affected = 4;
+
+  enum Status {
+    OK = 0;
+    ERROR = 1;
+  }
+  Status status = 5;        // Add a status field
+  string error_message = 6; // Add an error message field
 }
 
-message RowSet {
-  repeated Parameter values = 1;
+// Represents a single row of query results.
+message Row {
+  repeated Parameter values = 1;     // Values of the row, corresponding to column order.
 }
 
+// Request message for executing an update (e.g., INSERT, UPDATE, DELETE).
 message UpdateRequest {
-  string query = 1;
-  repeated Parameter params = 2;
+  string query = 1;                  // SQL query string for the update.
+  repeated Parameter params = 2;     // List of parameters for the update query.
 }
 
+// Response message for an update execution.
 message UpdateResponse {
-  int32 rows_affected = 1;
-  int64 last_insert_id = 2;
+  int64 rows_affected = 1;          // Number of rows affected by the update.
+  int64 last_insert_id = 2;         // ID of the last inserted row (if applicable).
 }
 
+// Request message for executing multiple queries in a batch.
 message BatchRequest {
-  repeated QueryRequest queries = 1;
+  repeated QueryRequest queries = 1; // List of queries to execute in batch.
 }
 
+// Response message for a batch execution.
 message BatchResponse {
-  repeated QueryResponse results = 1;
+  repeated QueryResponse results = 1; // Results for each query in the batch.
+  repeated string errors = 2;         // Errors for queries that failed (if any).
 }
 
+// Request message for retrieving table schema information.
 message SchemaRequest {
-  string table_name = 1;
+  string table_name = 1;            // Name of the table to retrieve schema for.
 }
 
+// Response message for table schema information.
 message SchemaResponse {
-  repeated ColumnInfo columns = 1;
+  repeated ColumnInfo columns = 1; // List of column metadata for the table.
 }
 
+// Describes a column in a table schema.
 message ColumnInfo {
-  string name = 1;
-  string type = 2;
-  bool nullable = 3;
-  bool primary_key = 4;
+  string name = 1;                 // Name of the column.
+  string type = 2;                 // Data type of the column (e.g., "INTEGER", "TEXT").
+  bool nullable = 3;               // True if the column allows NULL values.
+  bool primary_key = 4;            // True if the column is part of the primary key.
+  string default_value = 5;        // Default value for the column (if any).
 }
