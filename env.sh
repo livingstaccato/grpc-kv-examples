@@ -123,16 +123,14 @@ function get_key_size() {
     | sed -E 's/[^0-9]+//g'
 }
 
-#get_key_size "${PLUGIN_CLIENT_KEY_FILE}"
 PLUGIN_CLIENT_KEY_SIZE=$(echo $(get_key_size "${PLUGIN_CLIENT_KEY_FILE}"))
-
-#PLUGIN_CLIENT_KEY_SIZE=$(get_key_size ${PLUGIN_CLIENT_KEY_FILE})
+PLUGIN_SERVER_KEY_SIZE=$(echo $(get_key_size "${PLUGIN_SERVER_KEY_FILE}"))
 
 echo ""
 echo "🔐 TLS Configuration:"
 echo "   • Algorithm: ${PLUGIN_ALGO}"
-echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO}"
-echo "   • Server Algorithm: ${PLUGIN_SERVER_ALGO}"
+echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO} (${PLUGIN_CLIENT_KEY_SIZE} bits)"
+echo "   • Server Algorithm: ${PLUGIN_SERVER_ALGO} (${PLUGIN_SERVER_KEY_SIZE} bits)"
 echo ""
 echo "📊 Environment Status:"
 echo "   • Client Cert Size: $(echo "$PLUGIN_CLIENT_CERT" | wc -c | tr -d ' ') bytes"
