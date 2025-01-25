@@ -2,119 +2,139 @@ syntax = "proto3";
 
 package proto;
 
-// Service definition for interacting with an SQLite database.
-// Provides methods for executing queries, updates, batch operations, and schema inspection.
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// Service definition for interacting with an SQLite database
 service SQLiteStore {
-// Executes a query and returns results (e.g., SELECT statements).
-rpc ExecuteQuery(QueryRequest) returns (QueryResponse);
+ // Query execution
+ rpc ExecuteQuery(QueryRequest) returns (QueryResponse);
+ rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse);
+ rpc BatchExecute(BatchRequest) returns (BatchResponse);
+ rpc GetSchema(SchemaRequest) returns (SchemaResponse);
+ 
+ // Statement preparation and execution
+ rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse);
+ rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (QueryResponse);
 
-// Executes an update statement (e.g., INSERT, UPDATE, DELETE) and returns metadata.
-rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse);
-
-// Executes multiple queries in a single batch and returns the results.
-rpc BatchExecute(BatchRequest) returns (BatchResponse);
-
-// Retrieves schema information for a specified table.
-rpc GetSchema(SchemaRequest) returns (SchemaResponse);
-
-  // Prepares a statement for execution.
-  rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse);
-
-  // Executes a prepared statement with provided parameters.
-  rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (QueryResponse);
-
+ // Transaction management
+ rpc BeginTransaction(google.protobuf.Empty) returns (TransactionResponse);
+ rpc CommitTransaction(TransactionRequest) returns (TransactionResponse);
+ rpc RollbackTransaction(TransactionRequest) returns (TransactionResponse);
 }
 
-// Request message for executing a query.
-message QueryRequest {
-string query = 1; // SQL query string.
-repeated Parameter params = 2; // List of parameters for the query.
+// Status code and message for operations
+message Status {
+ enum Code {
+   OK = 0;
+   ERROR = 1; 
+   CONSTRAINT_VIOLATION = 2;
+   SYNTAX_ERROR = 3;
+   INVALID_PARAMETER = 4;
+   TRANSACTION_ERROR = 5;
+ }
+ Code code = 1;
+ string message = 2;
 }
 
-// Represents a parameter for prepared statements.
-// Uses a `oneof` construct to handle different data types.
+// Parameter for queries/statements
 message Parameter {
-oneof value {
-int64 int_value = 1; // Integer value.
-double float_value = 2; // Floating-point value.
-string string_value = 3; // UTF-8 encoded string value.
-bytes blob_value = 4; // Binary data (e.g., blobs).
+ oneof value {
+   int64 int_value = 1;
+   double float_value = 2;
+   string string_value = 3;
+   bytes blob_value = 4;
+   google.protobuf.Timestamp timestamp_value = 5;
+   bool null_value = 6;
+ }
 }
-bool is_null = 5; // Explicit null indicator. True if the value is NULL.
+
+// Query execution messages
+message QueryRequest {
+ string query = 1;
+ repeated Parameter params = 2;
+ string transaction_id = 3;
 }
 
 message QueryResponse {
-repeated Row rows = 1;
-repeated string column_names = 2;
-repeated string column_types = 3;
-int32 rows_affected = 4;
-
-enum Status {
-OK = 0;
-ERROR = 1;
-}
-Status status = 5; // Add a status field
-string error_message = 6; // Add an error message field
+ repeated Row rows = 1;
+ repeated string column_names = 2;
+ repeated string column_types = 3;
+ int32 rows_affected = 4;
+ Status status = 5;
 }
 
-// Represents a single row of query results.
 message Row {
-repeated Parameter values = 1; // Values of the row, corresponding to column order.
+ repeated Parameter values = 1;
 }
 
-// Request message for executing an update (e.g., INSERT, UPDATE, DELETE).
+// Update execution messages
 message UpdateRequest {
-string query = 1; // SQL query string for the update.
-repeated Parameter params = 2; // List of parameters for the update query.
+ string query = 1;
+ repeated Parameter params = 2;
+ string transaction_id = 3;
 }
 
-// Response message for an update execution.
 message UpdateResponse {
-int32 rows_affected = 1; // Number of rows affected by the update.
-int64 last_insert_id = 2; // ID of the last inserted row (if applicable).
+ int32 rows_affected = 1;
+ int64 last_insert_id = 2;
+ Status status = 3;
 }
 
-// Request message for executing multiple queries in a batch.
+// Batch execution messages
 message BatchRequest {
-repeated QueryRequest queries = 1; // List of queries to execute in batch.
+ repeated QueryRequest queries = 1;
+ string transaction_id = 2;
 }
 
-// Response message for a batch execution.
 message BatchResponse {
-repeated QueryResponse results = 1; // Results for each query in the batch.
-repeated string errors = 2; // Errors for queries that failed (if any).
+ repeated QueryResponse results = 1;
+ Status status = 2;
 }
 
-// Request message for retrieving table schema information.
+// Schema inspection messages
 message SchemaRequest {
-string table_name = 1; // Name of the table to retrieve schema for.
+ string table_name = 1;
 }
 
-// Response message for table schema information.
 message SchemaResponse {
-repeated ColumnInfo columns = 1; // List of column metadata for the table.
+ repeated ColumnInfo columns = 1;
+ Status status = 2;
 }
 
-// Describes a column in a table schema.
 message ColumnInfo {
-string name = 1; // Name of the column.
-string type = 2; // Data type of the column (e.g., "INTEGER", "TEXT").
-bool nullable = 3; // True if the column allows NULL values.
-bool primary_key = 4; // True if the column is part of the primary key.
-string default_value = 5; // Default value for the column (if any).
+ string name = 1;
+ string type = 2;
+ bool nullable = 3;
+ bool primary_key = 4;
+ string default_value = 5;
+ bool auto_increment = 6;
+ repeated string foreign_key = 7;
 }
 
+// Prepared statement messages
 message PrepareStatementRequest {
-  string query = 1;
+ string query = 1;
+ string transaction_id = 2;
 }
 
 message PrepareStatementResponse {
-  string statement_id = 1; // Unique ID for the prepared statement
-  TransactionResponse.Status status = 2;
-  string error_message = 3;
+ string statement_id = 1;
+ Status status = 2;
 }
 
 message ExecutePreparedStatementRequest {
-  string statement_id = 1;
-  repeated Parameter params = 2;
+ string statement_id = 1;
+ repeated Parameter params = 2;
+ string transaction_id = 3;
+}
+
+// Transaction messages
+message TransactionRequest {
+ string transaction_id = 1;
+}
+
+message TransactionResponse {
+ string transaction_id = 1;
+ Status status = 2;
 }
