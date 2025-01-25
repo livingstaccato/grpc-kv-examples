@@ -33,24 +33,21 @@ class KVServicer(kv_pb2_grpc.KVServicer):
 
     async def _log_request_details(self, context):
         try:
-            logger.debug(f"  🔎 🌐 Peer: {context.peer()}")
+            logger.debug(f"🔎 🌐 Peer: {context.peer()}")
 
-            # Try to get peer certificate details
-            peer_cert = context.peer_certificate()
-            if peer_cert:
-                logger.debug("  🔐 Peer Certificate (PEM):\n%s", peer_cert.decode())
-                x509_cert = load_pem_certificate(peer_cert)
-                logger.debug("  🔍 Peer Certificate Details:")
-                log_cert_info(x509_cert, "Peer")
+            auth_context = context.auth_context()
+            for k, v in auth_context.items():
+                logger.debug(f"🔎 🔒 Auth Context {k}: {v}")
+
+            # If `peer_identity` is part of the context, log it
+            if b"x509_common_name" in auth_context:
+                common_name = auth_context[b"x509_common_name"][0].decode()
+                logger.info(f"🔑 Client Common Name: {common_name}")
             else:
-                logger.warning("  ⚠️ No peer certificate found.")
-
-            logger.debug("  🔒 Metadata:")
-            for k, v in context.invocation_metadata():
-                logger.debug(f"      {k}: {v}")
-
+                logger.warning("⚠️ No x509_common_name found in auth context")
         except Exception as e:
-            logger.error(f"  ❌ Logging error: {e}")
+            logger.error(f"🔎 ❌ Logging error: {e}")
+
 
 async def serve():
     logger.info("🚀 🔄 Server starting")
