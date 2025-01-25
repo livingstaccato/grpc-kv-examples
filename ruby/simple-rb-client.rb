@@ -30,27 +30,6 @@ class CertificateLogger
 end
 
 class GrpcClient
-  def self.get_trusted_server_cert(addr)
-    LOGGER.info "🌐 Dialing server to fetch certificate 🔄"
-    
-    tcp_socket = TCPSocket.new(*addr.split(':'))
-    ssl_context = OpenSSL::SSL::SSLContext.new
-    ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    
-    ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, ssl_context)
-    ssl_socket.connect
-    
-    cert = ssl_socket.peer_cert
-    CertificateLogger.log_cert_info(cert, "Server Certificate")
-    
-    cert.to_pem
-  rescue => e
-    raise "Failed to get server certificate: #{e.message}"
-  ensure
-    ssl_socket&.close
-    tcp_socket&.close
-  end
-
   def initialize
     LOGGER.info "🚀 Starting gRPC client... 🌟"
     
@@ -107,15 +86,19 @@ class GrpcClient
       'grpc.http2.min_time_between_pings_ms' => 10_000,
       'grpc.ssl_handshake_timeout_ms' => 5_000
     }
+
+    @channel = GRPC::Core::Channel.new(
+      'localhost:50051',
+      @channel_args,
+      @creds
+    )
   end
 
   def run
     LOGGER.info "🔌 Creating gRPC connection... 🔄"
     
     stub = Proto::KV::Stub.new(
-      'localhost:50051',
-      @creds,
-      channel_args: @channel_args,
+      @channel,
       timeout: 10
     )
     
@@ -135,7 +118,17 @@ class GrpcClient
       LOGGER.error "❌ Error: #{e.message} 🚫"
       LOGGER.error "❌ Backtrace: #{e.backtrace.join("\n")} 🚫"
       raise
+    ensure
+      shutdown
     end
+  end
+
+  def shutdown
+    LOGGER.info "🔄 Shutting down gRPC channel... 🛑"
+    @channel.close
+    LOGGER.info "✅ Channel shutdown complete"
+  rescue => e
+    LOGGER.warn "⚠️ Error during channel shutdown: #{e.message}"
   end
 end
 
