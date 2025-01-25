@@ -123,6 +123,8 @@ function get_key_size() {
     | sed -E 's/[^0-9]+//g'
 }
 
+export get_key_size
+
 PLUGIN_CLIENT_KEY_SIZE=$(get_key_size ${PLUGIN_CLIENT_KEY_FILE})
 
 echo ""
