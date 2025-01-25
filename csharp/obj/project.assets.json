@@ -404,6 +404,23 @@
           }
         }
       },
+      "Serilog.Extensions.Logging/9.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "9.0.0",
+          "Serilog": "4.2.0"
+        },
+        "compile": {
+          "lib/net9.0/Serilog.Extensions.Logging.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/Serilog.Extensions.Logging.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Serilog.Sinks.Console/6.0.0": {
         "type": "package",
         "dependencies": {
@@ -1122,6 +1139,29 @@
         "serilog.nuspec"
       ]
     },
+    "Serilog.Extensions.Logging/9.0.0": {
+      "sha512": "NwSSYqPJeKNzl5AuXVHpGbr6PkZJFlNa14CdIebVjK3k/76kYj/mz5kiTRNVSsSaxM8kAIa1kpy/qyT9E4npRQ==",
+      "type": "package",
+      "path": "serilog.extensions.logging/9.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net462/Serilog.Extensions.Logging.dll",
+        "lib/net462/Serilog.Extensions.Logging.xml",
+        "lib/net8.0/Serilog.Extensions.Logging.dll",
+        "lib/net8.0/Serilog.Extensions.Logging.xml",
+        "lib/net9.0/Serilog.Extensions.Logging.dll",
+        "lib/net9.0/Serilog.Extensions.Logging.xml",
+        "lib/netstandard2.0/Serilog.Extensions.Logging.dll",
+        "lib/netstandard2.0/Serilog.Extensions.Logging.xml",
+        "lib/netstandard2.1/Serilog.Extensions.Logging.dll",
+        "lib/netstandard2.1/Serilog.Extensions.Logging.xml",
+        "serilog-extension-nuget.png",
+        "serilog.extensions.logging.9.0.0.nupkg.sha512",
+        "serilog.extensions.logging.nuspec"
+      ]
+    },
     "Serilog.Sinks.Console/6.0.0": {
       "sha512": "fQGWqVMClCP2yEyTXPIinSr5c+CBGUvBybPxjAGcf7ctDhadFhrQw03Mv8rJ07/wR5PDfFjewf2LimvXCDzpbA==",
       "type": "package",
@@ -1156,6 +1196,7 @@
       "Microsoft.Extensions.Logging >= 9.0.1",
       "Microsoft.Extensions.Logging.Console >= 9.0.1",
       "Serilog >= 4.2.0",
+      "Serilog.Extensions.Logging >= 9.0.0",
       "Serilog.Sinks.Console >= 6.0.0"
     ]
   },
@@ -1236,6 +1277,10 @@
           "Serilog": {
             "target": "Package",
             "version": "[4.2.0, )"
+          },
+          "Serilog.Extensions.Logging": {
+            "target": "Package",
+            "version": "[9.0.0, )"
           },
           "Serilog.Sinks.Console": {
             "target": "Package",

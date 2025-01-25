@@ -4,6 +4,8 @@ using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
 using Proto;
 using Grpc.Core;
+using Serilog;
+using Serilog.Extensions.Logging;
 
 namespace CSharpGrpcClient;
 
@@ -13,13 +15,13 @@ class Program
 
     static async Task Main(string[] args)
     {
-        // Setup logger factory
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}")
+            .CreateLogger();
+
         _loggerFactory = LoggerFactory.Create(builder =>
-        {
-            builder
-                .AddFilter("CSharpGrpcClient", LogLevel.Debug)
-                .AddConsole();
-        });
+            builder.AddSerilog(Log.Logger));
 
         var logger = _loggerFactory.CreateLogger<Program>();
 

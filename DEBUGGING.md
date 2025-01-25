@@ -200,3 +200,8 @@ No. Fucking. Way. It's the CA FALSE?!@#$?!@#$?
 # Ideas
 
 * Include a max retry/request before server exit? i.e. exit after one request.
+
+# gRPC Implementation
+
+[gRPC PHP README](https://github.com/grpc/grpc/blob/master/src/php/README.md)
+

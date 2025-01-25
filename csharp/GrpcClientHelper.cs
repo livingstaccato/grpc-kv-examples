@@ -48,6 +48,7 @@ public class GrpcClientHelper : IDisposable
         _logger.LogDebug("🔄🔗 Configuring HTTP client handler...");
         var httpClientHandler = new HttpClientHandler();
         httpClientHandler.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13; // Allow both TLS 1.2 and 1.3
+        httpClientHandler.ClientCertificates.Add(_clientCert);
         httpClientHandler.ServerCertificateCustomValidationCallback = ValidateServerCertificate;
         _logger.LogDebug("🔄🔗 HTTP Client Handler created");
 
@@ -55,9 +56,6 @@ public class GrpcClientHelper : IDisposable
         _logger.LogDebug("🔧 Setting up HTTP/2 and gRPC tracing...");
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
         // remove this line: GrpcChannel.EnableTracing = true;
-
-        httpClientHandler.SslProtocols = SslProtocols.Tls13; // 🎯2️⃣ Force TLS 1.3
-        _logger.LogDebug("🔄🔗 TLS 1.3 forced");
 
         httpClientHandler.ServerCertificateCustomValidationCallback = ValidateServerCertificate;
         _logger.LogDebug("🔄🔗 Server Certificate Custom Validation Callback Set");
@@ -74,7 +72,7 @@ public class GrpcClientHelper : IDisposable
         var channelOptions = new GrpcChannelOptions
         {
             HttpClient = _httpClient,
-            Credentials = ChannelCredentials.Insecure,
+            // Credentials = ChannelCredentials.Insecure,
             // ServiceConfig = new ServiceConfig
             // {
             //     MethodConfigs =
@@ -126,8 +124,18 @@ public class GrpcClientHelper : IDisposable
         }
     }
 
-    private bool ValidateServerCertificate(HttpRequestMessage message, X509Certificate2? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
+    private bool ValidateServerCertificate(HttpRequestMessage? message, X509Certificate2? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
     {
+        if (certificate != null)
+        {
+            _logger.LogDebug("📜🔐 Received Server Certificate:");
+            _logger.LogDebug($"Subject: {certificate.Subject}");
+            _logger.LogDebug($"Issuer: {certificate.Issuer}"); 
+            _logger.LogDebug($"Thumbprint: {certificate.Thumbprint}");
+            _logger.LogDebug($"Not Before: {certificate.NotBefore}");
+            _logger.LogDebug($"Not After: {certificate.NotAfter}");
+        }
+
         // 🔎🛡️ Basic certificate validation
         _logger.LogDebug("🔎🛡️ Performing basic SSL/TLS policy checks...");
 
