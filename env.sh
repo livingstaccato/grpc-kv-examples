@@ -19,3 +19,7 @@ alias ossl-connect-check='openssl s_client -connect localhost:50051 \
    -CAfile <(echo "$PLUGIN_SERVER_CERT") \
    -servername localhost
 '
+
+alias ossl-check-server-cert='openssl crl2pkcs7 -nocrl -certfile <(echo "$PLUGIN_SERVER_CERT") | \
+    openssl pkcs7 -print_certs -text -noout
+'
