@@ -59,10 +59,6 @@
               "target": "Package",
               "version": "[2.69.0, )"
             },
-            "Microsoft.Extensions.Logging.Console": {
-              "target": "Package",
-              "version": "[9.0.1, )"
-            },
             "Serilog": {
               "target": "Package",
               "version": "[4.2.0, )"
