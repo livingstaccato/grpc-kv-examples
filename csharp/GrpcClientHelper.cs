@@ -105,7 +105,8 @@ public class GrpcClientHelper
         var httpClient = new HttpClient(httpClientHandler)
         {
             // 🚀2️⃣ Specify HTTP/2 version
-            DefaultRequestVersion = new Version(2, 0)
+            DefaultRequestVersion = new Version(2, 0),
+            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher
         };
 
         var channelOptions = new GrpcChannelOptions
