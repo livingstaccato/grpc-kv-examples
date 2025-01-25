@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-
-from concurrent import futures
 import grpc
-import proto.sqlite_pb2 as pb2
-import proto.sqlite_pb2_grpc as pb2_grpc
+from certificate_helper import load_certificates_from_env
+
+def create_channel_credentials():
+    certs = load_certificates_from_env()
+    return grpc.ssl_channel_credentials(
+        root_certificates=certs["PLUGIN_SERVER_CERT"].encode(),
+        private_key=certs["PLUGIN_CLIENT_KEY"].encode(),
+        certificate_chain=certs["PLUGIN_CLIENT_CERT"].encode()
+    )
+
 
 class SQLiteClient:
    def __init__(self, channel):
@@ -62,8 +68,13 @@ class SQLiteClient:
        }
 
 def main():
-   channel = grpc.secure_channel('localhost:50051', create_channel_credentials())
-   client = SQLiteClient(channel)
+    channel_creds = create_channel_credentials()
+    options = [
+        ('grpc.ssl_target_name_override', 'localhost'),
+        ('grpc.default_authority', 'localhost')
+    ]
+    channel = grpc.secure_channel('localhost:50051', channel_creds, options=options)
+    client = SQLiteClient(channel)
 
    # Example queries
    print(client.execute_query("SELECT * FROM users WHERE id = ?", [1]))
