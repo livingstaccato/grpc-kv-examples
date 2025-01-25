@@ -5,6 +5,7 @@
 * Ruby 3.2.2
 * Go 1.23.5
 
+---
 
 # OpenSSL
 
@@ -54,13 +55,15 @@ curves.each do |(name, comment)|
 end
 ```
 
+---
 
-* Python required_
+## Notes
 
 
 * `simple-go-client` and `simple-go-server` work fine with the mTLS certificates.
 
 * `simple-py-client` and `simple-go-server` do not work.
+
 * I'm testing mTLS.
 * The Go Client and Go Server work together.
 
