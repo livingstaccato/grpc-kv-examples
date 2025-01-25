@@ -36,7 +36,7 @@ class SQLiteStoreStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.ExecuteQuery = channel.unary_unary(
+        self.ExecuteQuery = channel.unary_stream(
                 '/proto.SQLiteStore/ExecuteQuery',
                 request_serializer=sqlite__pb2.QueryRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.QueryResponse.FromString,
@@ -61,7 +61,7 @@ class SQLiteStoreStub(object):
                 request_serializer=sqlite__pb2.PrepareStatementRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.PrepareStatementResponse.FromString,
                 _registered_method=True)
-        self.ExecutePreparedStatement = channel.unary_unary(
+        self.ExecutePreparedStatement = channel.unary_stream(
                 '/proto.SQLiteStore/ExecutePreparedStatement',
                 request_serializer=sqlite__pb2.ExecutePreparedStatementRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.QueryResponse.FromString,
@@ -89,6 +89,7 @@ class SQLiteStoreServicer(object):
 
     def ExecuteQuery(self, request, context):
         """Query execution
+        Changed to streaming
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -113,14 +114,15 @@ class SQLiteStoreServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def PrepareStatement(self, request, context):
-        """Statement preparation and execution
+        """Statement preparation and execution (Now with streaming)
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ExecutePreparedStatement(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Changed to streaming
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -147,7 +149,7 @@ class SQLiteStoreServicer(object):
 
 def add_SQLiteStoreServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'ExecuteQuery': grpc.unary_unary_rpc_method_handler(
+            'ExecuteQuery': grpc.unary_stream_rpc_method_handler(
                     servicer.ExecuteQuery,
                     request_deserializer=sqlite__pb2.QueryRequest.FromString,
                     response_serializer=sqlite__pb2.QueryResponse.SerializeToString,
@@ -172,7 +174,7 @@ def add_SQLiteStoreServicer_to_server(servicer, server):
                     request_deserializer=sqlite__pb2.PrepareStatementRequest.FromString,
                     response_serializer=sqlite__pb2.PrepareStatementResponse.SerializeToString,
             ),
-            'ExecutePreparedStatement': grpc.unary_unary_rpc_method_handler(
+            'ExecutePreparedStatement': grpc.unary_stream_rpc_method_handler(
                     servicer.ExecutePreparedStatement,
                     request_deserializer=sqlite__pb2.ExecutePreparedStatementRequest.FromString,
                     response_serializer=sqlite__pb2.QueryResponse.SerializeToString,
@@ -215,7 +217,7 @@ class SQLiteStore(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
             '/proto.SQLiteStore/ExecuteQuery',
@@ -350,7 +352,7 @@ class SQLiteStore(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
             '/proto.SQLiteStore/ExecutePreparedStatement',
