@@ -7,22 +7,25 @@ static const char* socket_type_usage =
     "  socketpair: fds come from socketpair()\n"
     "  pipe: fds come from pipe()\n";
 
-### Go Server - secp521r1
 
-#### Client: secp384r1
+## Compatibility Matrix
+
+### macOS 15.2
+
+| ------ | --------- | ------ | --------- | --- | 
 | Server | Svr Algo  | Client | Cl Algo   | Fun | 
+| ------ | --------- | ------ | --------- | --- | 
+| Go     | secp521r1 | Go     | secp521r1 | Yes |
+| Go     | secp521r1 | Python | secp521r1 | No  |
+| Go     | secp521r1 | Ruby   | secp521r1 | No  |
+| Go     | secp521r1 | C#     | secp521r1 | No  |
 | ------ | --------- | ------ | --------- | --- | 
 | Go     | secp521r1 | Go     | secp384r1 | Yes |
 | Go     | secp521r1 | Python | secp384r1 | No  |
 | Go     | secp521r1 | Ruby   | secp384r1 | No  |
 | Go     | secp521r1 | C#     | secp384r1 | Yes |
-
-| Python | No  |
-| Ruby   | No  |
-| C#     | Yes |
-
-C#
-
-Works:
-Client: secp384r1
-Server: secp521r1
+| ------ | --------- | ------ | --------- | --- | 
+| Go     | secp521r1 | Go     | secp256r1 | Yes |
+| Go     | secp521r1 | Python | secp256r1 | No  |
+| Go     | secp521r1 | Ruby   | secp256r1 | No  |
+| Go     | secp521r1 | C#     | secp256r1 | Yes |
