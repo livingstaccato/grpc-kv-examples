@@ -112,7 +112,7 @@ export PLUGIN_HOST \
 
 function get_key_size() {
 openssl req -new \
-    -key - \
+    -key $1 \
     -x509 \
     -nodes \
     -days 365 \
