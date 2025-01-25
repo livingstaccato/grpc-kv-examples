@@ -8,7 +8,7 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Proto;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+using Serilog;
 
 namespace CSharpGrpcClient
 {
@@ -18,14 +18,15 @@ namespace CSharpGrpcClient
 
         static async Task Main(string[] args)
         {
-            // setup our logger
-            using var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder
-                    .AddFilter("CSharpGrpcClient.Program", LogLevel.Debug)
-                    .AddConsole();
-            });
-            _logger = loggerFactory.CreateLogger<Program>();
+            // Setup Serilog
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .Enrich.FromLogContext()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+                .CreateLogger();
+
+            // Use Serilog's static logger
+            _logger = Log.ForContext<Program>();
 
             // 🔧 Setting up environment variables...
             _logger.LogDebug("🔧 Setting up environment variables...");
@@ -34,7 +35,6 @@ namespace CSharpGrpcClient
             var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY");
             var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT");
             var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_SERVER_ENDPOINT") ?? "https://localhost:50051";
-            var serverNameOverride = Environment.GetEnvironmentVariable("GRPC_SSL_TARGET_NAME_OVERRIDE") ?? "localhost";
 
             // 🔍 Logging environment variables for debugging...
             _logger.LogDebug("🔍 PLUGIN_CLIENT_CERT: {clientCert}", !string.IsNullOrEmpty(clientCert) ? "<present>" : "<not set>");
@@ -53,11 +53,10 @@ namespace CSharpGrpcClient
                 // 🔧 Creating client certificate collection...
                 _logger.LogDebug("🔧 Creating client certificate collection...");
                 var clientCertificates = new X509Certificate2Collection();
-                var clientCertObj = X509Certificate2.CreateFromPem(clientCert, clientKey);
-                clientCertificates.Add(clientCertObj);
+                clientCertificates.Add(X509Certificate2.CreateFromPem(clientCert, clientKey));
 
                 // 🔍 Logging client certificate details...
-                LogCertificateDetails("Client", clientCertObj);
+                LogCertificateDetails("Client", clientCertificates[0]);
 
                 // Create an HttpClientHandler
                 var handler = new HttpClientHandler();
