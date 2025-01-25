@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/glT4iZ1qAk=",
+  "dgSpecHash": "Eb1sTr9DFcY=",
   "success": true,
   "projectFilePath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
   "expectedPackageFiles": [
@@ -8,6 +8,7 @@
     "/Users/tim.perkins/.nuget/packages/grpc.core.api/2.67.0/grpc.core.api.2.67.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/grpc.net.client/2.67.0/grpc.net.client.2.67.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/grpc.net.common/2.67.0/grpc.net.common.2.67.0.nupkg.sha512",
+    "/Users/tim.perkins/.nuget/packages/grpc.tools/2.69.0/grpc.tools.2.69.0.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.logging.abstractions/6.0.0/microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512"
   ],
   "logs": []
