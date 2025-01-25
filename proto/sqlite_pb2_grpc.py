@@ -56,6 +56,11 @@ class SQLiteStoreStub(object):
                 request_serializer=sqlite__pb2.SchemaRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.SchemaResponse.FromString,
                 _registered_method=True)
+        self.ExplainQueryPlan = channel.unary_unary(
+                '/proto.SQLiteStore/ExplainQueryPlan',
+                request_serializer=sqlite__pb2.ExplainQueryRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.ExplainQueryResponse.FromString,
+                _registered_method=True)
         self.PrepareStatement = channel.unary_unary(
                 '/proto.SQLiteStore/PrepareStatement',
                 request_serializer=sqlite__pb2.PrepareStatementRequest.SerializeToString,
@@ -65,6 +70,11 @@ class SQLiteStoreStub(object):
                 '/proto.SQLiteStore/ExecutePreparedStatement',
                 request_serializer=sqlite__pb2.ExecutePreparedStatementRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.QueryResponse.FromString,
+                _registered_method=True)
+        self.DeletePreparedStatement = channel.unary_unary(
+                '/proto.SQLiteStore/DeletePreparedStatement',
+                request_serializer=sqlite__pb2.DeletePreparedStatementRequest.SerializeToString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.BeginTransaction = channel.unary_unary(
                 '/proto.SQLiteStore/BeginTransaction',
@@ -81,10 +91,20 @@ class SQLiteStoreStub(object):
                 request_serializer=sqlite__pb2.TransactionRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.TransactionResponse.FromString,
                 _registered_method=True)
+        self.GetTransactionState = channel.unary_unary(
+                '/proto.SQLiteStore/GetTransactionState',
+                request_serializer=sqlite__pb2.TransactionRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.TransactionStateResponse.FromString,
+                _registered_method=True)
         self.CreateConnection = channel.unary_unary(
                 '/proto.SQLiteStore/CreateConnection',
                 request_serializer=sqlite__pb2.ConnectionRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.ConnectionResponse.FromString,
+                _registered_method=True)
+        self.CloseConnection = channel.unary_unary(
+                '/proto.SQLiteStore/CloseConnection',
+                request_serializer=sqlite__pb2.ConnectionRequest.SerializeToString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
 
 
@@ -94,63 +114,101 @@ class SQLiteStoreServicer(object):
 
     def ExecuteQuery(self, request, context):
         """Query execution
+        Execute a query and stream results
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ExecuteUpdate(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Execute a non-SELECT statement
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def BatchExecute(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Execute multiple queries/updates in a batch
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def GetSchema(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Retrieve schema details for a table
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ExplainQueryPlan(self, request, context):
+        """Provide query plan for debugging
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def PrepareStatement(self, request, context):
         """Statement preparation and execution
+        Prepare a SQL statement
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ExecutePreparedStatement(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Execute a prepared statement
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeletePreparedStatement(self, request, context):
+        """Clean up prepared statement
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def BeginTransaction(self, request, context):
         """Transaction management
+        Start a new transaction
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CommitTransaction(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Commit the active transaction
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def RollbackTransaction(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Rollback the active transaction
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTransactionState(self, request, context):
+        """Get the current transaction state
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CreateConnection(self, request, context):
         """Connection management
+        Establish a new connection
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CloseConnection(self, request, context):
+        """Close an active connection
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -179,6 +237,11 @@ def add_SQLiteStoreServicer_to_server(servicer, server):
                     request_deserializer=sqlite__pb2.SchemaRequest.FromString,
                     response_serializer=sqlite__pb2.SchemaResponse.SerializeToString,
             ),
+            'ExplainQueryPlan': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExplainQueryPlan,
+                    request_deserializer=sqlite__pb2.ExplainQueryRequest.FromString,
+                    response_serializer=sqlite__pb2.ExplainQueryResponse.SerializeToString,
+            ),
             'PrepareStatement': grpc.unary_unary_rpc_method_handler(
                     servicer.PrepareStatement,
                     request_deserializer=sqlite__pb2.PrepareStatementRequest.FromString,
@@ -188,6 +251,11 @@ def add_SQLiteStoreServicer_to_server(servicer, server):
                     servicer.ExecutePreparedStatement,
                     request_deserializer=sqlite__pb2.ExecutePreparedStatementRequest.FromString,
                     response_serializer=sqlite__pb2.QueryResponse.SerializeToString,
+            ),
+            'DeletePreparedStatement': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeletePreparedStatement,
+                    request_deserializer=sqlite__pb2.DeletePreparedStatementRequest.FromString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
             'BeginTransaction': grpc.unary_unary_rpc_method_handler(
                     servicer.BeginTransaction,
@@ -204,10 +272,20 @@ def add_SQLiteStoreServicer_to_server(servicer, server):
                     request_deserializer=sqlite__pb2.TransactionRequest.FromString,
                     response_serializer=sqlite__pb2.TransactionResponse.SerializeToString,
             ),
+            'GetTransactionState': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTransactionState,
+                    request_deserializer=sqlite__pb2.TransactionRequest.FromString,
+                    response_serializer=sqlite__pb2.TransactionStateResponse.SerializeToString,
+            ),
             'CreateConnection': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateConnection,
                     request_deserializer=sqlite__pb2.ConnectionRequest.FromString,
                     response_serializer=sqlite__pb2.ConnectionResponse.SerializeToString,
+            ),
+            'CloseConnection': grpc.unary_unary_rpc_method_handler(
+                    servicer.CloseConnection,
+                    request_deserializer=sqlite__pb2.ConnectionRequest.FromString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -330,6 +408,33 @@ class SQLiteStore(object):
             _registered_method=True)
 
     @staticmethod
+    def ExplainQueryPlan(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/ExplainQueryPlan',
+            sqlite__pb2.ExplainQueryRequest.SerializeToString,
+            sqlite__pb2.ExplainQueryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def PrepareStatement(request,
             target,
             options=(),
@@ -373,6 +478,33 @@ class SQLiteStore(object):
             '/proto.SQLiteStore/ExecutePreparedStatement',
             sqlite__pb2.ExecutePreparedStatementRequest.SerializeToString,
             sqlite__pb2.QueryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeletePreparedStatement(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/DeletePreparedStatement',
+            sqlite__pb2.DeletePreparedStatementRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,
@@ -465,6 +597,33 @@ class SQLiteStore(object):
             _registered_method=True)
 
     @staticmethod
+    def GetTransactionState(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/GetTransactionState',
+            sqlite__pb2.TransactionRequest.SerializeToString,
+            sqlite__pb2.TransactionStateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def CreateConnection(request,
             target,
             options=(),
@@ -481,6 +640,33 @@ class SQLiteStore(object):
             '/proto.SQLiteStore/CreateConnection',
             sqlite__pb2.ConnectionRequest.SerializeToString,
             sqlite__pb2.ConnectionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CloseConnection(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/CloseConnection',
+            sqlite__pb2.ConnectionRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,
