@@ -23,8 +23,8 @@ PLUGIN_SERVER_CERT="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.crt)"
 PLUGIN_SERVER_KEY="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.key)"
 
 PLUGIN_SERVER_ENDPOINT="tcp:${PLUGIN_HOST}:${PLUGIN_POST}"
-PLUGIN_PYTHON_SERVER_ENDPOINT="${PLUGIN_HOST}:${PLUGIN_PORT}"
-PLUGIN_CS_SERVER_ENDPOINT="https://${PLUGIN_HOST}:${PLUGIN_PORT}"
+PLUGIN_SERVER_ENDPOINT_PYTHON="${PLUGIN_HOST}:${PLUGIN_PORT}"
+PLUGIN_SERVER_ENDPOINT_CLIENT="https://${PLUGIN_HOST}:${PLUGIN_PORT}"
 
 # socat TCP-LISTEN:12345 UNIX-CONNECT:<path to server unix socket>
 
@@ -83,7 +83,7 @@ export PLUGIN_HOST \
 
 export PYTHONPATH
 
-echo "gRPC Host: ${PLUGIN_HOST}"
+echo "gRPC Endpoint: ${PLUGIN_HOST}"
 echo "gRPC Port: ${PLUGIN_PORT}"
 echo "🔑 Using ${ALGO}"
 echo "✅ Setup the environment."
