@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace CSharpGrpcClient
 
         static async Task Main(string[] args)
         {
-            // setup our logger
+            // Setup our logger
             using var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
@@ -28,20 +29,17 @@ namespace CSharpGrpcClient
 
             // 🔧 Setting up environment variables...
             _logger.LogDebug("🔧 Setting up environment variables...");
-            // Load environment variables (consider using a more robust method for production)
+            // Load environment variables
             var clientCert = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_CERT");
             var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY");
             var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT");
             var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_SERVER_ENDPOINT") ?? "https://localhost:50051";
             var serverNameOverride = Environment.GetEnvironmentVariable("GRPC_SSL_TARGET_NAME_OVERRIDE") ?? "localhost";
-            // No, it is using mTLS. No CA. All the certs have CA:TRUE.
-            // var rubyServerCert = Environment.GetEnvironmentVariable("RUBY_SERVER_CERT");
 
             // 🔍 Logging environment variables for debugging...
             _logger.LogDebug("🔍 PLUGIN_CLIENT_CERT: {clientCert}", !string.IsNullOrEmpty(clientCert) ? "<present>" : "<not set>");
             _logger.LogDebug("🔍 PLUGIN_CLIENT_KEY: {clientKey}", !string.IsNullOrEmpty(clientKey) ? "<present>" : "<not set>");
             _logger.LogDebug("🔍 PLUGIN_SERVER_CERT: {serverCert}", !string.IsNullOrEmpty(serverCert) ? "<present>" : "<not set>");
-            // _logger.LogDebug("🔍 RUBY_SERVER_CERT: {rubyServerCert}", !string.IsNullOrEmpty(rubyServerCert) ? "<present>" : "<not set>");
 
             if (string.IsNullOrEmpty(clientCert) || string.IsNullOrEmpty(clientKey) || string.IsNullOrEmpty(serverCert))
             {
@@ -61,14 +59,14 @@ namespace CSharpGrpcClient
                     Credentials = credentials,
                     HttpHandler = new SocketsHttpHandler
                     {
-                        SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                        SslOptions = new SslClientAuthenticationOptions
                         {
                             ClientCertificates = new X509Certificate2Collection { LoadCertificateFromPem(clientCert, clientKey) },
                             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
                             {
                                 // 🔍 Basic certificate validation...
                                 _logger.LogDebug("🔍 Basic certificate validation...");
-                                if (sslPolicyErrors != System.Net.Security.SslPolicyErrors.None)
+                                if (sslPolicyErrors != SslPolicyErrors.None)
                                 {
                                     // ❌ SSL Policy Errors: {sslPolicyErrors}
                                     _logger.LogError("❌ SSL Policy Errors: {sslPolicyErrors}", sslPolicyErrors);
@@ -78,10 +76,10 @@ namespace CSharpGrpcClient
                                 // 🔍 Check if the server's certificate matches the expected one...
                                 _logger.LogDebug("🔍 Check if the server's certificate matches the expected one...");
 
-                                var serverCertBytes = Encoding.UTF8.GetBytes(serverCert);
-                                var remoteCertBytes = certificate.Export(X509ContentType.Cert);
+                                var remoteCert = new X509Certificate2(certificate);
+                                var serverCertObj = new X509Certificate2(Encoding.UTF8.GetBytes(serverCert));
 
-                                if (!remoteCertBytes.SequenceEqual(serverCertBytes))
+                                if (!remoteCert.Equals(serverCertObj))
                                 {
                                     // ❌ Server's certificate does not match expected certificate.
                                     _logger.LogError("❌ Server's certificate does not match expected certificate.");
@@ -146,10 +144,6 @@ namespace CSharpGrpcClient
         {
             // 🔧 Loading client certificate and key...
             _logger.LogDebug("🔧 Loading client certificate and key...");
-
-            // Load client certificate and key
-            var clientCertData = Encoding.UTF8.GetBytes(clientCert);
-            var clientKeyData = Encoding.UTF8.GetBytes(clientKey);
 
             // 🔑 Creating key certificate pair...
             _logger.LogDebug("🔑 Creating key certificate pair...");
