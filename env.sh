@@ -16,11 +16,11 @@ export PLUGIN_SERVER_ENDPOINT="tcp:${PLUGIN_HOST}:${PLUGIN_POST}"
 export PLUGIN_PYTHON_SERVER_ENDPOINT="${PLUGIN_HOST}:${PLUGIN_PORT}"
 export PLUGIN_CS_SERVER_ENDPOINT="https://${PLUGIN_HOST}:${PLUGIN_PORT}"
 
-export PLUGIN_CLIENT_CERT="$(cat ./certs/${ALGO}mtls-client.crt)"
-export PLUGIN_CLIENT_KEY="$(cat ./certs/${ALGO}mtls-client.key)"
+export PLUGIN_CLIENT_CERT="$(cat ./certs/${ALGO}-mtls-client.crt)"
+export PLUGIN_CLIENT_KEY="$(cat ./certs/${ALGO}-mtls-client.key)"
 
-export PLUGIN_SERVER_CERT="$(cat ./certs/${ALGO}mtls-server.crt)"
-export PLUGIN_SERVER_KEY="$(cat ./certs/${ALGO}mtls-server.key)"
+export PLUGIN_SERVER_CERT="$(cat ./certs/${ALGO}-mtls-server.crt)"
+export PLUGIN_SERVER_KEY="$(cat ./certs/${ALGO}-mtls-server.key)"
 
 # socat TCP-LISTEN:12345 UNIX-CONNECT:<path to server unix socket>
 
