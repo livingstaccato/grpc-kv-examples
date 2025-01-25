@@ -50,7 +50,7 @@ public class GrpcClientHelper : IDisposable
         httpClientHandler.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13; // Allow both TLS 1.2 and 1.3
         httpClientHandler.ClientCertificates.Add(_clientCert);
         httpClientHandler.ServerCertificateCustomValidationCallback = ValidateServerCertificate;
-        _logger.LogDebug($"Supported Protocols: {httpClientHandler.SslProtocols}");
+        _logger.LogDebug($"🔄🔑 Supported Protocols: {httpClientHandler.SslProtocols}");
         _logger.LogDebug("🔄🔗 HTTP Client Handler created");
 
         // 🔧 HTTP/2 and Tracing
