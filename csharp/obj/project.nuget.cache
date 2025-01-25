@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "2Whja1Ns6Lg=",
+  "dgSpecHash": "ytjxe/TznFk=",
   "success": true,
   "projectFilePath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
   "expectedPackageFiles": [
@@ -20,7 +20,9 @@
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.logging.console/9.0.1/microsoft.extensions.logging.console.9.0.1.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.options/9.0.1/microsoft.extensions.options.9.0.1.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/microsoft.extensions.options.configurationextensions/9.0.1/microsoft.extensions.options.configurationextensions.9.0.1.nupkg.sha512",
-    "/Users/tim.perkins/.nuget/packages/microsoft.extensions.primitives/9.0.1/microsoft.extensions.primitives.9.0.1.nupkg.sha512"
+    "/Users/tim.perkins/.nuget/packages/microsoft.extensions.primitives/9.0.1/microsoft.extensions.primitives.9.0.1.nupkg.sha512",
+    "/Users/tim.perkins/.nuget/packages/serilog/4.2.0/serilog.4.2.0.nupkg.sha512",
+    "/Users/tim.perkins/.nuget/packages/serilog.sinks.console/6.0.0/serilog.sinks.console.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }
