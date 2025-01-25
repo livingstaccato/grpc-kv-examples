@@ -7,10 +7,29 @@
 $ ruby -ropenssl -e 'puts OpenSSL::OPENSSL_LIBRARY_VERSION'
 OpenSSL 3.4.0 22 Oct 2024
 
-python -c "import ssl; print(ssl.OPENSSL_VERSION)"
+$ python -c "import ssl; print(ssl.OPENSSL_VERSION)"
 OpenSSL 3.4.0 22 Oct 2024
 ```
 
+```
+#!/usr/bin/env ruby
+
+require 'openssl'
+
+# Fetch an array of curves. Each element is [name, comment].
+curves = OpenSSL::PKey::EC.builtin_curves
+
+# You can just inspect the array:
+p curves
+
+# Or print them in a more readable format:
+puts "Available EC curves:\n"
+curves.each do |(name, comment)|
+  puts " - #{name}: #{comment}"
+end
+```
+
+[["secp112r1", "SECG/WTLS curve over a 112 bit prime field"], ["secp112r2", "SECG curve over a 112 bit prime field"], ["secp128r1", "SECG curve over a 128 bit prime field"], ["secp128r2", "SECG curve over a 128 bit prime field"], ["secp160k1", "SECG curve over a 160 bit prime field"], ["secp160r1", "SECG curve over a 160 bit prime field"], ["secp160r2", "SECG/WTLS curve over a 160 bit prime field"], ["secp192k1", "SECG curve over a 192 bit prime field"], ["secp224k1", "SECG curve over a 224 bit prime field"], ["secp224r1", "NIST/SECG curve over a 224 bit prime field"], ["secp256k1", "SECG curve over a 256 bit prime field"], ["secp384r1", "NIST/SECG curve over a 384 bit prime field"], ["secp521r1", "NIST/SECG curve over a 521 bit prime field"], ["prime192v1", "NIST/X9.62/SECG curve over a 192 bit prime field"], ["prime192v2", "X9.62 curve over a 192 bit prime field"], ["prime192v3", "X9.62 curve over a 192 bit prime field"], ["prime239v1", "X9.62 curve over a 239 bit prime field"], ["prime239v2", "X9.62 curve over a 239 bit prime field"], ["prime239v3", "X9.62 curve over a 239 bit prime field"], ["prime256v1", "X9.62/SECG curve over a 256 bit prime field"], ["sect113r1", "SECG curve over a 113 bit binary field"], ["sect113r2", "SECG curve over a 113 bit binary field"], ["sect131r1", "SECG/WTLS curve over a 131 bit binary field"], ["sect131r2", "SECG curve over a 131 bit binary field"], ["sect163k1", "NIST/SECG/WTLS curve over a 163 bit binary field"], ["sect163r1", "SECG curve over a 163 bit binary field"], ["sect163r2", "NIST/SECG curve over a 163 bit binary field"], ["sect193r1", "SECG curve over a 193 bit binary field"], ["sect193r2", "SECG curve over a 193 bit binary field"], ["sect233k1", "NIST/SECG/WTLS curve over a 233 bit binary field"], ["sect233r1", "NIST/SECG/WTLS curve over a 233 bit binary field"], ["sect239k1", "SECG curve over a 239 bit binary field"], ["sect283k1", "NIST/SECG curve over a 283 bit binary field"], ["sect283r1", "NIST/SECG curve over a 283 bit binary field"], ["sect409k1", "NIST/SECG curve over a 409 bit binary field"], ["sect409r1", "NIST/SECG curve over a 409 bit binary field"], ["sect571k1", "NIST/SECG curve over a 571 bit binary field"], ["sect571r1", "NIST/SECG curve over a 571 bit binary field"], ["c2pnb163v1", "X9.62 curve over a 163 bit binary field"], ["c2pnb163v2", "X9.62 curve over a 163 bit binary field"], ["c2pnb163v3", "X9.62 curve over a 163 bit binary field"], ["c2pnb176v1", "X9.62 curve over a 176 bit binary field"], ["c2tnb191v1", "X9.62 curve over a 191 bit binary field"], ["c2tnb191v2", "X9.62 curve over a 191 bit binary field"], ["c2tnb191v3", "X9.62 curve over a 191 bit binary field"], ["c2pnb208w1", "X9.62 curve over a 208 bit binary field"], ["c2tnb239v1", "X9.62 curve over a 239 bit binary field"], ["c2tnb239v2", "X9.62 curve over a 239 bit binary field"], ["c2tnb239v3", "X9.62 curve over a 239 bit binary field"], ["c2pnb272w1", "X9.62 curve over a 272 bit binary field"], ["c2pnb304w1", "X9.62 curve over a 304 bit binary field"], ["c2tnb359v1", "X9.62 curve over a 359 bit binary field"], ["c2pnb368w1", "X9.62 curve over a 368 bit binary field"], ["c2tnb431r1", "X9.62 curve over a 431 bit binary field"], ["wap-wsg-idm-ecid-wtls1", "WTLS curve over a 113 bit binary field"], ["wap-wsg-idm-ecid-wtls3", "NIST/SECG/WTLS curve over a 163 bit binary field"], ["wap-wsg-idm-ecid-wtls4", "SECG curve over a 113 bit binary field"], ["wap-wsg-idm-ecid-wtls5", "X9.62 curve over a 163 bit binary field"], ["wap-wsg-idm-ecid-wtls6", "SECG/WTLS curve over a 112 bit prime field"], ["wap-wsg-idm-ecid-wtls7", "SECG/WTLS curve over a 160 bit prime field"], ["wap-wsg-idm-ecid-wtls8", "WTLS curve over a 112 bit prime field"], ["wap-wsg-idm-ecid-wtls9", "WTLS curve over a 160 bit prime field"], ["wap-wsg-idm-ecid-wtls10", "NIST/SECG/WTLS curve over a 233 bit binary field"], ["wap-wsg-idm-ecid-wtls11", "NIST/SECG/WTLS curve over a 233 bit binary field"], ["wap-wsg-idm-ecid-wtls12", "WTLS curve over a 224 bit prime field"], ["Oakley-EC2N-3", "\n\tIPSec/IKE/Oakley curve #3 over a 155 bit binary field.\n\tNot suitable for ECDSA.\n\tQuestionable extension field!"], ["Oakley-EC2N-4", "\n\tIPSec/IKE/Oakley curve #4 over a 185 bit binary field.\n\tNot suitable for ECDSA.\n\tQuestionable extension field!"], ["brainpoolP160r1", "RFC 5639 curve over a 160 bit prime field"], ["brainpoolP160t1", "RFC 5639 curve over a 160 bit prime field"], ["brainpoolP192r1", "RFC 5639 curve over a 192 bit prime field"], ["brainpoolP192t1", "RFC 5639 curve over a 192 bit prime field"], ["brainpoolP224r1", "RFC 5639 curve over a 224 bit prime field"], ["brainpoolP224t1", "RFC 5639 curve over a 224 bit prime field"], ["brainpoolP256r1", "RFC 5639 curve over a 256 bit prime field"], ["brainpoolP256t1", "RFC 5639 curve over a 256 bit prime field"], ["brainpoolP320r1", "RFC 5639 curve over a 320 bit prime field"], ["brainpoolP320t1", "RFC 5639 curve over a 320 bit prime field"], ["brainpoolP384r1", "RFC 5639 curve over a 384 bit prime field"], ["brainpoolP384t1", "RFC 5639 curve over a 384 bit prime field"], ["brainpoolP512r1", "RFC 5639 curve over a 512 bit prime field"], ["brainpoolP512t1", "RFC 5639 curve over a 512 bit prime field"], ["SM2", "SM2 curve over a 256 bit prime field"]]
 
 * Python required_
 
@@ -87,7 +106,7 @@ openssl s_client -connect localhost:50051 \
 No. Fucking. Way. It's the CA FALSE?!@#$?!@#$?
 
 
-
+```
 >>> from cryptography.hazmat.primitives.asymmetric import ec
 ... 
 ... available_curves = ec._CURVE_TYPES
