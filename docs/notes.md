@@ -60,24 +60,3 @@ static const char* socket_type_usage =
 | Ruby   | secp384r1 | Ruby   | secp521r1 | No  |
 | Ruby   | secp384r1 | C#     | secp521r1 | Yes |
 |-----------------------------------------------|
-
-| Python | secp384r1 | Go     | rsa-2048  | Yes |
-| Python | secp384r1 | Python | rsa-2048  | Yes |
-| Python | secp384r1 | PRuby  | rsa-2048  | Yes |
-| Python | secp384r1 | C#     | rsa-2048  | Yes |
-| ------ | --------- | ------ | --------- | --- | 
-| Python | secp384r1 | Go     | secp256r1 | Yes |
-| Python | secp384r1 | Python | secp256r1 | Yes |
-| Python | secp384r1 | PRuby  | secp256r1 | Yes |
-| Python | secp384r1 | C#     | secp256r1 | Yes |
-
-| ------ | --------- | ------ | --------- | --- | 
-| Go     | secp521r1 | Go     | secp384r1 | Yes |
-| Go     | secp521r1 | Python | secp384r1 | No  |
-| Go     | secp521r1 | Ruby   | secp384r1 | No  |
-| Go     | secp521r1 | C#     | secp384r1 | Yes |
-| ------ | --------- | ------ | --------- | --- | 
-| Go     | secp521r1 | Go     | secp256r1 | Yes |
-| Go     | secp521r1 | Python | secp256r1 | No  |
-| Go     | secp521r1 | Ruby   | secp256r1 | No  |
-| Go     | secp521r1 | C#     | secp256r1 | Yes |
