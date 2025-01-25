@@ -78,7 +78,6 @@ PLUGIN_SERVER_KEY_SIZE=$(echo $(get_key_size "${PLUGIN_SERVER_KEY_FILE}"))
 # Export all necessary environment variables
 export PLUGIN_HOST \
     PLUGIN_PORT \
-    PLUGIN_ALGO \
     PLUGIN_CLIENT_CERT \
     PLUGIN_CLIENT_KEY \
     PLUGIN_SERVER_CERT \
