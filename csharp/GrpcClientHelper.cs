@@ -74,7 +74,7 @@ public class GrpcClientHelper : IDisposable
         var channelOptions = new GrpcChannelOptions
         {
             HttpClient = _httpClient,
-            Credentials = ChannelCredentials.Insecure
+            Credentials = ChannelCredentials.Insecure,
             // ServiceConfig = new ServiceConfig
             // {
             //     MethodConfigs =
