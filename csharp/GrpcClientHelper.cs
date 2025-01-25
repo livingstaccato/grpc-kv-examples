@@ -48,62 +48,62 @@ public class GrpcClientHelper
 
         // 🔄🔗 Configure channel options
         _logger.LogDebug("🔄🔗 Configuring gRPC channel options...");
+
+        // Create an HttpClientHandler
+        var httpClientHandler = new HttpClientHandler();
+        httpClientHandler.SslProtocols = System.Security.Authentication.SslProtocols.Tls13;
+        httpClientHandler.ServerCertificateCustomValidationCallback = (httpRequestMessage, certificate, cetChain, policyErrors) =>
+        {
+            // 🔎🛡️ Basic certificate validation
+            _logger.LogDebug("🔎🛡️ Performing basic SSL/TLS policy checks...");
+            if (policyErrors != SslPolicyErrors.None)
+            {
+                _logger.LogError("❌❌ SSL Policy Errors: {sslPolicyErrors}", policyErrors);
+
+                // ℹ️⛓️ Log chain status if available
+                if (cetChain != null)
+                {
+                    _logger.LogDebug("ℹ️⛓️ Certificate chain status:");
+                    foreach (var chainStatus in cetChain.ChainStatus)
+                    {
+                        _logger.LogDebug("ℹ️⛓️ Chain Status Element: {StatusInformation}", chainStatus.StatusInformation);
+                    }
+                }
+
+                return false;
+            }
+            _logger.LogDebug("✅✅ Basic SSL/TLS policy checks passed.");
+
+            // 🎯🔍 Check if the server's certificate matches the expected one
+            _logger.LogDebug("🎯🔍 Comparing server certificate with expected certificate...");
+            
+            // Handle null certificate
+            if (certificate == null)
+            {
+                _logger.LogError("❌❌ Server certificate is null.");
+                return false;
+            }
+
+            var remoteCert = new X509Certificate2(certificate);
+            if (remoteCert.Thumbprint != serverCert.Thumbprint)
+            {
+                _logger.LogError("❌❌ Server's certificate does not match expected certificate.");
+                _logger.LogDebug("👀🏷️ Expected server cert thumbprint: {serverThumbprint}", serverCert.Thumbprint);
+                _logger.LogDebug("👀🪪 Received server cert thumbprint: {remoteThumbprint}", remoteCert.Thumbprint);
+                return false;
+            }
+
+            // 📋🔍 Log certificate details
+            _logger.LogDebug("📋🔍 Logging server certificate details...");
+            certHelper.LogCertificateDetails("Server", remoteCert);
+
+            _logger.LogDebug("✅✅ Server certificate is valid.");
+            return true;
+        };
+
         var channelOptions = new GrpcChannelOptions
         {
-            HttpHandler = new SocketsHttpHandler
-            {
-                SslOptions = new SslClientAuthenticationOptions
-                {
-                    // 🪪⛓️ Client certificates for mTLS
-                    ClientCertificates = new X509Certificate2Collection { _clientCert },
-                    // 👮🚨 Remote certificate validation callback
-                    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
-                    {
-                        // 🔎🛡️ Basic certificate validation
-                        _logger.LogDebug("🔎🛡️ Performing basic SSL/TLS policy checks...");
-                        if (sslPolicyErrors != SslPolicyErrors.None)
-                        {
-                            _logger.LogError("❌❌ SSL Policy Errors: {sslPolicyErrors}", sslPolicyErrors);
-
-                            // ℹ️⛓️ Log chain status if available
-                            if (chain != null)
-                            {
-                                _logger.LogDebug("ℹ️⛓️ Certificate chain status:");
-                                foreach (var chainStatus in chain.ChainStatus)
-                                {
-                                    _logger.LogDebug("ℹ️⛓️ Chain Status Element: {StatusInformation}", chainStatus.StatusInformation);
-                                }
-                            }
-
-                            return false;
-                        }
-                        _logger.LogDebug("✅✅ Basic SSL/TLS policy checks passed.");
-
-                        // 🎯🔍 Check if the server's certificate matches the expected one
-                        _logger.LogDebug("🎯🔍 Comparing server certificate with expected certificate...");
-                        var remoteCert = new X509Certificate2(certificate);
-                        if (remoteCert.Thumbprint != serverCert.Thumbprint)
-                        {
-                            _logger.LogError("❌❌ Server's certificate does not match expected certificate.");
-                            _logger.LogDebug("👀🏷️ Expected server cert thumbprint: {serverThumbprint}", serverCert.Thumbprint);
-                            _logger.LogDebug("👀🪪 Received server cert thumbprint: {remoteThumbprint}", remoteCert.Thumbprint);
-                            return false;
-                        }
-
-                        // 📋🔍 Log certificate details
-                        _logger.LogDebug("📋🔍 Logging server certificate details...");
-                        certHelper.LogCertificateDetails("Server", remoteCert);
-
-                        _logger.LogDebug("✅✅ Server certificate is valid.");
-                        return true;
-                    },
-                    // 🎯2️⃣ Force HTTP/2
-                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls13
-                },
-                // 🚀2️⃣ Force HTTP/2
-                DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
-            },
-            // 🔁🔄 Configure service config for retry policy
+            HttpHandler = new GrpcWebHandler(httpClientHandler),
             ServiceConfig = new ServiceConfig
             {
                 MethodConfigs =
