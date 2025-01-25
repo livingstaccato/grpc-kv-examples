@@ -26,7 +26,7 @@ def log_cert_info(cert: x509.Certificate, prefix: str):
     logger.info(f"🔍  Valid Until: {cert.not_valid_after_utc} ⏰")
     logger.info(f"🔍  Serial Number: {cert.serial_number} 🔢")
     logger.info(f"🔍  Version: {cert.version} 📊")
-    
+
     try:
         key_usage = cert.extensions.get_extension_for_oid(x509.oid.ExtensionOID.KEY_USAGE)
         logger.info(f"🔍  Key Usage: {key_usage.value} 🔑")
@@ -55,7 +55,7 @@ def clean_pem(pem_str: str) -> str:
 def load_certificates():
     """Load and validate certificates from environment"""
     logger.info("🔐 Loading certificates from environment...")
-    
+
     required_vars = {
         "PLUGIN_SERVER_CERT": "Server certificate",
         "PLUGIN_CLIENT_CERT": "Client certificate",
@@ -89,7 +89,7 @@ def create_channel_credentials(certs: dict):
         private_key=certs["PLUGIN_CLIENT_KEY"].encode(),
         certificate_chain=certs["PLUGIN_CLIENT_CERT"].encode()
     )
-    
+
     # Channel options matching Go client
     options = [
         ('grpc.ssl_target_name_override', 'localhost'),
@@ -100,13 +100,13 @@ def create_channel_credentials(certs: dict):
 def main():
     try:
         logger.info("🚀 Starting gRPC client... 🌟")
-        
+
         # Load certificates
         certs = load_certificates()
-        
+
         # Create credentials and channel options
         credentials, options = create_channel_credentials(certs)
-        
+
         # Server endpoint
         server_endpoint = os.getenv('PLUGIN_SERVER_ENDPOINT', 'localhost:50051')
         logger.info(f"🌐 Connecting to server: {server_endpoint}")
@@ -114,7 +114,7 @@ def main():
         # Create channel with timeout
         logger.info("🔌 Creating gRPC connection...")
         channel = grpc.secure_channel(server_endpoint, credentials, options=options)
-        
+
         # Wait for channel ready with timeout
         try:
             logger.debug("⏳ Waiting for channel ready...")
