@@ -75,7 +75,8 @@ def main():
         ('grpc.ssl_target_name_override', 'localhost'),
         ('grpc.default_authority', 'localhost')
     ]
-    channel = grpc.secure_channel('localhost:50051', channel_creds, options=options)
+    #channel = grpc.secure_channel('localhost:50051', channel_creds, options=options)
+    channel = grpc.insecure_channel('[::]:50051')
     client = SQLiteClient(channel)
 
     # Example queries
