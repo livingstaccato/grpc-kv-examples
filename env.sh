@@ -115,7 +115,8 @@ openssl req -new \
     -x509 \
     -nodes \
     -days 365 \
-    -subj "/CN=test.com" \
+    -subj "/CN=test.com" 
+    -key - \
 \
 | openssl x509 -noout -text | grep Public-Key
                 Public-Key: (384 bit)
