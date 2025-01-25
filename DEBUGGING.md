@@ -1,3 +1,11 @@
+# System Configuration
+
+* macOS 15.2
+* Python 3.13.1
+* Ruby 3.2.2
+* Go 1.23.5
+
+
 # OpenSSL
 
 ## Summary
@@ -14,6 +22,19 @@ OpenSSL 3.4.0 22 Oct 2024
 $ python -c "import ssl; print(ssl.OPENSSL_VERSION)"
 OpenSSL 3.4.0 22 Oct 2024
 ```
+
+## Fetch Python Curves
+
+```
+#!/usr/bin/env python3
+
+from cryptography.hazmat.primitives.asymmetric import ec
+
+available_curves = ec._CURVE_TYPES
+print(available_curves)
+```
+
+## Fetch Ruby Curves
 
 ```
 #!/usr/bin/env ruby
@@ -108,14 +129,7 @@ openssl s_client -connect localhost:50051 \
 
 No. Fucking. Way. It's the CA FALSE?!@#$?!@#$?
 
-## Python Curves
 
-```
->>> from cryptography.hazmat.primitives.asymmetric import ec
-... 
-... available_curves = ec._CURVE_TYPES
-... print(available_curves)
-... 
 {'prime192v1': <cryptography.hazmat.primitives.asymmetric.ec.SECP192R1 object at 0x1035e34d0>, 'prime256v1': <cryptography.hazmat.primitives.asymmetric.ec.SECP256R1 object at 0x1035e3620>, 'secp192r1': <cryptography.hazmat.primitives.asymmetric.ec.SECP192R1 object at 0x10362df90>, 'secp224r1': <cryptography.hazmat.primitives.asymmetric.ec.SECP224R1 object at 0x1035e3770>, 'secp256r1': <cryptography.hazmat.primitives.asymmetric.ec.SECP256R1 object at 0x10362d590>, 'secp384r1': <cryptography.hazmat.primitives.asymmetric.ec.SECP384R1 object at 0x1035e38c0>, 'secp521r1': <cryptography.hazmat.primitives.asymmetric.ec.SECP521R1 object at 0x1035e3a10>, 'secp256k1': <cryptography.hazmat.primitives.asymmetric.ec.SECP256K1 object at 0x1035e3b60>, 'sect163k1': <cryptography.hazmat.primitives.asymmetric.ec.SECT163K1 object at 0x1035e3cb0>, 'sect233k1': <cryptography.hazmat.primitives.asymmetric.ec.SECT233K1 object at 0x1035e3e00>, 'sect283k1': <cryptography.hazmat.primitives.asymmetric.ec.SECT283K1 object at 0x1036a0050>, 'sect409k1': <cryptography.hazmat.primitives.asymmetric.ec.SECT409K1 object at 0x1036a01a0>, 'sect571k1': <cryptography.hazmat.primitives.asymmetric.ec.SECT571K1 object at 0x1036a02f0>, 'sect163r2': <cryptography.hazmat.primitives.asymmetric.ec.SECT163R2 object at 0x1036a0440>, 'sect233r1': <cryptography.hazmat.primitives.asymmetric.ec.SECT233R1 object at 0x1036a0590>, 'sect283r1': <cryptography.hazmat.primitives.asymmetric.ec.SECT283R1 object at 0x1036a06e0>, 'sect409r1': <cryptography.hazmat.primitives.asymmetric.ec.SECT409R1 object at 0x1036a0830>, 'sect571r1': <cryptography.hazmat.primitives.asymmetric.ec.SECT571R1 object at 0x1036a0980>, 'brainpoolP256r1': <cryptography.hazmat.primitives.asymmetric.ec.BrainpoolP256R1 object at 0x1036a0ad0>, 'brainpoolP384r1': <cryptography.hazmat.primitives.asymmetric.ec.BrainpoolP384R1 object at 0x1036a0c20>, 'brainpoolP512r1': <cryptography.hazmat.primitives.asymmetric.ec.BrainpoolP512R1 object at 0x1036a0d70>}
 ```
 
