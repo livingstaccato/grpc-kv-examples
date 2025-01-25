@@ -136,6 +136,9 @@ public class GrpcClientHelper : IDisposable
             _logger.LogDebug($"Not After: {certificate.NotAfter}");
         }
 
+        // Only validate thumbprint match, ignore chain errors
+        return certificate.Thumbprint == _serverCert.Thumbprint;
+
         // 🔎🛡️ Basic certificate validation
         _logger.LogDebug("🔎🛡️ Performing basic SSL/TLS policy checks...");
 
