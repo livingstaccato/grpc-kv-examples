@@ -7,7 +7,7 @@ from proto import kv_pb2, kv_pb2_grpc
 import time
 import os
 import ssl
-from  cryptography import x509
+from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 
 # Configure logging
@@ -36,11 +36,11 @@ class KVServicer(kv_pb2_grpc.KVServicer):
         try:
             logger.debug(f"  🔎 🌐 Peer: {context.peer()}")
 
-            # Try to get peer certificate details
-            peer_cert = context.peer_certificate()
+            # Try to get peer certificate details using interceptor
+            peer_cert = context.auth_context().get('x509_pem_cert')
             if peer_cert:
-                logger.debug("  🔐 Peer Certificate (PEM):\n%s", peer_cert.decode())
-                x509_cert = x509.load_pem_x509_certificate(peer_cert)
+                logger.debug("  🔐 Peer Certificate (PEM):\n%s", peer_cert[0].decode())
+                x509_cert = x509.load_pem_x509_certificate(peer_cert[0])
                 logger.debug("  🔍 Peer Certificate Details:")
                 self._log_cert_details(x509_cert)
             else:
@@ -95,17 +95,18 @@ class KVServicer(kv_pb2_grpc.KVServicer):
 def serve():
     logger.info("🚀 🔄 Server starting")
 
+    server_cert = os.getenv('PLUGIN_SERVER_CERT')
+    server_key = os.getenv('PLUGIN_SERVER_KEY')
+    client_cert = os.getenv('PLUGIN_CLIENT_CERT')
+
+    if not all([server_cert, server_key]):
+        logger.error("🔐 ❌ Missing certificates")
+        raise ValueError("Missing certificates")
+
+    logger.debug(f"🔐 📊 Cert lengths - Server: {len(server_cert)}, Key: {len(server_key)}, Client: {len(client_cert) if client_cert else 0}")
+
+    # Create server credentials
     try:
-        server_cert = os.getenv('PLUGIN_SERVER_CERT')
-        server_key = os.getenv('PLUGIN_SERVER_KEY')
-        client_cert = os.getenv('PLUGIN_CLIENT_CERT')
-
-        if not all([server_cert, server_key]):
-            raise ValueError("🔐 ❌ Missing certificates")
-
-        logger.debug(f"🔐 📊 Cert lengths - Server: {len(server_cert)}, Key: {len(server_key)}, Client: {len(client_cert) if client_cert else 0}")
-
-        # Create SSL context
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
             root_certificates=client_cert.encode() if client_cert else None,
@@ -123,7 +124,6 @@ def serve():
         options=[
             ('grpc.ssl_target_name_override', 'localhost'),
             ('grpc.default_authority', 'localhost'),
-            #('grpc.use_local_subchannel_pool', 1),
         ]
     )
 
