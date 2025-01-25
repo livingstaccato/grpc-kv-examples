@@ -30,7 +30,7 @@ class Program
         var clientCert = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_CERT") ?? string.Empty;
         var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY") ?? string.Empty;
         var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT") ?? string.Empty;
-        var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_CS_SERVER_ENDPOINT") ?? "https://localhost:50051";
+        var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_CS_SERVER_ENDPOINT") ?? "http://localhost:50051";
 
         // 🔍 Logging environment variables for debugging...
         logger.LogDebug("🔍 PLUGIN_CLIENT_CERT: {clientCert}", !string.IsNullOrEmpty(clientCert) ? "<present>" : "<not set>");
