@@ -10,9 +10,9 @@ ALGO=ec-secp384r1- # this works
 export PLUGIN_HOST="localhost"
 export PLUGIN_PORT="50051"
 
-export PLUGIN_SERVER_ENDPOINT="tcp:${PLUGIN_HOST}:${POST}"
-export PLUGIN_PYTHON_SERVER_ENDPOINT="${PLUGIN_HOST}:${PORT}"
-export PLUGIN_CS_SERVER_ENDPOINT="http://${PLUGIN_HOST}:${PORT}"
+export PLUGIN_SERVER_ENDPOINT="tcp:${PLUGIN_HOST}:${PLUGIN_POST}"
+export PLUGIN_PYTHON_SERVER_ENDPOINT="${PLUGIN_HOST}:${PLUGIN_PORT}"
+export PLUGIN_CS_SERVER_ENDPOINT="http://${PLUGIN_HOST}:${PLUGIN_PORT}"
 
 export PLUGIN_CLIENT_CERT="$(cat ./certs/${ALGO}mtls-client.crt)"
 export PLUGIN_CLIENT_KEY="$(cat ./certs/${ALGO}mtls-client.key)"
