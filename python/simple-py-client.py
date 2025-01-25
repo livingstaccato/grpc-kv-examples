@@ -7,7 +7,7 @@ import time
 from datetime import datetime, timezone
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
-from ..proto import kv_pb2, kv_pb2_grpc
+from proto import kv_pb2, kv_pb2_grpc
 from certificate_helper import log_cert_info, load_certificates_from_env
 
 # Configure logging with microsecond precision
