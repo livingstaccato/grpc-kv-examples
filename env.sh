@@ -13,6 +13,13 @@ export PLUGIN_SERVER_KEY="$(cat ./certs/${ALGO}mtls-server.key)"
 
 # socat TCP-LISTEN:12345 UNIX-CONNECT:<path to server unix socket>
 
+alias ossl-connect-check='openssl s_client -connect localhost:50051 \
+   -cert <(echo "$PLUGIN_CLIENT_CERT") \
+   -key <(echo "$PLUGIN_CLIENT_KEY") \
+   -CAfile <(echo "$PLUGIN_SERVER_CERT") \
+   -servername localhost
+'
+
 # openssl s_client -connect localhost:12345 \
 #   -cert <(echo "$PLUGIN_CLIENT_CERT") \
 #   -key <(echo "$PLUGIN_CLIENT_KEY") \
