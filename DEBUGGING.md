@@ -31,9 +31,9 @@ library confirm that they should support `secp521r1`.
 # System Configuration
 
 * macOS 15.2
-* Python 3.13.1
-* Ruby 3.2.2
-* Go 1.23.5
+* Python 3.13
+* Ruby 3.2
+* Go 1.23
 * .NET 9.0
 
 ---
