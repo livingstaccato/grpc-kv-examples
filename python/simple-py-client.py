@@ -23,9 +23,11 @@ def create_channel_credentials(certs: dict):
     # Configure SSL context with explicit curves
     ssl_context = ssl.create_default_context()
     ssl_context.minimum_version = ssl.TLSVersion.TLSv1_3
-    ssl_context.set_ciphers('secp521r1')
+        # Set ciphers that support ECDSA with P-521
+    ssl_context.set_ciphers('ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305')
+
     ssl_context.verify_mode = ssl.CERT_REQUIRED
-    
+
     # Create credentials with SSL context
     credentials = grpc.ssl_channel_credentials(
         root_certificates=certs["PLUGIN_SERVER_CERT"].encode(),
@@ -33,7 +35,7 @@ def create_channel_credentials(certs: dict):
         certificate_chain=certs["PLUGIN_CLIENT_CERT"].encode(),
         ssl_context=ssl_context
     )
-    
+
     return credentials
 
 def Xcreate_channel_credentials(certs: dict):
