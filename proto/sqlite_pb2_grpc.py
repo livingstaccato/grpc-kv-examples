@@ -81,6 +81,11 @@ class SQLiteStoreStub(object):
                 request_serializer=sqlite__pb2.TransactionRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.TransactionResponse.FromString,
                 _registered_method=True)
+        self.CreateConnection = channel.unary_unary(
+                '/proto.SQLiteStore/CreateConnection',
+                request_serializer=sqlite__pb2.ConnectionRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.ConnectionResponse.FromString,
+                _registered_method=True)
 
 
 class SQLiteStoreServicer(object):
@@ -89,7 +94,6 @@ class SQLiteStoreServicer(object):
 
     def ExecuteQuery(self, request, context):
         """Query execution
-        Changed to streaming
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -114,15 +118,14 @@ class SQLiteStoreServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def PrepareStatement(self, request, context):
-        """Statement preparation and execution (Now with streaming)
+        """Statement preparation and execution
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ExecutePreparedStatement(self, request, context):
-        """Changed to streaming
-        """
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -142,6 +145,13 @@ class SQLiteStoreServicer(object):
 
     def RollbackTransaction(self, request, context):
         """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateConnection(self, request, context):
+        """Connection management
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -193,6 +203,11 @@ def add_SQLiteStoreServicer_to_server(servicer, server):
                     servicer.RollbackTransaction,
                     request_deserializer=sqlite__pb2.TransactionRequest.FromString,
                     response_serializer=sqlite__pb2.TransactionResponse.SerializeToString,
+            ),
+            'CreateConnection': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateConnection,
+                    request_deserializer=sqlite__pb2.ConnectionRequest.FromString,
+                    response_serializer=sqlite__pb2.ConnectionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -439,6 +454,33 @@ class SQLiteStore(object):
             '/proto.SQLiteStore/RollbackTransaction',
             sqlite__pb2.TransactionRequest.SerializeToString,
             sqlite__pb2.TransactionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CreateConnection(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SQLiteStore/CreateConnection',
+            sqlite__pb2.ConnectionRequest.SerializeToString,
+            sqlite__pb2.ConnectionResponse.FromString,
             options,
             channel_credentials,
             insecure,
