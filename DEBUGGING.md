@@ -34,6 +34,7 @@ library confirm that they should support `secp521r1`.
 * Python 3.13.1
 * Ruby 3.2.2
 * Go 1.23.5
+* .NET 9.0
 
 ---
 
