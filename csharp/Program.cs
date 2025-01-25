@@ -2,47 +2,59 @@
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
-using Proto; // This namespace will be generated from your kv.proto
+using Proto;
+using Microsoft.Extensions.Logging;
 
 namespace CSharpGrpcClient
 {
     class Program
     {
+        private static ILogger? _logger;
+
         static async Task Main(string[] args)
         {
+            // setup our logger
+            using var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddFilter("CSharpGrpcClient.Program", LogLevel.Debug)
+                    .AddConsole();
+            });
+            _logger = loggerFactory.CreateLogger<Program>();
+
+            // 🔧 Setting up environment variables...
+            _logger.LogDebug("🔧 Setting up environment variables...");
             // Load environment variables (consider using a more robust method for production)
             var clientCert = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_CERT");
             var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY");
             var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT");
             var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_SERVER_ENDPOINT") ?? "https://localhost:50051";
             var serverNameOverride = Environment.GetEnvironmentVariable("GRPC_SSL_TARGET_NAME_OVERRIDE") ?? "localhost";
-            var rubyServerCert = Environment.GetEnvironmentVariable("RUBY_SERVER_CERT");
+            // No, it is using mTLS. No CA. All the certs have CA:TRUE.
+            // var rubyServerCert = Environment.GetEnvironmentVariable("RUBY_SERVER_CERT");
 
-            if (string.IsNullOrEmpty(clientCert) || string.IsNullOrEmpty(clientKey))
+            // 🔍 Logging environment variables for debugging...
+            _logger.LogDebug("🔍 PLUGIN_CLIENT_CERT: {clientCert}", !string.IsNullOrEmpty(clientCert) ? "<present>" : "<not set>");
+            _logger.LogDebug("🔍 PLUGIN_CLIENT_KEY: {clientKey}", !string.IsNullOrEmpty(clientKey) ? "<present>" : "<not set>");
+            _logger.LogDebug("🔍 PLUGIN_SERVER_CERT: {serverCert}", !string.IsNullOrEmpty(serverCert) ? "<present>" : "<not set>");
+            // _logger.LogDebug("🔍 RUBY_SERVER_CERT: {rubyServerCert}", !string.IsNullOrEmpty(rubyServerCert) ? "<present>" : "<not set>");
+
+            if (string.IsNullOrEmpty(clientCert) || string.IsNullOrEmpty(clientKey) || string.IsNullOrEmpty(serverCert))
             {
-                Console.WriteLine("Error: PLUGIN_CLIENT_CERT or PLUGIN_CLIENT_KEY environment variables are not set.");
+                // ❌ Error: Missing environment variables...
+                _logger.LogError("❌ Error: PLUGIN_CLIENT_CERT, PLUGIN_CLIENT_KEY, or PLUGIN_SERVER_CERT environment variables are not set.");
                 return;
             }
 
             try
             {
-                // Create credentials
+                // 🔧 Creating credentials...
+                _logger.LogDebug("🔧 Creating credentials...");
                 var credentials = CreateCredentials(clientCert, clientKey, serverCert);
-
-                // Use the appropriate server certificate based on the target.
-                if (!string.IsNullOrEmpty(rubyServerCert) && serverEndpoint.Contains("ruby"))
-                {
-                    Console.WriteLine("Using Ruby server certificate for connection.");
-                    credentials = CreateCredentials(clientCert, clientKey, rubyServerCert);
-                }
-                else
-                {
-                  Console.WriteLine("Using default server certificate for connection.");
-                  credentials = CreateCredentials(clientCert, clientKey, serverCert);
-                }
 
                 var channelOptions = new GrpcChannelOptions
                 {
@@ -51,32 +63,33 @@ namespace CSharpGrpcClient
                     {
                         SslOptions = new System.Net.Security.SslClientAuthenticationOptions
                         {
-                            ClientCertificates = new X509Certificate2Collection
-                            {
-                                new X509Certificate2(
-                                    X509Certificate.CreateFromCertFile(Path.GetTempFileName()).Export(X509ContentType.Pfx), "")
-                            },
+                            ClientCertificates = new X509Certificate2Collection { LoadCertificateFromPem(clientCert, clientKey) },
                             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
                             {
-                                // basic certificate validation
+                                // 🔍 Basic certificate validation...
+                                _logger.LogDebug("🔍 Basic certificate validation...");
                                 if (sslPolicyErrors != System.Net.Security.SslPolicyErrors.None)
                                 {
-                                    Console.WriteLine($"SSL Policy Errors: {sslPolicyErrors}");
+                                    // ❌ SSL Policy Errors: {sslPolicyErrors}
+                                    _logger.LogError("❌ SSL Policy Errors: {sslPolicyErrors}", sslPolicyErrors);
                                     return false;
                                 }
 
-                                // check if the server's certificate matches the expected one
-                                var expectedCert = new X509Certificate2(
-                                    string.IsNullOrEmpty(rubyServerCert) ? 
-                                    serverCert : 
-                                    rubyServerCert);
+                                // 🔍 Check if the server's certificate matches the expected one...
+                                _logger.LogDebug("🔍 Check if the server's certificate matches the expected one...");
 
-                                if (!certificate.Equals(expectedCert))
+                                var serverCertBytes = Encoding.UTF8.GetBytes(serverCert);
+                                var remoteCertBytes = certificate.Export(X509ContentType.Cert);
+
+                                if (!remoteCertBytes.SequenceEqual(serverCertBytes))
                                 {
-                                    Console.WriteLine("Server's certificate does not match expected certificate.");
+                                    // ❌ Server's certificate does not match expected certificate.
+                                    _logger.LogError("❌ Server's certificate does not match expected certificate.");
                                     return false;
                                 }
 
+                                // ✅ Server certificate is valid
+                                _logger.LogDebug("✅ Server certificate is valid");
                                 return true;
                             }
                         }
@@ -84,48 +97,67 @@ namespace CSharpGrpcClient
                 };
 
                 // Create a channel (consider reusing channels in production)
+                // 🔌 Creating gRPC channel...
+                _logger.LogDebug("🔌 Creating gRPC channel...");
                 using var channel = GrpcChannel.ForAddress(serverEndpoint, channelOptions);
 
                 // Create a client
+                // 👥 Creating gRPC client...
+                _logger.LogDebug("👥 Creating gRPC client...");
                 var client = new KV.KVClient(channel);
 
                 // Send a Get request
-                Console.WriteLine("Sending Get request...");
+                // 📡 Sending Get request...
+                _logger.LogDebug("📡 Sending Get request...");
                 var response = await client.GetAsync(new GetRequest { Key = "test" });
 
-                Console.WriteLine("Response: " + response.Value.ToStringUtf8());
+                // ✨ Response: {response.Value}
+                _logger.LogInformation("✨ Response: {response.Value}", response.Value);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                // ❌ Error: {ex.Message}
+                _logger.LogError("❌ Error: {ex.Message}", ex.Message);
                 if (ex.InnerException != null)
                 {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                    // ❌ Inner Exception: {ex.InnerException.Message}
+                    _logger.LogError("❌ Inner Exception: {ex.InnerException.Message}", ex.InnerException.Message);
                 }
             }
         }
 
-        static SslCredentials CreateCredentials(string clientCert, string clientKey, string? serverCert = null)
+        static X509Certificate2 LoadCertificateFromPem(string certPem, string keyPem)
         {
-          // Load client certificate and key
-          var clientCertData = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "certs", clientCert));
-          var clientKeyData = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "certs", clientKey));
-          var clientCertPem = new X509Certificate2(X509Certificate.CreateFromCertFile(Path.Combine(Directory.GetCurrentDirectory(), "certs", clientCert)).Export(X509ContentType.Pfx), "");
+            // 🔧 Loading certificate from PEM data...
+            _logger.LogDebug("🔧 Loading certificate from PEM data...");
+            try
+            {
+                return X509Certificate2.CreateFromPem(certPem, keyPem);
+            }
+            catch (Exception ex)
+            {
+                // ❌ Error loading certificate from PEM: {ex.Message}
+                _logger.LogError("❌ Error loading certificate from PEM: {ex.Message}", ex.Message);
+                throw;
+            }
+        }
 
-          // Load server certificate if provided
-          X509Certificate2? serverCertPem = null;
-          if (!string.IsNullOrEmpty(serverCert))
-          {
-            var serverCertData = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "certs", serverCert));
-            serverCertPem = new X509Certificate2(X509Certificate.CreateFromCertFile(Path.Combine(Directory.GetCurrentDirectory(), "certs", serverCert)));
-          }
+        static SslCredentials CreateCredentials(string clientCert, string clientKey, string serverCert)
+        {
+            // 🔧 Loading client certificate and key...
+            _logger.LogDebug("🔧 Loading client certificate and key...");
 
-          // Create credentials
-          var credentials = new SslCredentials(
-            serverCertPem?.ExportCertificatePem(),
-            new KeyCertificatePair(clientCertPem.ExportCertificatePem(), clientKeyData));
+            // Load client certificate and key
+            var clientCertData = Encoding.UTF8.GetBytes(clientCert);
+            var clientKeyData = Encoding.UTF8.GetBytes(clientKey);
 
-          return credentials;
+            // 🔑 Creating key certificate pair...
+            _logger.LogDebug("🔑 Creating key certificate pair...");
+            var keyCertPair = new KeyCertificatePair(clientCert, clientKey);
+
+            // 🔒 Creating credentials...
+            _logger.LogDebug("🔒 Creating credentials...");
+            return new SslCredentials(serverCert, keyCertPair);
         }
     }
 }
