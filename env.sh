@@ -110,6 +110,17 @@ export PLUGIN_HOST \
     PLUGIN_CS_SERVER_ENDPOINT \
     PYTHONPATH
 
+function get_key_size() {
+openssl req -new \
+    -x509 \
+    -nodes \
+    -days 365 \
+    -subj "/CN=test.com" \
+\
+| openssl x509 -noout -text | grep Public-Key
+                Public-Key: (384 bit)
+}
+
 echo ""
 echo "🔐 TLS Configuration:"
 echo "   • Algorithm: ${PLUGIN_ALGO}"
