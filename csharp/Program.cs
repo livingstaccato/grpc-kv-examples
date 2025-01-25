@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -30,12 +28,11 @@ namespace CSharpGrpcClient
 
             // 🔧 Setting up environment variables...
             _logger.LogDebug("🔧 Setting up environment variables...");
-            // Load environment variables (consider using a more robust method for production)
+            // Load environment variables
             var clientCert = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_CERT");
             var clientKey = Environment.GetEnvironmentVariable("PLUGIN_CLIENT_KEY");
             var serverCert = Environment.GetEnvironmentVariable("PLUGIN_SERVER_CERT");
             var serverEndpoint = Environment.GetEnvironmentVariable("PLUGIN_SERVER_ENDPOINT") ?? "https://localhost:50051";
-            var serverNameOverride = Environment.GetEnvironmentVariable("GRPC_SSL_TARGET_NAME_OVERRIDE") ?? "localhost";
 
             // 🔍 Logging environment variables for debugging...
             _logger.LogDebug("🔍 PLUGIN_CLIENT_CERT: {clientCert}", !string.IsNullOrEmpty(clientCert) ? "<present>" : "<not set>");
@@ -53,16 +50,22 @@ namespace CSharpGrpcClient
             {
                 // 🔧 Creating credentials...
                 _logger.LogDebug("🔧 Creating credentials...");
-                var credentials = CreateCredentials(clientCert, clientKey, serverCert);
+
+                // Create a collection for client certificates
+                var clientCertificates = new X509Certificate2Collection();
+                clientCertificates.Add(X509Certificate2.CreateFromPem(clientCert, clientKey));
 
                 var channelOptions = new GrpcChannelOptions
                 {
-                    Credentials = credentials,
+                    Credentials = ChannelCredentials.Create(new SslCredentials(serverCert), CallCredentials.FromInterceptor((ctx, meta) =>
+                    {
+                        return Task.CompletedTask;
+                    })),
                     HttpHandler = new SocketsHttpHandler
                     {
                         SslOptions = new SslClientAuthenticationOptions
                         {
-                            ClientCertificates = new X509Certificate2Collection { LoadCertificateFromPem(clientCert, clientKey) },
+                            ClientCertificates = clientCertificates,
                             RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
                             {
                                 // 🔍 Basic certificate validation...
@@ -76,11 +79,11 @@ namespace CSharpGrpcClient
 
                                 // 🔍 Check if the server's certificate matches the expected one...
                                 _logger.LogDebug("🔍 Check if the server's certificate matches the expected one...");
-                                
-                                // Important: Use CreateFromPem to load the server certificate string
+
+                                var remoteCert = new X509Certificate2(certificate);
                                 var serverCertObj = X509Certificate2.CreateFromPem(serverCert);
 
-                                if (!certificate.Equals(serverCertObj))
+                                if (!remoteCert.Equals(serverCertObj))
                                 {
                                     // ❌ Server's certificate does not match expected certificate.
                                     _logger.LogError("❌ Server's certificate does not match expected certificate.");
@@ -123,36 +126,6 @@ namespace CSharpGrpcClient
                     _logger.LogError("❌ Inner Exception: {ex.InnerException.Message}", ex.InnerException.Message);
                 }
             }
-        }
-
-        static X509Certificate2 LoadCertificateFromPem(string certPem, string keyPem)
-        {
-            // 🔧 Loading certificate from PEM data...
-            _logger.LogDebug("🔧 Loading certificate from PEM data...");
-            try
-            {
-                return X509Certificate2.CreateFromPem(certPem, keyPem);
-            }
-            catch (Exception ex)
-            {
-                // ❌ Error loading certificate from PEM: {ex.Message}
-                _logger.LogError("❌ Error loading certificate from PEM: {ex.Message}", ex.Message);
-                throw;
-            }
-        }
-
-        static SslCredentials CreateCredentials(string clientCert, string clientKey, string serverCert)
-        {
-            // 🔧 Loading client certificate and key...
-            _logger.LogDebug("🔧 Loading client certificate and key...");
-
-            // 🔑 Creating key certificate pair...
-            _logger.LogDebug("🔑 Creating key certificate pair...");
-            var keyCertPair = new KeyCertificatePair(clientCert, clientKey);
-
-            // 🔒 Creating credentials...
-            _logger.LogDebug("🔒 Creating credentials...");
-            return new SslCredentials(serverCert, keyCertPair);
         }
     }
 }
