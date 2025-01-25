@@ -22,7 +22,7 @@ static const char* socket_type_usage =
 | Python | secp521r1 | Go     | rsa-2048  | Yes |
 | Python | secp521r1 | Python | rsa-2048  | No  |
 | Python | secp521r1 | Ruby   | rsa-2048  | No  |
-| Python | secp521r1 | C#     | rsa-2048  | No  |
+| Python | secp521r1 | C#     | rsa-2048  | Yes |
 | ------ | --------- | ------ | --------- | --- | 
 | Go     | secp521r1 | Go     | secp384r1 | Yes |
 | Go     | secp521r1 | Python | secp384r1 | No  |
