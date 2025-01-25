@@ -10,7 +10,7 @@
     HashiCorp `go-plugin`. Currently, `go-plugin` forces P-521 key. All gRPC
     clients, and servers, must support P-521.
 
-* All Clients, and Servers, across all languages in this repository, are able
+* All Clients, and Servers, except CSharp, across all languages in this repository, are able
   to make Put/Get requests between the different implementationss.
 
 ---
