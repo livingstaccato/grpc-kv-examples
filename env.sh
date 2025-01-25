@@ -44,5 +44,5 @@ alias go-server="${BASE_PATH}/go/build/simple-go-server"
 alias py-client="${BASE_PATH}/python/simple-py-client.py"
 alias py-server="${BASE_PATH}/python/simple-py-server.py"
 
-alias rb-client="${BASE_PATH}/python/simple-rb-client.rb"
-alias rb-server="${BASE_PATH}/python/simple-rb-server.rb"
+alias rb-client="${BASE_PATH}/ruby/simple-rb-client.rb"
+alias rb-server="${BASE_PATH}/ruby/simple-rb-server.rb"
