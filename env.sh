@@ -60,7 +60,6 @@ alias rb-server="(cd ${BASE_PATH}; source env.sh; ./ruby/simple-rb-server.rb)"
 
 alias cs-build="(cd ${BASE_PATH}; source env.sh; cd ./csharp; dotnet build)"
 alias cs-client="(cd ${BASE_PATH}; source env.sh; cd ./csharp; dotnet run)"
-#alias cs-server="${BASE_PATH}/ruby/simple-rb-server.rb"
 
 export PLUGIN_HOST \
     PLUGIN_PORT \
@@ -74,5 +73,5 @@ export PLUGIN_HOST \
 
 export PYTHONPATH
 
-echo "🔑 Using 
+echo "🔑 Using ${ALGO}"
 echo "✅ Setup the environment."
