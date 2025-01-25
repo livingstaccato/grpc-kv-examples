@@ -52,6 +52,7 @@ def main():
         # Channel options matching Go client
         options = [
             ('grpc.ssl_target_name_override', 'localhost'),
+            ('grpc.use_local_subchannel_pool', 1),
         ]
 
         # Server endpoint
