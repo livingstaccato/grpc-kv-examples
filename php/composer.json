@@ -1,5 +1,6 @@
 {
     "require": {
-        "grpc/grpc": "^1.57"
+        "grpc/grpc": "^1.57",
+        "monolog/monolog": "^3.8"
     }
 }
