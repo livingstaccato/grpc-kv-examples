@@ -80,8 +80,8 @@ alias py-server="(cd ${BASE_PATH} && source env.sh && ./python/simple-py-server.
 alias rb-client="(cd ${BASE_PATH} && source env.sh && ./ruby/simple-rb-client.rb)"
 alias rb-server="(cd ${BASE_PATH} && source env.sh && ./ruby/simple-rb-server.rb)"
 
-alias cs-build="(cd ${BASE_PATH}/csharp && dotnet build)"
-alias cs-client="(cd ${BASE_PATH}/csharp && dotnet run)"
+alias cs-build="(cd ${BASE_PATH}  && source env.sh && cd ./csharp && dotnet build)"
+alias cs-client="(cd ${BASE_PATH} && source env.sh && cd ./csharp && dotnet run)"
 
 # Export all necessary environment variables
 export PLUGIN_HOST \
