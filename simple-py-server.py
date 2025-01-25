@@ -35,7 +35,7 @@ class KVServicer(kv_pb2_grpc.KVServicer):
 
 def serve():
     logger.info("🚀 🔄 Server starting")
-    
+
     try:
         server_cert = os.getenv('PLUGIN_SERVER_CERT')
         server_key = os.getenv('PLUGIN_SERVER_KEY')
@@ -43,13 +43,13 @@ def serve():
 
         if not all([server_cert, server_key]):
             raise ValueError("🔐 ❌ Missing certificates")
-        
+
         logger.debug(f"🔐 📊 Cert lengths - Server: {len(server_cert)}, Key: {len(server_key)}, Client: {len(client_cert) if client_cert else 0}")
 
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
             root_certificates=client_cert.encode(),
-            require_client_auth=None,
+            require_client_auth=True,
         )
 
         logger.info("🔒 ✅ Credentials created")
