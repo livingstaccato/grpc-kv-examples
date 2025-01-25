@@ -46,6 +46,22 @@ library confirm that they should support `secp521r1`.
 
 * Both Python and Ruby verify that they support the `secp521r1` curve.
 
+## Verifying Certificates
+
+```
+openssl ecparam -name secp521r1 \
+  -genkey \
+  -noout \
+  -in ec-secp521r1-mtls-client.key \
+| openssl req -new \
+  -key ec-secp521r1-mtls-client.key \
+  -x509 \
+  -nodes \
+  -days 365 \
+  -out blah \
+  -subj "/CN=test.com"
+`
+
 ## Verifying OpenSSL Version
 
 ```
