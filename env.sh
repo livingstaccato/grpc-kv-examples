@@ -123,14 +123,14 @@ function get_key_size() {
     | sed -E 's/[^0-9]+//g'
 }
 
-export get_key_size
+get_key_size ${PLUG_CLIENT_KEY_FILE}
 
 PLUGIN_CLIENT_KEY_SIZE=$(get_key_size ${PLUGIN_CLIENT_KEY_FILE})
 
 echo ""
 echo "🔐 TLS Configuration:"
 echo "   • Algorithm: ${PLUGIN_ALGO}"
-echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO} $(get_key_size <$(echo ${PLUG_CLIENT_KEY}))"
+echo "   • Client Algorithm: ${PLUGIN_CLIENT_ALGO}"
 echo "   • Server Algorithm: ${PLUGIN_SERVER_ALGO}"
 echo ""
 echo "📊 Environment Status:"
