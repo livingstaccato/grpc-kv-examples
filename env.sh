@@ -1,8 +1,8 @@
 #!/bin/sh
 
 #ALGO=rsa-
-#ALGO=ec-secp256r1-
-ALGO=ec-secp521r1-
+ALGO=ec-secp256r1-
+#ALGO=ec-secp521r1-
 
 export PLUGIN_CLIENT_CERT="$(cat ./certs/${ALGO}mtls-client.crt)"
 export PLUGIN_CLIENT_KEY="$(cat ./certs/${ALGO}mtls-client.key)"
