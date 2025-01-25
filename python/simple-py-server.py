@@ -7,6 +7,8 @@ from proto import kv_pb2, kv_pb2_grpc
 import time
 import os
 import ssl
+from  cryptography import x509
+from cryptography.hazmat.primitives import serialization
 
 # Configure logging
 logging.basicConfig(
@@ -34,22 +36,61 @@ class KVServicer(kv_pb2_grpc.KVServicer):
         try:
             logger.debug(f"  🔎 🌐 Peer: {context.peer()}")
 
-            # Get the SSL object and log details if available
-            ssl_obj = context._sslobject  # Access the internal _sslobject
-            if ssl_obj:
-                logger.debug("  🔐 SSL details:")
-                logger.debug(f"    Version: {ssl_obj.version()}")
-                cipher = ssl_obj.cipher()
-                logger.debug(f"    Cipher: {cipher[0]} (protocol: {cipher[1]}, bits: {cipher[2]})")
+            # Try to get peer certificate details
+            peer_cert = context.peer_certificate()
+            if peer_cert:
+                logger.debug("  🔐 Peer Certificate (PEM):\n%s", peer_cert.decode())
+                x509_cert = x509.load_pem_x509_certificate(peer_cert)
+                logger.debug("  🔍 Peer Certificate Details:")
+                self._log_cert_details(x509_cert)
             else:
-                logger.warning("  ⚠️ No SSL object found in the context.")
-            
+                logger.warning("  ⚠️ No peer certificate found.")
+
             logger.debug("  🔒 Metadata:")
             for k, v in context.invocation_metadata():
                 logger.debug(f"      {k}: {v}")
 
         except Exception as e:
             logger.error(f"  ❌ Logging error: {e}")
+
+    def _log_cert_details(self, cert: x509.Certificate):
+        logger.debug(f"    Subject: {cert.subject}")
+        logger.debug(f"    Issuer: {cert.issuer}")
+        logger.debug(f"    Valid From: {cert.not_valid_before_utc}")
+        logger.debug(f"    Valid Until: {cert.not_valid_after_utc}")
+        logger.debug(f"    Serial Number: {cert.serial_number}")
+        logger.debug(f"    Version: {cert.version}")
+        logger.debug(f"    Signature Algorithm: {cert.signature_algorithm_oid.dotted_string}")
+        logger.debug(f"    Signature: {cert.signature.hex()}")
+        logger.debug(f"    Public Key: {cert.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()}")
+
+        # Log Key Usage extension
+        try:
+            key_usage = cert.extensions.get_extension_for_oid(x509.oid.ExtensionOID.KEY_USAGE)
+            logger.debug(f"    Key Usage: {key_usage.value}")
+        except x509.ExtensionNotFound:
+            logger.warning("    Key Usage extension not found.")
+
+        # Log Extended Key Usage extension
+        try:
+            ext_key_usage = cert.extensions.get_extension_for_oid(x509.oid.ExtensionOID.EXTENDED_KEY_USAGE)
+            logger.debug(f"    Extended Key Usage: {ext_key_usage.value}")
+        except x509.ExtensionNotFound:
+            logger.warning("    Extended Key Usage extension not found.")
+
+        # Log Subject Alternative Name extension
+        try:
+            san = cert.extensions.get_extension_for_oid(x509.oid.ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
+            logger.debug(f"    Subject Alternative Name: {san.value.get_values_for_type(x509.DNSName)}")
+        except x509.ExtensionNotFound:
+            logger.debug("    Subject Alternative Name extension not found.")
+        
+        # Log Basic Constraints extension
+        try:
+            basic_constraints = cert.extensions.get_extension_for_oid(x509.oid.ExtensionOID.BASIC_CONSTRAINTS)
+            logger.debug(f"    Basic Constraints: CA={basic_constraints.value.ca}, Path Length={basic_constraints.value.path_length}")
+        except x509.ExtensionNotFound:
+            logger.debug("    Basic Constraints extension not found.")
 
 def serve():
     logger.info("🚀 🔄 Server starting")
