@@ -36,6 +36,9 @@ fi
 PLUGIN_CLIENT_CERT="$(cat ${PLUGIN_CLIENT_CERT_FILE})"
 PLUGIN_CLIENT_KEY="$(cat ${PLUGIN_CLIENT_KEY_FILE})"
 
+PLUGIN_SERVER_CERT_FILE="${BASE_PATH}/certs/${PLUGIN_SERVER_ALGO}-mtls-server.crt"
+PLUGIN_SERVER_KEY_FILE="${BASE_PATH}/certs/${PLUGIN_SERVER_ALGO}-mtls-server.key"
+
 # Load certificates
 if [ ! -f "${PLUGIN_SERVER_CERT_FILE}" ]; then
     echo "❌ Error: Server certificate not found at ${PLUGIN_SERVER_CERT_FILE}"
