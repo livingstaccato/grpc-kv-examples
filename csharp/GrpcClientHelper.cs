@@ -1,6 +1,5 @@
 using System;
 using System.Net.Security;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -33,10 +32,8 @@ public class GrpcClientHelper
 
     public GrpcChannel CreateChannel()
     {
-        var credentials = CreateCredentials();
         var channelOptions = new GrpcChannelOptions
         {
-            Credentials = credentials,
             HttpHandler = new SocketsHttpHandler
             {
                 SslOptions = new SslClientAuthenticationOptions
@@ -49,15 +46,6 @@ public class GrpcClientHelper
 
         _logger.LogDebug("🔌 Creating gRPC channel to {serverEndpoint}...", _serverEndpoint);
         return GrpcChannel.ForAddress(_serverEndpoint, channelOptions);
-    }
-
-    private SslCredentials CreateCredentials()
-    {
-        // 🔒 Creating credentials...
-        _logger.LogDebug("🔒 Creating credentials...");
-        var serverCert = new X509Certificate2(Encoding.UTF8.GetBytes(_serverCertPem));
-
-        return new SslCredentials(PemKeyCertPair.PemCertificatePrefix + PemKeyCertPair.PemCertificateSuffix, new KeyCertificatePair(PemKeyCertPair.PemCertificatePrefix + PemKeyCertPair.PemCertificateSuffix, _clientCert.GetRSAPrivateKey().ToKeyParameter().ToString()));
     }
 
     private bool ValidateServerCertificate(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
