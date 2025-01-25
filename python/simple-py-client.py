@@ -54,7 +54,7 @@ def main():
             ('grpc.ssl_target_name_override', 'localhost'),
             ('grpc.default_authority', 'localhost'),
             ('grpc.min_tls_version', '1.3'),
-            ('grpc.tls_signature_algorithms', 'ECDSA+SHA512:ECDSA+SHA384')
+            ('grpc.tls_signature_algorithms', 'ECDSA+SHA512:ECDSA+SHA384'),
             ('grpc.use_local_subchannel_pool', 1),
         ]
 
