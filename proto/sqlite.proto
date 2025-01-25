@@ -8,154 +8,170 @@ import "google/protobuf/empty.proto";
 // Service definition for interacting with an SQLite database
 service SQLiteStore {
   // Query execution
-  rpc ExecuteQuery(QueryRequest) returns (stream QueryResponse);
-  rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse);
-  rpc BatchExecute(BatchRequest) returns (BatchResponse);
-  rpc GetSchema(SchemaRequest) returns (SchemaResponse);
+  rpc ExecuteQuery(QueryRequest) returns (stream QueryResponse); // Execute a query and stream results
+  rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse); // Execute a non-SELECT statement
+  rpc BatchExecute(BatchRequest) returns (BatchResponse); // Execute multiple queries/updates in a batch
+  rpc GetSchema(SchemaRequest) returns (SchemaResponse); // Retrieve schema details for a table
+  rpc ExplainQueryPlan(ExplainQueryRequest) returns (ExplainQueryResponse); // Provide query plan for debugging
 
   // Statement preparation and execution
-  rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse);
-  rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (stream QueryResponse);
+  rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse); // Prepare a SQL statement
+  rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (stream QueryResponse); // Execute a prepared statement
+  rpc DeletePreparedStatement(DeletePreparedStatementRequest) returns (google.protobuf.Empty); // Clean up prepared statement
 
   // Transaction management
-  rpc BeginTransaction(google.protobuf.Empty) returns (TransactionResponse);
-  rpc CommitTransaction(TransactionRequest) returns (TransactionResponse);
-  rpc RollbackTransaction(TransactionRequest) returns (TransactionResponse);
+  rpc BeginTransaction(google.protobuf.Empty) returns (TransactionResponse); // Start a new transaction
+  rpc CommitTransaction(TransactionRequest) returns (TransactionResponse); // Commit the active transaction
+  rpc RollbackTransaction(TransactionRequest) returns (TransactionResponse); // Rollback the active transaction
+  rpc GetTransactionState(TransactionRequest) returns (TransactionStateResponse); // Get the current transaction state
 
   // Connection management
-  rpc CreateConnection(ConnectionRequest) returns (ConnectionResponse);
+  rpc CreateConnection(ConnectionRequest) returns (ConnectionResponse); // Establish a new connection
+  rpc CloseConnection(ConnectionRequest) returns (google.protobuf.Empty); // Close an active connection
 }
 
 // Status code and message for operations
 message Status {
   enum Code {
-    OK = 0;
-    ERROR = 1; 
-    CONSTRAINT_VIOLATION = 2;
-    SYNTAX_ERROR = 3;
-    INVALID_PARAMETER = 4;
-    TRANSACTION_ERROR = 5;
+    OK = 0; // Operation successful
+    ERROR = 1; // General error
+    CONSTRAINT_VIOLATION = 2; // Constraint violation error
+    SYNTAX_ERROR = 3; // SQL syntax error
+    INVALID_PARAMETER = 4; // Invalid input parameter
+    TRANSACTION_ERROR = 5; // Transaction-related error
   }
-  Code code = 1;
-  string message = 2;
+  Code code = 1; // Status code
+  string message = 2; // Human-readable error message
 }
 
 // Parameter for queries/statements
 message Parameter {
   optional string name = 1; // Optional name for named parameters
   oneof value {
-    int64 int_value = 2;
-    double float_value = 3;
-    string string_value = 4;
-    bytes blob_value = 5;
-    google.protobuf.Timestamp timestamp_value = 6;
-    bool null_value = 7;
+    int64 int_value = 2; // Integer value
+    double float_value = 3; // Float value
+    string string_value = 4; // String value
+    bytes blob_value = 5; // Binary value
+    google.protobuf.Timestamp timestamp_value = 6; // Timestamp value
+    bool null_value = 7; // Explicit NULL value
   }
 }
 
 // Query execution messages
 message QueryRequest {
-  string connection_id = 1;
-  string query = 2;
-  repeated Parameter params = 3;
-  string transaction_id = 4;
+  string connection_id = 1; // Connection identifier
+  string query = 2; // SQL query string
+  repeated Parameter params = 3; // Parameters for the query
+  string transaction_id = 4; // Associated transaction ID
 }
 
 message QueryResponse {
-  repeated Row rows = 1;
-  repeated string column_names = 2;
-  repeated string column_types = 3;
-  int32 rows_affected = 4;
-  Status status = 5;
+  repeated Row rows = 1; // Result rows
+  repeated string column_names = 2; // Names of result columns
+  repeated string column_types = 3; // Types of result columns
+  int32 rows_affected = 4; // Number of rows affected (if applicable)
+  Status status = 5; // Status of the query execution
 }
 
 message Row {
-  repeated Parameter values = 1;
+  repeated Parameter values = 1; // Values in a row
 }
 
 // Update execution messages
 message UpdateRequest {
-  string connection_id = 1;
-  string query = 2;
-  repeated Parameter params = 3;
-  string transaction_id = 4;
+  string connection_id = 1; // Connection identifier
+  string query = 2; // SQL update statement
+  repeated Parameter params = 3; // Parameters for the update
+  string transaction_id = 4; // Associated transaction ID
 }
 
 message UpdateResponse {
-  int32 rows_affected = 1;
-  int64 last_insert_id = 2;
-  Status status = 3;
+  int32 rows_affected = 1; // Number of rows updated
+  int64 last_insert_id = 2; // ID of the last inserted row
+  Status status = 3; // Status of the update
 }
 
 // Batch execution messages
 message BatchRequest {
-  string connection_id = 1;
-  repeated QueryRequest queries = 2;
-  string transaction_id = 3;
+  string connection_id = 1; // Connection identifier
+  repeated QueryRequest queries = 2; // List of queries/updates to execute
+  string transaction_id = 3; // Associated transaction ID
 }
 
 message BatchResponse {
-  repeated QueryResponse results = 1;
-  Status status = 2;
+  repeated QueryResponse results = 1; // Results of the batch execution
+  Status status = 2; // Status of the batch execution
 }
 
 // Schema inspection messages
 message SchemaRequest {
-  string connection_id = 1;
-  string table_name = 2;
+  string connection_id = 1; // Connection identifier
+  string table_name = 2; // Name of the table to inspect
 }
 
 message SchemaResponse {
-  repeated ColumnInfo columns = 1;
-  Status status = 2;
+  repeated ColumnInfo columns = 1; // Details of table columns
+  Status status = 2; // Status of the schema retrieval
 }
 
 message ColumnInfo {
-  string name = 1;
-  string type = 2;
-  bool nullable = 3;
-  bool primary_key = 4;
-  string default_value = 5;
-  bool auto_increment = 6;
-  repeated string foreign_key = 7;
+  string name = 1; // Column name
+  string type = 2; // Column data type
+  bool nullable = 3; // Whether the column allows NULL
+  bool primary_key = 4; // Whether the column is part of the primary key
+  string default_value = 5; // Default value of the column
+  bool auto_increment = 6; // Whether the column is auto-incrementing
+  repeated string foreign_key = 7; // Foreign key references (if any)
 }
 
 // Prepared statement messages
 message PrepareStatementRequest {
-  string connection_id = 1;
-  string query = 2;
-  string transaction_id = 3;
+  string connection_id = 1; // Connection identifier
+  string query = 2; // SQL statement to prepare
+  string transaction_id = 3; // Associated transaction ID
 }
 
 message PrepareStatementResponse {
-  string statement_id = 1;
-  Status status = 2;
+  string statement_id = 1; // Identifier for the prepared statement
+  Status status = 2; // Status of the preparation
 }
 
 message ExecutePreparedStatementRequest {
-  string connection_id = 1;
-  string statement_id = 2;
-  repeated Parameter params = 3;
-  string transaction_id = 4;
+  string connection_id = 1; // Connection identifier
+  string statement_id = 2; // Identifier for the prepared statement
+  repeated Parameter params = 3; // Parameters for the execution
+  string transaction_id = 4; // Associated transaction ID
+}
+
+message DeletePreparedStatementRequest {
+  string connection_id = 1; // Connection identifier
+  string statement_id = 2; // Identifier for the prepared statement
 }
 
 // Transaction messages
 message TransactionRequest {
-  string connection_id = 1;
-  string transaction_id = 2;
+  string connection_id = 1; // Connection identifier
+  string transaction_id = 2; // Identifier for the transaction
 }
 
 message TransactionResponse {
-  string transaction_id = 1;
-  Status status = 2;
+  string transaction_id = 1; // Identifier for the transaction
+  Status status = 2; // Status of the transaction operation
+}
+
+message TransactionStateResponse {
+  string transaction_id = 1; // Identifier for the transaction
+  string state = 2; // Current state of the transaction (e.g., active, committed)
+  Status status = 3; // Status of the request
 }
 
 // Connection management messages
 message ConnectionRequest {
-  string database_path = 1; // Or connection string
+  string database_path = 1; // Path to the SQLite database or connection string
 }
 
 message ConnectionResponse {
-  string connection_id = 1;
-  Status status = 2;
+  string connection_id = 1; // Identifier for the new connection
+  Status status = 2; // Status of the connection creation
 }
+
