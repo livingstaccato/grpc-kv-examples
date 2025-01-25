@@ -111,16 +111,16 @@ export PLUGIN_HOST \
     PYTHONPATH
 
 function get_key_size() {
-openssl req -new \
-    -key $1 \
-    -x509 \
-    -nodes \
-    -days 365 \
-    -subj "/CN=test.com" \
-\
-| openssl x509 -noout -text \
-| grep Public-Key \
-| sed -E 's/[^0-9+]\([0-9]+) .*\)$/\1/g'
+    openssl req -new \
+        -key $1 \
+        -x509 \
+        -nodes \
+        -days 365 \
+        -subj "/CN=test.com" \
+    \
+    | openssl x509 -noout -text \
+    | grep Public-Key \
+    | sed -E 's/[^0-9]+//g'
 }
 
 echo ""
