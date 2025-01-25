@@ -50,17 +50,21 @@ library confirm that they should support `secp521r1`.
 
 ```
 openssl ecparam -name secp521r1 \
-  -genkey \
-  -noout \
-  -in ec-secp521r1-mtls-client.key \
+    -genkey \
+    -noout \
+    -in ec-secp521r1-mtls-client.key \
+\
 | openssl req -new \
-  -key ec-secp521r1-mtls-client.key \
-  -x509 \
-  -nodes \
-  -days 365 \
-  -out blah \
-  -subj "/CN=test.com"
-`
+    -key ec-secp521r1-mtls-client.key \
+    -x509 \
+    -nodes \
+    -days 365 \
+    -subj "/CN=test.com" \
+\
+| openssl x509 
+    -text -noout
+
+```
 
 ## Verifying OpenSSL Version
 
