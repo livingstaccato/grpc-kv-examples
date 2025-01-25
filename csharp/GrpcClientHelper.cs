@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Logging;
+using Grpc.Net.Client.Configuration;
 
 namespace CSharpGrpcClient;
 
@@ -32,6 +33,8 @@ public class GrpcClientHelper
 
     public GrpcChannel CreateChannel()
     {
+        var serverCert = X509Certificate2.CreateFromPem(_serverCertPem);
+
         var channelOptions = new GrpcChannelOptions
         {
             HttpHandler = new SocketsHttpHandler
@@ -39,74 +42,55 @@ public class GrpcClientHelper
                 SslOptions = new SslClientAuthenticationOptions
                 {
                     ClientCertificates = new X509Certificate2Collection { _clientCert },
-                    RemoteCertificateValidationCallback = ValidateServerCertificate
+                    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+                    {
+                        // 1. Basic certificate validation
+                        if (sslPolicyErrors != SslPolicyErrors.None)
+                        {
+                            _logger.LogError("❌ SSL Policy Errors: {sslPolicyErrors}", sslPolicyErrors);
+                            return false;
+                        }
+
+                        // 2. Check if the server's certificate matches the expected one
+                        var remoteCert = new X509Certificate2(certificate);
+                        if (remoteCert.Thumbprint != serverCert.Thumbprint)
+                        {
+                            _logger.LogError("❌ Server's certificate does not match expected certificate.");
+                            _logger.LogDebug("🔍 Expected server cert thumbprint: {serverThumbprint}", serverCert.Thumbprint);
+                            _logger.LogDebug("🔍 Received server cert thumbprint: {remoteThumbprint}", remoteCert.Thumbprint);
+                            return false;
+                        }
+
+                        // Log certificate details
+                        var certHelper = new CertificateHelper(_logger);
+                        certHelper.LogCertificateDetails("Server", remoteCert);
+
+                        _logger.LogDebug("✅ Server certificate is valid");
+                        return true;
+                    }
+                }
+            },
+            ServiceConfig = new ServiceConfig
+            {
+                MethodConfigs =
+                {
+                    new MethodConfig
+                    {
+                        Names = { MethodName.Default },
+                        RetryPolicy = new RetryPolicy
+                        {
+                            MaxAttempts = 5,
+                            InitialBackoff = TimeSpan.FromSeconds(1),
+                            MaxBackoff = TimeSpan.FromSeconds(5),
+                            BackoffMultiplier = 1.5,
+                            RetryableStatusCodes = { StatusCode.Unavailable }
+                        }
+                    }
                 }
             }
         };
 
         _logger.LogDebug("🔌 Creating gRPC channel to {serverEndpoint}...", _serverEndpoint);
         return GrpcChannel.ForAddress(_serverEndpoint, channelOptions);
-    }
-
-    private bool ValidateServerCertificate(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
-    {
-        // 🔍 Basic certificate validation...
-        _logger.LogDebug("🔍 Basic certificate validation...");
-        if (sslPolicyErrors != SslPolicyErrors.None)
-        {
-            // ❌ SSL Policy Errors: {sslPolicyErrors}
-            _logger.LogError("❌ SSL Policy Errors: {sslPolicyErrors}", sslPolicyErrors);
-
-            // 🔍 Log details about the chain
-            if (chain != null)
-            {
-                _logger.LogDebug("🔍 Certificate chain status: {ChainStatus}", (object)chain.ChainStatus);
-                foreach (var chainStatus in chain.ChainStatus)
-                {
-                    _logger.LogDebug("🔍 Chain Status Element: {StatusInformation}", chainStatus.StatusInformation);
-                }
-
-                _logger.LogDebug("🔍 Certificate chain elements:");
-                foreach (var chainElement in chain.ChainElements)
-                {
-                    _logger.LogDebug("🔍 Chain Element Subject: {Subject}", chainElement.Certificate.Subject);
-                    _logger.LogDebug("🔍 Chain Element Issuer: {Issuer}", chainElement.Certificate.Issuer);
-                    _logger.LogDebug("🔍 Chain Element Status: {Status}", (object)chainElement.ChainElementStatus);
-                }
-            }
-
-            return false;
-        }
-
-        // 🔍 Check if the server's certificate matches the expected one...
-        _logger.LogDebug("🔍 Check if the server's certificate matches the expected one...");
-
-        if (certificate == null)
-        {
-            _logger.LogError("❌ Server certificate is null.");
-            return false;
-        }
-
-        var remoteCert = new X509Certificate2(certificate);
-
-        // 🔍 Logging server certificate details...
-        var certHelper = new CertificateHelper(_logger);
-        certHelper.LogCertificateDetails("Server", remoteCert);
-
-        var serverCertObj = X509Certificate2.CreateFromPem(_serverCertPem);
-
-        // Compare certificate thumbprints
-        if (remoteCert.Thumbprint != serverCertObj.Thumbprint)
-        {
-            // ❌ Server's certificate does not match expected certificate.
-            _logger.LogError("❌ Server's certificate does not match expected certificate.");
-            _logger.LogDebug("🔍 Expected server cert thumbprint: {serverThumbprint}", serverCertObj.Thumbprint);
-            _logger.LogDebug("🔍 Received server cert thumbprint: {remoteThumbprint}", remoteCert.Thumbprint);
-            return false;
-        }
-
-        // ✅ Server certificate is valid
-        _logger.LogDebug("✅ Server certificate is valid");
-        return true;
     }
 }
