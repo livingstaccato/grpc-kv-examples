@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/tim.perkins/code/py/simple-grpc-example/CSharpGrpcClient/CSharpGrpcClient.csproj": {}
+    "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj": {}
   },
   "projects": {
-    "/Users/tim.perkins/code/py/simple-grpc-example/CSharpGrpcClient/CSharpGrpcClient.csproj": {
+    "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/tim.perkins/code/py/simple-grpc-example/CSharpGrpcClient/CSharpGrpcClient.csproj",
+        "projectUniqueName": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
         "projectName": "CSharpGrpcClient",
-        "projectPath": "/Users/tim.perkins/code/py/simple-grpc-example/CSharpGrpcClient/CSharpGrpcClient.csproj",
+        "projectPath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
         "packagesPath": "/Users/tim.perkins/.nuget/packages/",
-        "outputPath": "/Users/tim.perkins/code/py/simple-grpc-example/CSharpGrpcClient/obj/",
+        "outputPath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/tim.perkins/.nuget/NuGet/NuGet.Config"
@@ -44,6 +44,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Grpc.Net.Client": {
+              "target": "Package",
+              "version": "[2.67.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
