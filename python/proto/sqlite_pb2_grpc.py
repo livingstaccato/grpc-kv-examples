@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import sqlite_pb2
+import proto.sqlite_pb2
 
 GRPC_GENERATED_VERSION = '1.68.0'
 GRPC_VERSION = grpc.__version__
