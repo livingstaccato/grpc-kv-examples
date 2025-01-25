@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import grpc
 from certificate_helper import load_certificates_from_env
+import proto.sqlite_pb2 as pb2
+import proto.sqlite_pb2_grpc as pb2_grpc
 
 def create_channel_credentials():
     certs = load_certificates_from_env()
