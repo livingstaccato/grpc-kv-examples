@@ -111,6 +111,7 @@ export PLUGIN_HOST \
     PYTHONPATH
 
 function get_key_size() {
+    echo $1
     openssl req -new \
         -key $1 \
         -x509 \
