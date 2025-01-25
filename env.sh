@@ -2,6 +2,8 @@
 
 BASE_PATH=$(pwd)
 
+ALGO=${MY_VAR:-"secp256r1"}
+
 ALGO=rsa-          # this works
 ALGO=ec-secp256r1- # this works
 ALGO=ec-secp384r1- # this works
