@@ -112,14 +112,13 @@ export PLUGIN_HOST \
 
 function get_key_size() {
 openssl req -new \
+    -key - \
     -x509 \
     -nodes \
     -days 365 \
-    -subj "/CN=test.com" 
-    -key - \
+    -subj "/CN=test.com" \
 \
 | openssl x509 -noout -text | grep Public-Key
-                Public-Key: (384 bit)
 }
 
 echo ""
