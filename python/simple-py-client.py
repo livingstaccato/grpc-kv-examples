@@ -23,7 +23,7 @@ def create_channel_credentials(certs: dict):
     # Configure SSL context with explicit curves
     ssl_context = ssl.create_default_context()
     ssl_context.minimum_version = ssl.TLSVersion.TLSv1_3
-    ssl_context.set_curves(['secp521r1'])
+    ssl_context.set_ciphers(['secp521r1'])
     ssl_context.verify_mode = ssl.CERT_REQUIRED
     
     # Create credentials with SSL context
