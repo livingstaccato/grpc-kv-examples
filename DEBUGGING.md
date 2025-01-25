@@ -61,8 +61,7 @@ openssl ecparam -name secp521r1 \
     -days 365 \
     -subj "/CN=test.com" \
 \
-| openssl x509 
-    -text -noout
+| openssl x509 -noout -text
 
 ```
 
