@@ -4,10 +4,10 @@ BASE_PATH=$(pwd)
 
 ALGO=${ALGO:-"secp256r1"}
 
-ALGO=rsa-          # this works
-ALGO=ec-secp256r1- # this works
-ALGO=ec-secp384r1- # this works
-ALGO=ec-secp521r1- # this does not on Python 3.13 and Ruby 3.4 on macOS 15.2
+# ALGO=rsa-          # this works
+# ALGO=ec-secp256r1- # this works
+# ALGO=ec-secp384r1- # this works
+# ALGO=ec-secp521r1- # this does not on Python 3.13 and Ruby 3.4 on macOS 15.2
 
 export PLUGIN_HOST="localhost"
 export PLUGIN_PORT="50051"
@@ -47,6 +47,8 @@ alias ossl-server='openssl s_server \
     -Verify 2
 '
 
+# socat TCP-LISTEN:12345 UNIX-CONNECT:<path to server unix socket>
+
 alias go-client="(${BASE_PATH}; source env.sh; ./go/build/simple-go-client)"
 alias go-server="(${BASE_PATH}; source env.sh; ./go/build/simple-go-server)"
 
@@ -60,4 +62,17 @@ alias cs-build="(cd ${BASE_PATH}; source env.sh; cd ./csharp; dotnet build)"
 alias cs-client="(cd ${BASE_PATH}; source env.sh; cd ./csharp; dotnet run)"
 #alias cs-server="${BASE_PATH}/ruby/simple-rb-server.rb"
 
+export PLUGIN_HOST \
+    PLUGIN_PORT \
+    PLUGIN_SERVER_ENDPOINT \
+    PLUGIN_PYTHON_SERVER_ENDPOINT \
+    PLUGIN_CS_SERVER_ENDPOINT \
+    PLUGIN_CLIENT_CERT \
+    PLUGIN_CLIENT_KEY \
+    PLUGIN_SERVER_CERT \
+    PLUGIN_SERVER_KEY
+
+export PYTHONPATH
+
+echo "🔑 Using 
 echo "✅ Setup the environment."
