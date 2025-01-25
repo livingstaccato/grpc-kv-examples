@@ -71,8 +71,8 @@ alias go-build="(cd ${BASE_PATH}/go/bin; \
   go build ../simple-go-client.go; \
   go build ../simple-go-server.go)"
 
-alias go-client="(cd ${BASE_PATH} && source env.sh && ./go/build/simple-go-client)"
-alias go-server="(cd ${BASE_PATH} && source env.sh && ./go/build/simple-go-server)"
+alias go-client="(cd ${BASE_PATH} && source env.sh && ./go/bin/simple-go-client)"
+alias go-server="(cd ${BASE_PATH} && source env.sh && ./go/bin/simple-go-server)"
 
 alias py-client="(cd ${BASE_PATH} && source env.sh && ./python/simple-py-client.py)"
 alias py-server="(cd ${BASE_PATH} && source env.sh && ./python/simple-py-server.py)"
