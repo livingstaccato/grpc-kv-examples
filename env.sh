@@ -15,6 +15,8 @@ export PLUGIN_SERVER_KEY="$(cat ./certs/${ALGO}mtls-server.key)"
 
 # socat TCP-LISTEN:12345 UNIX-CONNECT:<path to server unix socket>
 
+export PYTHONPATH="${BASE_PATH}/python:${BASE_PATH}"
+
 alias ossl-client='openssl s_client -connect localhost:50051 \
    -cert <(echo "$PLUGIN_CLIENT_CERT") \
    -key <(echo "$PLUGIN_CLIENT_KEY") \
