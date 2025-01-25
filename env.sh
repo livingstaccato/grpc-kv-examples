@@ -90,6 +90,7 @@ export PLUGIN_HOST \
     PYTHONPATH
 
 # Status report
+echo ""
 echo "📊 Environment Status:"
 echo "   • Client Cert Size: $(echo "$PLUGIN_CLIENT_CERT" | wc -c) bytes"
 echo "   • Client Key Size: $(echo "$PLUGIN_CLIENT_KEY" | wc -c) bytes"
