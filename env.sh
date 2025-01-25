@@ -123,9 +123,9 @@ function get_key_size() {
     | sed -E 's/[^0-9]+//g'
 }
 
-get_key_size ${PLUG_CLIENT_KEY_FILE}
+get_key_size "${PLUG_CLIENT_KEY_FILE}"
 
-PLUGIN_CLIENT_KEY_SIZE=$(get_key_size ${PLUGIN_CLIENT_KEY_FILE})
+#PLUGIN_CLIENT_KEY_SIZE=$(get_key_size ${PLUGIN_CLIENT_KEY_FILE})
 
 echo ""
 echo "🔐 TLS Configuration:"
