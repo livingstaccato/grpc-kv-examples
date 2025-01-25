@@ -9,8 +9,11 @@ BASE_PATH=$(pwd)
 # Algorithms not working:
 #     ec-secp521r1
 #
-ALGO=${ALGO:-"ec-secp256r1"}
+PLUGIN_ALGO=${ALGO:-"ec-secp256r1"}
 
+PLUGIN_CLIENT_ALGO=${PLUGIN_CLIENT_ALGO:-${PLUGIN_ALGO}}
+echo $PLUGIN_CLIENTY_ALGO
+exit 0
 export PLUGIN_HOST=${PLUGIN_HOST:-"localhost"}
 export PLUGIN_PORT=${PLUGIN_PORT:-"50051"}
 
