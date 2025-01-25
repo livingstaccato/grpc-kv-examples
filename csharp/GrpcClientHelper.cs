@@ -49,6 +49,8 @@ public class GrpcClientHelper : IDisposable
         var httpClientHandler = new HttpClientHandler();
         httpClientHandler.SslProtocols = SslProtocols.Tls13; // 🎯2️⃣ Force TLS 1.3
         httpClientHandler.ServerCertificateCustomValidationCallback = ValidateServerCertificate;
+        httpClientHandler.EnableMultipleHttp2Connections = false; // Add this line, try both true and false
+
         _logger.LogDebug("🔄🔗 HTTP Client Handler created");
 
         // 🔧 HTTP/2 and Tracing
