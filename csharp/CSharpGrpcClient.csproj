@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\protos\kv.proto" GrpcServices="Client" />
+    <Protobuf Include="..\proto\kv.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>
