@@ -76,9 +76,9 @@ def main():
     channel = grpc.secure_channel('localhost:50051', channel_creds, options=options)
     client = SQLiteClient(channel)
 
-   # Example queries
-   print(client.execute_query("SELECT * FROM users WHERE id = ?", [1]))
-   print(client.execute_update("INSERT INTO users (name) VALUES (?)", ["Alice"]))
+    # Example queries
+    print(client.execute_query("SELECT * FROM users WHERE id = ?", [1]))
+    print(client.execute_update("INSERT INTO users (name) VALUES (?)", ["Alice"]))
 
 if __name__ == '__main__':
-   main()
+    main()
