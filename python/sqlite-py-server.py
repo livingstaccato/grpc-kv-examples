@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sqlite4
+import sqlite3
 from concurrent import futures
 import grpc
 import proto.sqlite_pb2 as pb2
@@ -11,7 +11,7 @@ class SQLiteService(pb2_grpc.SQLiteStoreServicer):
         self.db_path = db_path
 
     def _get_db(self):
-        return sqlite4.connect(self.db_path)
+        return sqlite3.connect(self.db_path)
 
     def _param_to_python(self, param):
         if param.HasField('int_value'):
