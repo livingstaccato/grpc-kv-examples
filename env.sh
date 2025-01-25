@@ -2,12 +2,14 @@
 
 BASE_PATH=$(pwd)
 
-ALGO=${ALGO:-"secp256r1"}
-
-# ALGO=rsa-          # this works
-# ALGO=ec-secp256r1- # this works
-# ALGO=ec-secp384r1- # this works
-# ALGO=ec-secp521r1- # this does not on Python 3.13 and Ruby 3.4 on macOS 15.2
+#
+# Algorithms verified to work:
+#    rsa, ec-secp2561, ec-secp384r1
+#
+# Algorithms not working:
+#     ec-secp521r1
+#
+ALGO=${ALGO:-"ec-secp256r1"}
 
 export PLUGIN_HOST=${PLUGIN_HOST:-"localhost"}
 export PLUGIN_PORT=${PLUGIN_PORT:-"50051"}
