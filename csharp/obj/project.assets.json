@@ -959,7 +959,6 @@
       "Google.Protobuf >= 3.29.3",
       "Grpc.Net.Client >= 2.67.0",
       "Grpc.Tools >= 2.69.0",
-      "Microsoft.Extensions.Logging >= 9.0.1",
       "Microsoft.Extensions.Logging.Console >= 9.0.1",
       "Serilog >= 4.2.0",
       "Serilog.Sinks.Console >= 6.0.0"
@@ -1022,10 +1021,6 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[2.69.0, )"
-          },
-          "Microsoft.Extensions.Logging": {
-            "target": "Package",
-            "version": "[9.0.1, )"
           },
           "Microsoft.Extensions.Logging.Console": {
             "target": "Package",
