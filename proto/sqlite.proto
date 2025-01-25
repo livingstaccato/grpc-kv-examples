@@ -8,14 +8,15 @@ import "google/protobuf/empty.proto";
 // Service definition for interacting with an SQLite database
 service SQLiteStore {
  // Query execution
- rpc ExecuteQuery(QueryRequest) returns (QueryResponse);
+ rpc ExecuteQuery(QueryRequest) returns (stream QueryResponse); // Changed to streaming
  rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse);
  rpc BatchExecute(BatchRequest) returns (BatchResponse);
  rpc GetSchema(SchemaRequest) returns (SchemaResponse);
- 
- // Statement preparation and execution
- rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse);
- rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (QueryResponse);
+
+
+  // Statement preparation and execution (Now with streaming)
+  rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse);
+  rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (stream QueryResponse); // Changed to streaming
 
  // Transaction management
  rpc BeginTransaction(google.protobuf.Empty) returns (TransactionResponse);
@@ -139,3 +140,14 @@ message TransactionResponse {
  string transaction_id = 1;
  Status status = 2;
 }
+
+// Connection management messages (New)
+message ConnectionRequest {
+  string database_path = 1; // Or connection string
+}
+
+message ConnectionResponse {
+  string connection_id = 1;
+  Status status = 2;
+}
+
