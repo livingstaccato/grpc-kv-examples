@@ -45,14 +45,14 @@ alias ossl-server='openssl s_server \
     -Verify 2
 '
 
-alias go-client="(${BASE_PATH}; source env.sh; ./go/build/simple-go-client"
-alias go-server="(${BASE_PATH}; source env.sh; ./go/build/simple-go-server"
+alias go-client="(${BASE_PATH}; source env.sh; ./go/build/simple-go-client)"
+alias go-server="(${BASE_PATH}; source env.sh; ./go/build/simple-go-server)"
 
-alias py-client="(cd ${BASE_PATH}; source env.sh; ./python/simple-py-client.py"
-alias py-server="(cd ${BASE_PATH}; source env.sh; ./python/simple-py-server.py"
+alias py-client="(cd ${BASE_PATH}; source env.sh; ./python/simple-py-client.py)"
+alias py-server="(cd ${BASE_PATH}; source env.sh; ./python/simple-py-server.py)"
 
-alias rb-client="(cd ${BASE_PATH}; source env.sh; .ruby/simple-rb-client.rb"
-alias rb-server="(cd ${BASE_PATH}; source env.sh; .ruby/simple-rb-server.rb"
+alias rb-client="(cd ${BASE_PATH}; source env.sh; .ruby/simple-rb-client.rb)"
+alias rb-server="(cd ${BASE_PATH}; source env.sh; .ruby/simple-rb-server.rb)"
 
 alias cs-build="(cd ${BASE_PATH}; source env.sh; cd ./csharp; dotnet build)"
 alias cs-client="(cd ${BASE_PATH}; source env.sh; cd ./csharp; dotnet run)"
