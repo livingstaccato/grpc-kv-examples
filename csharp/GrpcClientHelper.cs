@@ -53,7 +53,6 @@ public class GrpcClientHelper : IDisposable
 
         // 🔧 HTTP/2 and Tracing
         _logger.LogDebug("🔧 Setting up HTTP/2 and gRPC tracing...");
-        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2Support", true);
         // remove this line: GrpcChannel.EnableTracing = true;
 
