@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import asyncio
 import grpc
 import logging
 from concurrent import futures
@@ -7,7 +8,7 @@ from proto import kv_pb2, kv_pb2_grpc
 import time
 import os
 import ssl
-from  cryptography import x509
+from cryptography import x509
 from cryptography.hazmat.primitives import serialization
 
 # Configure logging
@@ -22,27 +23,27 @@ class KVServicer(kv_pb2_grpc.KVServicer):
     def __init__(self):
         logger.info("🔧 🚀 Initializing KVServicer")
 
-    def Put(self, request, context):
+    async def Put(self, request, context):
         logger.info(f"📝 📥 Put request - Key: {request.key}")
-        self._log_request_details(context)
+        await self._log_request_details(context)
         return kv_pb2.Empty()
 
-    def Get(self, request, context):
+    async def Get(self, request, context):
         logger.info(f"🔍 📥 Get request - Key: {request.key}")
-        self._log_request_details(context)
+        await self._log_request_details(context)
         return kv_pb2.GetResponse(value=b"OK")
 
-    def _log_request_details(self, context):
+    async def _log_request_details(self, context):
         try:
             logger.debug(f"  🔎 🌐 Peer: {context.peer()}")
 
             # Try to get peer certificate details
-            peer_cert = context.peer_certificate()
+            peer_cert = context.peer_certificate_chain()
             if peer_cert:
-                logger.debug("  🔐 Peer Certificate (PEM):\n%s", peer_cert.decode())
-                x509_cert = x509.load_pem_x509_certificate(peer_cert)
-                logger.debug("  🔍 Peer Certificate Details:")
-                self._log_cert_details(x509_cert)
+                logger.debug("  🔐 Peer Certificate Chain:")
+                for cert_bytes in peer_cert:
+                    cert = x509.load_der_x509_certificate(cert_bytes)
+                    self._log_cert_details(cert)
             else:
                 logger.warning("  ⚠️ No peer certificate found.")
 
@@ -84,7 +85,7 @@ class KVServicer(kv_pb2_grpc.KVServicer):
             logger.debug(f"    Subject Alternative Name: {san.value.get_values_for_type(x509.DNSName)}")
         except x509.ExtensionNotFound:
             logger.debug("    Subject Alternative Name extension not found.")
-        
+
         # Log Basic Constraints extension
         try:
             basic_constraints = cert.extensions.get_extension_for_oid(x509.oid.ExtensionOID.BASIC_CONSTRAINTS)
@@ -92,38 +93,36 @@ class KVServicer(kv_pb2_grpc.KVServicer):
         except x509.ExtensionNotFound:
             logger.debug("    Basic Constraints extension not found.")
 
-def serve():
+async def serve():
     logger.info("🚀 🔄 Server starting")
 
+    server_cert = os.getenv('PLUGIN_SERVER_CERT')
+    server_key = os.getenv('PLUGIN_SERVER_KEY')
+    client_cert = os.getenv('PLUGIN_CLIENT_CERT')
+
+    if not all([server_cert, server_key]):
+        logger.error("🔐 ❌ Missing certificates")
+        raise ValueError("Missing certificates")
+
+    logger.debug(f"🔐 📊 Cert lengths - Server: {len(server_cert)}, Key: {len(server_key)}, Client: {len(client_cert) if client_cert else 0}")
+
+    # Create server credentials
     try:
-        server_cert = os.getenv('PLUGIN_SERVER_CERT')
-        server_key = os.getenv('PLUGIN_SERVER_KEY')
-        client_cert = os.getenv('PLUGIN_CLIENT_CERT')
-
-        if not all([server_cert, server_key]):
-            raise ValueError("🔐 ❌ Missing certificates")
-
-        logger.debug(f"🔐 📊 Cert lengths - Server: {len(server_cert)}, Key: {len(server_key)}, Client: {len(client_cert) if client_cert else 0}")
-
-        # Create SSL context
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
             root_certificates=client_cert.encode() if client_cert else None,
             require_client_auth=True if client_cert else False
         )
-
         logger.info("🔒 ✅ Credentials created")
-
     except Exception as e:
-        logger.error(f"🔒 ❌ Credentials setup failed: {str(e)}")
+        logger.error(f"🔒 ❌ Credentials setup failed: {e}")
         raise
 
-    server = grpc.server(
+    server = grpc.aio.server(
         futures.ThreadPoolExecutor(max_workers=10),
         options=[
             ('grpc.ssl_target_name_override', 'localhost'),
             ('grpc.default_authority', 'localhost'),
-            #('grpc.use_local_subchannel_pool', 1),
         ]
     )
 
@@ -133,20 +132,15 @@ def serve():
         server.add_secure_port('[::]:50051', server_credentials)
         logger.info("🌐 ✅ Port bound")
     except Exception as e:
-        logger.error(f"🌐 ❌ Port binding failed: {str(e)}")
+        logger.error(f"🌐 ❌ Port binding failed: {e}")
         raise
 
+    await server.start()
+    logger.info("🚀 ✅ Server started")
     try:
-        server.start()
-        logger.info("🚀 ✅ Server started")
-        while True:
-            time.sleep(86400)
+        await server.wait_for_termination()
     except KeyboardInterrupt:
-        server.stop(0)
-    except Exception as e:
-        logger.error(f"⚡ ❌ Error: {str(e)}")
-        server.stop(0)
-        raise
+        await server.stop(0)
 
 if __name__ == '__main__':
-    serve()
+    asyncio.run(serve())
