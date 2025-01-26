@@ -60,20 +60,25 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             rows = execute_query(request.query)  # Fetch rows
             logger.debug(f"🔍 Rows fetched: {rows}")
 
+            logger.debug(f"🔍 Rows fetched from database: {rows}")
+
             response = celersql_pb2.QueryResponse()
 
             if rows:
-                # Add column metadata
+                # Log and add column metadata
                 response.column_names.extend(rows[0].keys())
                 response.column_types.extend([type(value).__name__ for value in rows[0].values()])
-                logger.debug(f"📊 Response metadata: columns={response.column_names}, types={response.column_types}")
+                logger.debug(f"📊 Added column metadata: {response.column_names}")
 
-                # Add rows to the response
+                # Log and add rows
                 for row in rows:
                     grpc_row = celersql_pb2.Row(
                         values=[self._python_to_param(value) for value in row.values()]
                     )
+                    logger.debug(f"🔍 Adding row to response: {row}")
                     response.rows.append(grpc_row)
+
+            logger.debug(f"📤 Sending final QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
 
             log_response_details(
                 response_id=transaction_id,
