@@ -51,13 +51,13 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         Returns:
             celersql_pb2.QueryResponse: Streamed query results with metadata and rows.
         """
-        transaction_id = str(datetime.utcnow().timestamp())
+        transaction_id = str(datetime.datetime.now(datetime.UTC).timestamp())
         log_transaction(
             transaction_id=transaction_id,
             client_id=context.peer(),
             request_type="ExecuteQuery",
             status="pending",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.datetime.now(datetime.UTC),
         )
 
         log_request_details(
