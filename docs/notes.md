@@ -85,3 +85,20 @@ CipherSuites: []uint16{
     tls.TLS_AES_256_GCM_SHA384,
     tls.TLS_AES_128_GCM_SHA256,
 },
+
+
+
+# C#
+```
+the client has:
+    log.Println("⚙️ Configuring TLS... 🔄")
+    tlsConfig := &tls.Config{
+        Certificates:       []tls.Certificate{clientCert},
+        RootCAs:           certPool,
+        ServerName:        "localhost",
+        MinVersion:        tls.VersionTLS13,
+        CurvePreferences: []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+    }
+```
+
+If the MinVersion is set to TLS13 it will break the C# client.
