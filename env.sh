@@ -110,9 +110,7 @@ alias ossl-server='openssl s_server \
     -Verify 2'
 
 # Client/Server aliases with proper directory handling
-alias go-build="(cd ${BASE_PATH}/go/bin; \
-  go build ../go-kv-client.go; \
-  go build ../go-kv-server.go)"
+alias go-build="(cd ${BASE_PATH}/go; ./build.sh)"
 
 alias go-client="(cd ${BASE_PATH} && source env.sh && ./go/bin/go-kv-client)"
 alias go-server="(cd ${BASE_PATH} && source env.sh && ./go/bin/go-kv-server)"
