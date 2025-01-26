@@ -82,15 +82,24 @@ if [ -n "${RSA_BITS}" ]; then
 
     generate_certificate "${_cert_name}-client" \
         "${_cert_name}-client" \
-        "localhost" "localhost,127.0.0.1" \
-        "rsa" # org \
-    # SAN \
-    # algorithm
+        "localhost" \
+        "localhost,127.0.0.1" \
+        "rsa"
+
+    local name=$1
+    local org=$2
+    local cn=$3
+    local san=$4
+    local algo=$5
     echo
     echo "====================================================================="
     echo "*** Server RSA Cert ***"
     echo "====================================================================="
-    generate_certificate "${_cert_name}-server" "localhost" "localhost,127.0.0.1" "${_cert_name}-server" "rsa"
+    generate_certificate "${_cert_name}-server" \
+        "${_cert_name}-server" \
+        "localhost" \
+        "localhost,127.0.0.1" \
+        "rsa"
     echo
     echo "====================================================================="
 fi
@@ -98,7 +107,11 @@ fi
 if [ -n "${ECDSA_CURVE}" ]; then
     echo "====================================================================="
     echo "*** Client Cert ***"
-    generate_certificate "ec-${ECDSA_CURVE}-mtls-client" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-client" "ecdsa"
+    generate_certificate "ec-${ECDSA_CURVE}-mtls-client" \
+        "ec-${ECDSA_CURVE}-mtls-client" \
+        "localhost" \
+        "localhost,127.0.0.1" \
+        "ecdsa"
     echo
     echo
     generate_certificate "ec-${ECDSA_CURVE}-mtls-server" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-server" "ecdsa"
