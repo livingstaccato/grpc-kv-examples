@@ -3,8 +3,7 @@
 import grpc
 import warnings
 
-import proto.celersql_pb2 as celersql__pb2
-
+import celersql_pb2 as celersql__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 GRPC_GENERATED_VERSION = '1.68.0'
@@ -27,8 +26,8 @@ if _version_not_supported:
     )
 
 
-class SimpleSQLStoreStub(object):
-    """Service definition for interacting with a SimpleSQL database
+class CelerSQLStoreStub(object):
+    """Service definition for interacting with a CelerSQL database
     """
 
     def __init__(self, channel):
@@ -38,154 +37,154 @@ class SimpleSQLStoreStub(object):
             channel: A grpc.Channel.
         """
         self.ExecuteQuery = channel.unary_stream(
-                '/proto.SimpleSQLStore/ExecuteQuery',
+                '/proto.CelerSQLStore/ExecuteQuery',
                 request_serializer=celersql__pb2.QueryRequest.SerializeToString,
                 response_deserializer=celersql__pb2.QueryResponse.FromString,
                 _registered_method=True)
         self.CancelQuery = channel.unary_unary(
-                '/proto.SimpleSQLStore/CancelQuery',
+                '/proto.CelerSQLStore/CancelQuery',
                 request_serializer=celersql__pb2.CancelQueryRequest.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.ExecuteUpdate = channel.unary_unary(
-                '/proto.SimpleSQLStore/ExecuteUpdate',
+                '/proto.CelerSQLStore/ExecuteUpdate',
                 request_serializer=celersql__pb2.UpdateRequest.SerializeToString,
                 response_deserializer=celersql__pb2.UpdateResponse.FromString,
                 _registered_method=True)
         self.BatchExecute = channel.unary_unary(
-                '/proto.SimpleSQLStore/BatchExecute',
+                '/proto.CelerSQLStore/BatchExecute',
                 request_serializer=celersql__pb2.BatchRequest.SerializeToString,
                 response_deserializer=celersql__pb2.BatchResponse.FromString,
                 _registered_method=True)
         self.ExecuteBulkInsert = channel.unary_unary(
-                '/proto.SimpleSQLStore/ExecuteBulkInsert',
+                '/proto.CelerSQLStore/ExecuteBulkInsert',
                 request_serializer=celersql__pb2.BulkInsertRequest.SerializeToString,
                 response_deserializer=celersql__pb2.BulkInsertResponse.FromString,
                 _registered_method=True)
         self.GetSchema = channel.unary_unary(
-                '/proto.SimpleSQLStore/GetSchema',
+                '/proto.CelerSQLStore/GetSchema',
                 request_serializer=celersql__pb2.SchemaRequest.SerializeToString,
                 response_deserializer=celersql__pb2.SchemaResponse.FromString,
                 _registered_method=True)
         self.ExplainQueryPlan = channel.unary_unary(
-                '/proto.SimpleSQLStore/ExplainQueryPlan',
+                '/proto.CelerSQLStore/ExplainQueryPlan',
                 request_serializer=celersql__pb2.ExplainQueryRequest.SerializeToString,
                 response_deserializer=celersql__pb2.ExplainQueryResponse.FromString,
                 _registered_method=True)
         self.VacuumDatabase = channel.unary_unary(
-                '/proto.SimpleSQLStore/VacuumDatabase',
+                '/proto.CelerSQLStore/VacuumDatabase',
                 request_serializer=celersql__pb2.VacuumRequest.SerializeToString,
                 response_deserializer=celersql__pb2.VacuumResponse.FromString,
                 _registered_method=True)
         self.BackupDatabase = channel.unary_unary(
-                '/proto.SimpleSQLStore/BackupDatabase',
+                '/proto.CelerSQLStore/BackupDatabase',
                 request_serializer=celersql__pb2.BackupRequest.SerializeToString,
                 response_deserializer=celersql__pb2.BackupResponse.FromString,
                 _registered_method=True)
         self.CheckIntegrity = channel.unary_unary(
-                '/proto.SimpleSQLStore/CheckIntegrity',
+                '/proto.CelerSQLStore/CheckIntegrity',
                 request_serializer=celersql__pb2.IntegrityRequest.SerializeToString,
                 response_deserializer=celersql__pb2.IntegrityResponse.FromString,
                 _registered_method=True)
         self.GetDatabaseInfo = channel.unary_unary(
-                '/proto.SimpleSQLStore/GetDatabaseInfo',
+                '/proto.CelerSQLStore/GetDatabaseInfo',
                 request_serializer=celersql__pb2.DatabaseInfoRequest.SerializeToString,
                 response_deserializer=celersql__pb2.DatabaseInfoResponse.FromString,
                 _registered_method=True)
         self.CreateTable = channel.unary_unary(
-                '/proto.SimpleSQLStore/CreateTable',
+                '/proto.CelerSQLStore/CreateTable',
                 request_serializer=celersql__pb2.CreateTableRequest.SerializeToString,
                 response_deserializer=celersql__pb2.CreateTableResponse.FromString,
                 _registered_method=True)
         self.DropTable = channel.unary_unary(
-                '/proto.SimpleSQLStore/DropTable',
+                '/proto.CelerSQLStore/DropTable',
                 request_serializer=celersql__pb2.DropTableRequest.SerializeToString,
                 response_deserializer=celersql__pb2.DropTableResponse.FromString,
                 _registered_method=True)
         self.ListTables = channel.unary_unary(
-                '/proto.SimpleSQLStore/ListTables',
+                '/proto.CelerSQLStore/ListTables',
                 request_serializer=celersql__pb2.ListTablesRequest.SerializeToString,
                 response_deserializer=celersql__pb2.ListTablesResponse.FromString,
                 _registered_method=True)
         self.AlterTable = channel.unary_unary(
-                '/proto.SimpleSQLStore/AlterTable',
+                '/proto.CelerSQLStore/AlterTable',
                 request_serializer=celersql__pb2.AlterTableRequest.SerializeToString,
                 response_deserializer=celersql__pb2.AlterTableResponse.FromString,
                 _registered_method=True)
         self.CreateIndex = channel.unary_unary(
-                '/proto.SimpleSQLStore/CreateIndex',
+                '/proto.CelerSQLStore/CreateIndex',
                 request_serializer=celersql__pb2.CreateIndexRequest.SerializeToString,
                 response_deserializer=celersql__pb2.CreateIndexResponse.FromString,
                 _registered_method=True)
         self.DropIndex = channel.unary_unary(
-                '/proto.SimpleSQLStore/DropIndex',
+                '/proto.CelerSQLStore/DropIndex',
                 request_serializer=celersql__pb2.DropIndexRequest.SerializeToString,
                 response_deserializer=celersql__pb2.DropIndexResponse.FromString,
                 _registered_method=True)
         self.ListIndexes = channel.unary_unary(
-                '/proto.SimpleSQLStore/ListIndexes',
+                '/proto.CelerSQLStore/ListIndexes',
                 request_serializer=celersql__pb2.ListIndexesRequest.SerializeToString,
                 response_deserializer=celersql__pb2.ListIndexesResponse.FromString,
                 _registered_method=True)
         self.GetConnectionPoolStats = channel.unary_unary(
-                '/proto.SimpleSQLStore/GetConnectionPoolStats',
+                '/proto.CelerSQLStore/GetConnectionPoolStats',
                 request_serializer=celersql__pb2.ConnectionPoolStatsRequest.SerializeToString,
                 response_deserializer=celersql__pb2.ConnectionPoolStatsResponse.FromString,
                 _registered_method=True)
         self.SetConnectionPoolSize = channel.unary_unary(
-                '/proto.SimpleSQLStore/SetConnectionPoolSize',
+                '/proto.CelerSQLStore/SetConnectionPoolSize',
                 request_serializer=celersql__pb2.ConnectionPoolSizeRequest.SerializeToString,
                 response_deserializer=celersql__pb2.ConnectionPoolSizeResponse.FromString,
                 _registered_method=True)
         self.PrepareStatement = channel.unary_unary(
-                '/proto.SimpleSQLStore/PrepareStatement',
+                '/proto.CelerSQLStore/PrepareStatement',
                 request_serializer=celersql__pb2.PrepareStatementRequest.SerializeToString,
                 response_deserializer=celersql__pb2.PrepareStatementResponse.FromString,
                 _registered_method=True)
         self.ExecutePreparedStatement = channel.unary_stream(
-                '/proto.SimpleSQLStore/ExecutePreparedStatement',
+                '/proto.CelerSQLStore/ExecutePreparedStatement',
                 request_serializer=celersql__pb2.ExecutePreparedStatementRequest.SerializeToString,
                 response_deserializer=celersql__pb2.QueryResponse.FromString,
                 _registered_method=True)
         self.DeletePreparedStatement = channel.unary_unary(
-                '/proto.SimpleSQLStore/DeletePreparedStatement',
+                '/proto.CelerSQLStore/DeletePreparedStatement',
                 request_serializer=celersql__pb2.DeletePreparedStatementRequest.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
         self.BeginTransaction = channel.unary_unary(
-                '/proto.SimpleSQLStore/BeginTransaction',
+                '/proto.CelerSQLStore/BeginTransaction',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=celersql__pb2.TransactionResponse.FromString,
                 _registered_method=True)
         self.CommitTransaction = channel.unary_unary(
-                '/proto.SimpleSQLStore/CommitTransaction',
+                '/proto.CelerSQLStore/CommitTransaction',
                 request_serializer=celersql__pb2.TransactionRequest.SerializeToString,
                 response_deserializer=celersql__pb2.TransactionResponse.FromString,
                 _registered_method=True)
         self.RollbackTransaction = channel.unary_unary(
-                '/proto.SimpleSQLStore/RollbackTransaction',
+                '/proto.CelerSQLStore/RollbackTransaction',
                 request_serializer=celersql__pb2.TransactionRequest.SerializeToString,
                 response_deserializer=celersql__pb2.TransactionResponse.FromString,
                 _registered_method=True)
         self.GetTransactionState = channel.unary_unary(
-                '/proto.SimpleSQLStore/GetTransactionState',
+                '/proto.CelerSQLStore/GetTransactionState',
                 request_serializer=celersql__pb2.GetTransactionStateRequest.SerializeToString,
                 response_deserializer=celersql__pb2.GetTransactionStateResponse.FromString,
                 _registered_method=True)
         self.CreateConnection = channel.unary_unary(
-                '/proto.SimpleSQLStore/CreateConnection',
+                '/proto.CelerSQLStore/CreateConnection',
                 request_serializer=celersql__pb2.ConnectionRequest.SerializeToString,
                 response_deserializer=celersql__pb2.ConnectionResponse.FromString,
                 _registered_method=True)
         self.CloseConnection = channel.unary_unary(
-                '/proto.SimpleSQLStore/CloseConnection',
+                '/proto.CelerSQLStore/CloseConnection',
                 request_serializer=celersql__pb2.ConnectionRequest.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
 
 
-class SimpleSQLStoreServicer(object):
-    """Service definition for interacting with a SimpleSQL database
+class CelerSQLStoreServicer(object):
+    """Service definition for interacting with a CelerSQL database
     """
 
     def ExecuteQuery(self, request, context):
@@ -421,7 +420,7 @@ class SimpleSQLStoreServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_SimpleSQLStoreServicer_to_server(servicer, server):
+def add_CelerSQLStoreServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'ExecuteQuery': grpc.unary_stream_rpc_method_handler(
                     servicer.ExecuteQuery,
@@ -570,14 +569,14 @@ def add_SimpleSQLStoreServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'proto.SimpleSQLStore', rpc_method_handlers)
+            'proto.CelerSQLStore', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('proto.SimpleSQLStore', rpc_method_handlers)
+    server.add_registered_method_handlers('proto.CelerSQLStore', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class SimpleSQLStore(object):
-    """Service definition for interacting with a SimpleSQL database
+class CelerSQLStore(object):
+    """Service definition for interacting with a CelerSQL database
     """
 
     @staticmethod
@@ -594,7 +593,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_stream(
             request,
             target,
-            '/proto.SimpleSQLStore/ExecuteQuery',
+            '/proto.CelerSQLStore/ExecuteQuery',
             celersql__pb2.QueryRequest.SerializeToString,
             celersql__pb2.QueryResponse.FromString,
             options,
@@ -621,7 +620,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/CancelQuery',
+            '/proto.CelerSQLStore/CancelQuery',
             celersql__pb2.CancelQueryRequest.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
@@ -648,7 +647,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/ExecuteUpdate',
+            '/proto.CelerSQLStore/ExecuteUpdate',
             celersql__pb2.UpdateRequest.SerializeToString,
             celersql__pb2.UpdateResponse.FromString,
             options,
@@ -675,7 +674,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/BatchExecute',
+            '/proto.CelerSQLStore/BatchExecute',
             celersql__pb2.BatchRequest.SerializeToString,
             celersql__pb2.BatchResponse.FromString,
             options,
@@ -702,7 +701,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/ExecuteBulkInsert',
+            '/proto.CelerSQLStore/ExecuteBulkInsert',
             celersql__pb2.BulkInsertRequest.SerializeToString,
             celersql__pb2.BulkInsertResponse.FromString,
             options,
@@ -729,7 +728,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/GetSchema',
+            '/proto.CelerSQLStore/GetSchema',
             celersql__pb2.SchemaRequest.SerializeToString,
             celersql__pb2.SchemaResponse.FromString,
             options,
@@ -756,7 +755,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/ExplainQueryPlan',
+            '/proto.CelerSQLStore/ExplainQueryPlan',
             celersql__pb2.ExplainQueryRequest.SerializeToString,
             celersql__pb2.ExplainQueryResponse.FromString,
             options,
@@ -783,7 +782,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/VacuumDatabase',
+            '/proto.CelerSQLStore/VacuumDatabase',
             celersql__pb2.VacuumRequest.SerializeToString,
             celersql__pb2.VacuumResponse.FromString,
             options,
@@ -810,7 +809,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/BackupDatabase',
+            '/proto.CelerSQLStore/BackupDatabase',
             celersql__pb2.BackupRequest.SerializeToString,
             celersql__pb2.BackupResponse.FromString,
             options,
@@ -837,7 +836,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/CheckIntegrity',
+            '/proto.CelerSQLStore/CheckIntegrity',
             celersql__pb2.IntegrityRequest.SerializeToString,
             celersql__pb2.IntegrityResponse.FromString,
             options,
@@ -864,7 +863,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/GetDatabaseInfo',
+            '/proto.CelerSQLStore/GetDatabaseInfo',
             celersql__pb2.DatabaseInfoRequest.SerializeToString,
             celersql__pb2.DatabaseInfoResponse.FromString,
             options,
@@ -891,7 +890,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/CreateTable',
+            '/proto.CelerSQLStore/CreateTable',
             celersql__pb2.CreateTableRequest.SerializeToString,
             celersql__pb2.CreateTableResponse.FromString,
             options,
@@ -918,7 +917,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/DropTable',
+            '/proto.CelerSQLStore/DropTable',
             celersql__pb2.DropTableRequest.SerializeToString,
             celersql__pb2.DropTableResponse.FromString,
             options,
@@ -945,7 +944,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/ListTables',
+            '/proto.CelerSQLStore/ListTables',
             celersql__pb2.ListTablesRequest.SerializeToString,
             celersql__pb2.ListTablesResponse.FromString,
             options,
@@ -972,7 +971,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/AlterTable',
+            '/proto.CelerSQLStore/AlterTable',
             celersql__pb2.AlterTableRequest.SerializeToString,
             celersql__pb2.AlterTableResponse.FromString,
             options,
@@ -999,7 +998,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/CreateIndex',
+            '/proto.CelerSQLStore/CreateIndex',
             celersql__pb2.CreateIndexRequest.SerializeToString,
             celersql__pb2.CreateIndexResponse.FromString,
             options,
@@ -1026,7 +1025,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/DropIndex',
+            '/proto.CelerSQLStore/DropIndex',
             celersql__pb2.DropIndexRequest.SerializeToString,
             celersql__pb2.DropIndexResponse.FromString,
             options,
@@ -1053,7 +1052,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/ListIndexes',
+            '/proto.CelerSQLStore/ListIndexes',
             celersql__pb2.ListIndexesRequest.SerializeToString,
             celersql__pb2.ListIndexesResponse.FromString,
             options,
@@ -1080,7 +1079,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/GetConnectionPoolStats',
+            '/proto.CelerSQLStore/GetConnectionPoolStats',
             celersql__pb2.ConnectionPoolStatsRequest.SerializeToString,
             celersql__pb2.ConnectionPoolStatsResponse.FromString,
             options,
@@ -1107,7 +1106,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/SetConnectionPoolSize',
+            '/proto.CelerSQLStore/SetConnectionPoolSize',
             celersql__pb2.ConnectionPoolSizeRequest.SerializeToString,
             celersql__pb2.ConnectionPoolSizeResponse.FromString,
             options,
@@ -1134,7 +1133,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/PrepareStatement',
+            '/proto.CelerSQLStore/PrepareStatement',
             celersql__pb2.PrepareStatementRequest.SerializeToString,
             celersql__pb2.PrepareStatementResponse.FromString,
             options,
@@ -1161,7 +1160,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_stream(
             request,
             target,
-            '/proto.SimpleSQLStore/ExecutePreparedStatement',
+            '/proto.CelerSQLStore/ExecutePreparedStatement',
             celersql__pb2.ExecutePreparedStatementRequest.SerializeToString,
             celersql__pb2.QueryResponse.FromString,
             options,
@@ -1188,7 +1187,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/DeletePreparedStatement',
+            '/proto.CelerSQLStore/DeletePreparedStatement',
             celersql__pb2.DeletePreparedStatementRequest.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
@@ -1215,7 +1214,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/BeginTransaction',
+            '/proto.CelerSQLStore/BeginTransaction',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             celersql__pb2.TransactionResponse.FromString,
             options,
@@ -1242,7 +1241,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/CommitTransaction',
+            '/proto.CelerSQLStore/CommitTransaction',
             celersql__pb2.TransactionRequest.SerializeToString,
             celersql__pb2.TransactionResponse.FromString,
             options,
@@ -1269,7 +1268,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/RollbackTransaction',
+            '/proto.CelerSQLStore/RollbackTransaction',
             celersql__pb2.TransactionRequest.SerializeToString,
             celersql__pb2.TransactionResponse.FromString,
             options,
@@ -1296,7 +1295,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/GetTransactionState',
+            '/proto.CelerSQLStore/GetTransactionState',
             celersql__pb2.GetTransactionStateRequest.SerializeToString,
             celersql__pb2.GetTransactionStateResponse.FromString,
             options,
@@ -1323,7 +1322,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/CreateConnection',
+            '/proto.CelerSQLStore/CreateConnection',
             celersql__pb2.ConnectionRequest.SerializeToString,
             celersql__pb2.ConnectionResponse.FromString,
             options,
@@ -1350,7 +1349,7 @@ class SimpleSQLStore(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/proto.SimpleSQLStore/CloseConnection',
+            '/proto.CelerSQLStore/CloseConnection',
             celersql__pb2.ConnectionRequest.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
