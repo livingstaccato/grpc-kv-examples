@@ -262,6 +262,11 @@ static const char* socket_type_usage =
 
 # Regenerating the proto files.
 ```
+# Ruby
+python -m grpc_tools.protoc -I proto \
+    --python_out=python/proto \
+    --grpc_python_out=python/proto \
+    proto/kv.proto
 
 # Ruby
 grpc_tools_ruby_protoc --ruby_out=ruby --grpc_out=ruby proto/kv.proto
