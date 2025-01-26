@@ -59,7 +59,12 @@ def clean_pem(pem_str: str) -> str:
     return '\n'.join(line.strip() for line in pem_str.strip().splitlines())
 
 def load_certificates_from_env() -> dict:
-    """Load and validate certificates from environment variables."""
+    """
+    Load and parse certificates from environment variables.
+
+    Returns:
+        dict: A dictionary containing loaded certificate PEM strings and parsed x509 objects.
+    """
     logger.info("🔐 Loading certificates from environment...")
 
     required_vars = {
@@ -74,7 +79,15 @@ def load_certificates_from_env() -> dict:
         value = os.getenv(var)
         if not value:
             raise ValueError(f"❌ Missing {desc} ({var})")
-        certs[var] = clean_pem(value)
-        logger.debug(f"📦 Loaded {desc}: {len(certs[var])} bytes")
+        certs[var] = value  # Keep the raw PEM string for gRPC
+
+        if "CERT" in var:  # Parse only certificates, not keys
+            try:
+                cert_obj = x509.load_pem_x509_certificate(value.encode())
+                certs[f"{var}_OBJ"] = cert_obj
+                logger.debug(f"📦 Parsed {desc}: {len(value)} bytes")
+            except Exception as e:
+                logger.error(f"❌ Error parsing {desc}: {e}")
+                raise
 
     return certs
