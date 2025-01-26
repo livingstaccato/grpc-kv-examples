@@ -75,19 +75,19 @@ EOF
 
 # Generate certificates
 if [ -n "${RSA_BITS}" ]; then
-    echo "---------------------------------------------------------------------"
+    echo "====================================================================="
+    echo "*** Client Cert ***"
     _cert_name="rsa-${RSA_BITS}-mtls"
     generate_certificate "${_cert_name}-client" \
         "localhost" "localhost,127.0.0.1" \
         "${_cert_name}-client" \
         "rsa"
     echo
-    echo
-    echo "====================================================================="
+    echo "---------------------------------------------------------------------"
+    echo "*** Server Cert ***"
     generate_certificate "${_cert_name}-server" "localhost" "localhost,127.0.0.1" "${_cert_name}-server" "rsa"
     echo
-    echo
-    echo "---------------------------------------------------------------------"
+    echo "====================================================================="
 fi
 
 if [ -n "${ECDSA_CURVE}" ]; then
