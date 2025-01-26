@@ -57,17 +57,16 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
 
         try:
             logger.info(f"📝 Processing query: {request.query}")
-            rows = execute_query(request.query)
+            rows = execute_query(request.query)  # Fetch rows
             logger.debug(f"🔍 Rows fetched: {rows}")
 
-            # Create the QueryResponse object
             response = celersql_pb2.QueryResponse()
-            logger.debug(f"📤 Sending QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
 
             if rows:
                 # Add column metadata
                 response.column_names.extend(rows[0].keys())
                 response.column_types.extend([type(value).__name__ for value in rows[0].values()])
+                logger.debug(f"📊 Response metadata: columns={response.column_names}, types={response.column_types}")
 
                 # Add rows to the response
                 for row in rows:
@@ -76,6 +75,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
                     )
                     response.rows.append(grpc_row)
 
+                logger.debug(f"📤 Sending QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
             else:
                 logger.debug("🛑 Query returned no rows.")
 
