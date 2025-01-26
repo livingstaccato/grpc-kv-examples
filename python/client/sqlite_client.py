@@ -253,7 +253,10 @@ if __name__ == "__main__":
         client.execute_update(
             "INSERT INTO users (name) VALUES (?)", ["Test User"]
         )
+
         result = client.execute_query("SELECT * FROM users")
+        logger.debug(f"🔍 Rows fetched from database: {result}")
+
         logger.info(f"✨ Query result: {result}")
     except Exception as e:
         logger.error(f"❌ Client error: {e}")
