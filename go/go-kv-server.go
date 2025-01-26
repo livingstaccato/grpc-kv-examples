@@ -271,21 +271,6 @@ func main() {
     }
     logCertificateDetails(logger, x509Cert, "Server")
 
-    // Customize TLS Config for logging handshakes
-    tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-        logger.Printf("🔐 🤝 TLS Handshake attempt")
-        if len(rawCerts) > 0 {
-            cert, err := x509.ParseCertificate(rawCerts[0])
-            if err != nil {
-                logger.Printf("❌ 📜 Failed to parse client certificate: %v", err)
-                return err
-            }
-            logger.Printf("🔍 👤 Client certificate - Subject: %s", cert.Subject)
-            logger.Printf("🔍 🔑 Client certificate - Public Key Type: %T", cert.PublicKey)
-        }
-        logger.Printf("✅ 🤝 Certificate verification complete")
-        return nil
-    }
 
     // Configure TLS
     logger.Printf("🔒 ⚙️ Configuring TLS settings...")
@@ -304,6 +289,23 @@ func main() {
             tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
         },
         PreferServerCipherSuites: true,
+    }
+
+
+    // Customize TLS Config for logging handshakes
+    tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+        logger.Printf("🔐 🤝 TLS Handshake attempt")
+        if len(rawCerts) > 0 {
+            cert, err := x509.ParseCertificate(rawCerts[0])
+            if err != nil {
+                logger.Printf("❌ 📜 Failed to parse client certificate: %v", err)
+                return err
+            }
+            logger.Printf("🔍 👤 Client certificate - Subject: %s", cert.Subject)
+            logger.Printf("🔍 🔑 Client certificate - Public Key Type: %T", cert.PublicKey)
+        }
+        logger.Printf("✅ 🤝 Certificate verification complete")
+        return nil
     }
 
     // Configure keepalive parameters
