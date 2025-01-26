@@ -410,7 +410,7 @@ func main() {
             case <-ctx.Done():
                 return
             default:
-                time.Sleep(time.Second)
+                time.Sleep(time.Second * 30)
                 stats := s.GetServiceInfo()
                 if len(stats) > 0 {
                     logger.Printf("🔄 📊 Active services: %d", len(stats))
