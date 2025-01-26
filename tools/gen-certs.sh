@@ -74,7 +74,7 @@ EOF
 }
 
 # Generate certificates
-if [ -z "${RSA_BITS}" ]; then
+if [ -n "${RSA_BITS}" ]; then
     generate_certificate "rsa-${RSA_BITS}-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-client" "rsa"
     generate_certificate "rsa-${RSA_BITS}-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-server" "rsa"
 fi
