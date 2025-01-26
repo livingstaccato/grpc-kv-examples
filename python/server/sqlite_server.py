@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # sqlite_server.py
 #
