@@ -6,6 +6,8 @@ import sqlite3
 from contextlib import contextmanager
 from typing import Any, Dict, Optional, Generator
 import logging
+from queue import Queue
+import threading
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -18,6 +20,46 @@ logging.basicConfig(
 DB_PATH = "celersql.db"
 SCHEMA_VERSION = 1  # Increment this for schema updates
 
+logger = logging.getLogger(__name__)
+
+class DatabaseConnectionPool:
+    def __init__(self, db_path, max_connections=5):
+        self.db_path = db_path
+        self.max_connections = max_connections
+        self.connections = Queue(maxsize=max_connections)
+        self.lock = threading.Lock()
+
+        for _ in range(max_connections):
+            self.connections.put(self._create_connection())
+
+    def _create_connection(self):
+        try:
+            conn = sqlite3.connect(self.db_path, detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False)
+            conn.row_factory = sqlite3.Row
+            logger.debug("🔌 New database connection established.")
+            return conn
+        except sqlite3.Error as e:
+            logger.error(f"❌ Database connection error: {e}")
+            raise
+
+    def get_connection(self):
+        return self.connections.get()
+
+    def release_connection(self, conn):
+        if conn:
+            self.connections.put(conn)
+            logger.debug("🔌 Database connection released to pool.")
+
+db_pool = DatabaseConnectionPool(DB_PATH)
+
+@contextmanager
+def connect_db() -> Generator[sqlite3.Connection, None, None]:
+    conn = None
+    try:
+        conn = db_pool.get_connection()
+        yield conn
+    finally:
+        db_pool.release_connection(conn)
 
 @contextmanager
 def connect_db() -> Generator[sqlite3.Connection, None, None]:
