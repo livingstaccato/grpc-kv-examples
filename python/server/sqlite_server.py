@@ -62,6 +62,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
 
             # Create the QueryResponse object
             response = celersql_pb2.QueryResponse()
+            logger.debug(f"📤 Sending QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
 
             if rows:
                 # Add column metadata
