@@ -62,28 +62,6 @@ def connect_db() -> Generator[sqlite3.Connection, None, None]:
     finally:
         db_pool.release_connection(conn)
 
-@contextmanager
-def x_connect_db() -> Generator[sqlite3.Connection, None, None]:
-    """
-    Context manager to handle SQLite database connection.
-    Yields:
-        sqlite3.Connection: Database connection object.
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect(DB_PATH, detect_types=sqlite3.PARSE_DECLTYPES)
-        conn.row_factory = sqlite3.Row  # Enable named column access
-        logger.debug("🔌 Database connection established.")
-        yield conn
-    except sqlite3.Error as e:
-        logger.error(f"❌ Database connection error: {e}")
-        raise
-    finally:
-        if conn:
-            conn.close()
-            logger.debug("🔌 Database connection closed.")
-
-
 def initialize_schema() -> None:
     """
     Initializes or updates the database schema. Handles migrations if necessary.
