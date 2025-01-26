@@ -1,4 +1,4 @@
-module github.com/livingstaccato/grpc-kv-examples
+module github.com/livingstaccato/grpc-kv-examples/proto
 
 go 1.23.5
 
