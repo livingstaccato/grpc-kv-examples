@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# sqlite_client.py
+# client/sqlite_client.py
 #
 
 import grpc
