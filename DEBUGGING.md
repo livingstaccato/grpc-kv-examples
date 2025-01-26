@@ -244,3 +244,17 @@ No. Fucking. Way. It's the CA FALSE?!@#$?!@#$?
 # Security
 
 https://security.stackexchange.com/questions/100991/why-is-secp521r1-no-longer-supported-in-chrome-others
+
+# Interesting Finds.
+
+Maybe this will help figure this out.
+
+```
+/Users/tim.perkins/code/opensource/grpc/test/core/network_benchmarks/low_level_ping_pong.cc
+
+static const char* socket_type_usage =
+    "Type of socket used, one of:\n"
+    "  tcp: fds are endpoints of a TCP connection\n"
+    "  socketpair: fds come from socketpair()\n"
+    "  pipe: fds come from pipe()\n";
+```
