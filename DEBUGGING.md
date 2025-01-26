@@ -140,9 +140,9 @@ openssl crl2pkcs7 -nocrl -certfile <(echo "$PLUGIN_SERVER_CERT") | \
 ## Notes
 
 
-* `simple-go-client` and `simple-go-server` work fine with the mTLS certificates.
+* `go-kv-client` and `go-kv-server` work fine with the mTLS certificates.
 
-* `simple-py-client` and `simple-go-server` do not work.
+* `py-kv-client` and `go-kv-server` do not work.
 
 * I'm testing mTLS.
 * The Go Client and Go Server work together.
