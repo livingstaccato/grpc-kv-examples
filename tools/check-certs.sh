@@ -9,6 +9,3 @@ for cert_file in certs/*.crt; do
     openssl x509 -noout -text -in ${cert_file} | grep -E '(Issuer|Public-Key)'
     echo
 done
-
-........Issuer: O=rsa-2048-mtls-client, CN=localhost
-asdf
