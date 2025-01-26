@@ -59,9 +59,14 @@ class CelerSQLClient:
         """Execute a SQL update with detailed logging"""
         logger.info(f"📝 Executing update: {query}")
         try:
-            request = celersql_pb2.UpdateRequest(query=query)
-            if params:
-                request.params.extend([self._python_to_param(p) for p in params])
+            # request = celersql_pb2.UpdateRequest(query=query)
+            # if params:
+            #     request.params.extend([self._python_to_param(p) for p in params])
+
+            request = celersql_pb2.UpdateRequest(
+                query="INSERT INTO users (name) VALUES (?)",
+                params=[celersql_pb2.Parameter(string_value="Test User")]
+            )
 
             response = self.stub.ExecuteUpdate(request)
             logger.info(f"✅ Update successful. Rows affected: {response.rows_affected}")
@@ -144,7 +149,7 @@ def main():
 
             # Create client and execute test queries
             client = CelerSQLClient(channel)
-            
+
             # Example operations
             client.execute_update("""
                 CREATE TABLE IF NOT EXISTS users (
