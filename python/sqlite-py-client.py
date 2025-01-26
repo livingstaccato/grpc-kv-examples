@@ -153,9 +153,12 @@ def main():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            
-            client.execute_update("INSERT INTO users (name) VALUES (?)", ["Test User"])
-            
+
+            client.execute_update(
+                "INSERT INTO users (name) VALUES (?)", 
+                ["Test User"]  # Add the parameter value
+            )
+
             result = client.execute_query("SELECT * FROM users")
             logger.info(f"✨ Query result: {result}")
 
