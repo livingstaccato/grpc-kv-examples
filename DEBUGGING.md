@@ -258,3 +258,11 @@ static const char* socket_type_usage =
     "  socketpair: fds come from socketpair()\n"
     "  pipe: fds come from pipe()\n";
 ```
+
+
+# Regenerating the proto files.
+```
+
+# Ruby
+grpc_tools_ruby_protoc --ruby_out=ruby --grpc_out=ruby proto/kv.proto
+```
