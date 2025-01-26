@@ -94,6 +94,7 @@ class CelerSQLClient:
             columns = []
             types = []
 
+            # Process the gRPC response stream
             for batch in response:
                 if not columns:  # Extract metadata only once
                     columns = list(batch.column_names)
@@ -101,7 +102,8 @@ class CelerSQLClient:
                     logger.debug(f"📊 Metadata: columns={columns}, types={types}")
 
                 # Parse rows
-                results.extend(self._parse_rows(batch.rows))
+                for row in batch.rows:
+                    results.append([self._param_to_python(value) for value in row.values])
 
             log_response_details(
                 response_id=transaction_id,
