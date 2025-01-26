@@ -61,7 +61,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         with self._get_db() as conn:
             cursor = conn.cursor()
             try:
-                cursor.execute(request.query)
+                cursor.execute(request.query, [param.string_value for param in request.params])
                 
                 response = celersql_pb2.QueryResponse()
                 if cursor.description:
