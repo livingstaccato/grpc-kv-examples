@@ -97,12 +97,13 @@ message QueryRequest {
 }
 
 message QueryResponse {
-  repeated Row rows = 1; // Result rows
-  repeated string column_names = 2; // Names of result columns
-  repeated string column_types = 3; // Types of result columns
-  int32 rows_affected = 4; // Number of rows affected (if applicable)
-  Status status = 5; // Status of the query execution
-  optional QueryStatistics statistics = 6; // Query execution statistics
+  string query_id = 1; // Unique identifier for the query
+  repeated Row rows = 2;
+  repeated string column_names = 3;
+  repeated string column_types = 4;
+  int32 rows_affected = 5;
+  Status status = 6;
+  optional QueryStatistics statistics = 7;
 }
 
 message QueryStatistics {
