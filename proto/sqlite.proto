@@ -63,6 +63,9 @@ message QueryRequest {
   string query = 2; // SQL query string
   repeated Parameter params = 3; // Parameters for the query
   string transaction_id = 4; // Associated transaction ID
+  optional int32 timeout_ms = 5;
+  optional int32 limit = 6;
+  optional int32 offset = 7;
 }
 
 message QueryResponse {
