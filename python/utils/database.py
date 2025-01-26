@@ -1,5 +1,5 @@
 #
-# database.py
+# utils/database.py
 #
 
 import sqlite3
