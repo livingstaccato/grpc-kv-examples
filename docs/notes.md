@@ -72,3 +72,16 @@
 ossl-client
 go cipher: AEAD-CHACHA20-POLY1305-SHA256
 python:    AEAD-CHACHA20-POLY1305-SHA256
+
+
+# Go gRPC Algos
+
+If I change the order of the algorithms it can/will break things. For instance:
+
+The Go client works. All others break.
+
+CipherSuites: []uint16{
+    tls.TLS_CHACHA20_POLY1305_SHA256,
+    tls.TLS_AES_256_GCM_SHA384,
+    tls.TLS_AES_128_GCM_SHA256,
+},
