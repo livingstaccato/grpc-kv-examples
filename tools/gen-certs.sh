@@ -7,8 +7,8 @@ DAYS=365
 
 # RSA_BITS=2048
 ECDSA_CURVE="secp521r1"
-ECDSA_CURVE="secp384r1"
-ECDSA_CURVE="secp256r1"
+#ECDSA_CURVE="secp384r1"
+#ECDSA_CURVE="secp256r1"
 
 # Create certificate directory
 mkdir -p "$CERT_DIR"
@@ -76,15 +76,15 @@ EOF
 # Generate certificates
 if [ -n "${RSA_BITS}" ]; then
     _cert_name="rsa-${RSA_BITS}-mtls-client"
-    echo "Creating "${_cert_name} certificates..."
+    echo "Creating ${_cert_name} certificates..."
     generate_certificate "rsa-${RSA_BITS}-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-client" "rsa"
     generate_certificate "rsa-${RSA_BITS}-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-server" "rsa"
     echo "Done creating certificates."
 fi
 
 if [ -n "${ECDSA_CURVE}" ]; then
-generate_certificate "ec-${ECDSA_CURVE}-mtls-client" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-client" "ecdsa"
-generate_certificate "ec-${ECDSA_CURVE}-mtls-server" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-server" "ecdsa"
+    generate_certificate "ec-${ECDSA_CURVE}-mtls-client" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-client" "ecdsa"
+    generate_certificate "ec-${ECDSA_CURVE}-mtls-server" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-server" "ecdsa"
 fi
 
 echo "All certificates generated successfully in $CERT_DIR."
