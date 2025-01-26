@@ -79,7 +79,7 @@ if [ -n "${RSA_BITS}" ]; then
     echo "Creating "${_cert_name} certificates..."
     generate_certificate "rsa-${RSA_BITS}-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-client" "rsa"
     generate_certificate "rsa-${RSA_BITS}-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-server" "rsa"
-    echo "Done creating certificates.""
+    echo "Done creating certificates."
 fi
 
 if [ -n "${ECDSA_CURVE}" ]; then
