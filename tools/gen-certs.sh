@@ -77,6 +77,7 @@ EOF
 if [ -n "${RSA_BITS}" ]; then
     echo "====================================================================="
     echo "*** Client Cert ***"
+    echo "====================================================================="
     _cert_name="rsa-${RSA_BITS}-mtls"
     generate_certificate "${_cert_name}-client" \
         "localhost" "localhost,127.0.0.1" \
