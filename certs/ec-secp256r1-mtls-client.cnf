@@ -1,0 +1,24 @@
+[req]
+default_bits        = 
+distinguished_name  = req_distinguished_name
+req_extensions      = req_ext
+x509_extensions     = v3_ext
+prompt              = no
+
+[req_distinguished_name]
+O  = ec-secp256r1-mtls-client
+CN = localhost
+
+[req_ext]
+subjectAltName = @alt_names
+
+[v3_ext]
+basicConstraints = critical, CA:TRUE
+subjectAltName = @alt_names
+extendedKeyUsage = TLS Web Client Authentication, TLS Web Server Authentication
+keyUsage = critical, Digital Signature, Key Encipherment, Key Agreement
+subjectKeyIdentifier = hash
+
+[alt_names]
+DNS.1 = localhost
+IP.1  = 127.0.0.1
