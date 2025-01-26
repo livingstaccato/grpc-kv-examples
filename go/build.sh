@@ -2,16 +2,16 @@
 
 set -e # Exit on any error
 
-export KV_CLIENT="$(pwd)/kv-go-client"
-export KV_PLUGIN="$(pwd)/kv-go-server"
+export KV_CLIENT="$(pwd)/bin/simple-go-client"
+export KV_SERVER="$(pwd)/bin/simple-go-server"
 
 echo "Cleaning up previous builds..."
-rm -f ${KV_CLIENT} ${KV_PLUGIN}
+rm -f ${KV_CLIENT} ${KV_SERVER}
 
 # Initialize module if needed
 if [ ! -f go.mod ]; then
 	echo "Initializing Go module..."
-	go mod init github.com/provide-io/pyvider-rpcplugin/examples/grpc
+	go mod init github.com/livingstaccato/grpc-kv-examples
 
 	echo "Installing buf dependencies..."
 	go install github.com/bufbuild/buf/cmd/buf@latest
@@ -24,12 +24,12 @@ echo "Updating Go dependencies..."
 go mod tidy
 
 echo "Building client and server..."
-go build -o kv-go-client ./plugin-go-client
-go build -o kv-go-server ./plugin-go-server
+go build -o ${KV_CLIENT} ./simple-go-client.go
+go build -o ${KV_SERVER} ./simple-go-server.go
 
 echo "Build complete. Binary information:"
 file ${KV_CLIENT}
-file ${KV_PLUGIN}
+file ${KV_SERVER}
 
 echo "\nNext steps:"
 echo "1. Set environment variables: source env.sh"
