@@ -60,7 +60,7 @@ service SimpleSQLStore {
   // This ensures that the database is not corrupted and is in a consistent state.
   rpc CheckIntegrity(IntegrityRequest) returns (IntegrityResponse);
 
-  // Retrieves metadata about the database, such as size, page count, and SQLite version.
+  // Retrieves metadata about the database, such as size, page count, and database version.
   rpc GetDatabaseInfo(DatabaseInfoRequest) returns (DatabaseInfoResponse);
 
   // Table management
@@ -409,7 +409,7 @@ message DatabaseInfoResponse {
   int32 page_size = 2; // Page size of the database
   int32 page_count = 3; // Number of pages in the database
   repeated string attached_databases = 4; // List of attached databases
-  string sqlite_version = 5; // SQLite version
+  string db_version = 5; // Database version
   Status status = 6; // Status of the request
 }
 
