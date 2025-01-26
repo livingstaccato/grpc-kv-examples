@@ -1,8 +1,8 @@
 version: v1
 plugins:
   - plugin: buf.build/protocolbuffers/go
-    out: .
+    out: go/proto
     opt: paths=source_relative
   - plugin: buf.build/grpc/go:v1.3.0
-    out: .
+    out: go/proto
     opt: paths=source_relative
