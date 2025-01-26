@@ -61,6 +61,9 @@
 
 ## TLS Check
 
+| ------ | --------- | --- | ---------------------------- | --- | 
+| Server | Svr Algo  | TLS | Cipher                       | Bit | 
+| ------ | --------- | --- | ---------------------------- | --- | 
 | Go     | secp521r1 | 1.3 | TLS_AES_128_GCM_SHA256       | 128 |
 | Python | secp521r1 | 1.3 | TLS_AES_256_GCM_SHA384       | 256 |
 | Ruby   | secp521r1 | 1.3 | TLS_CHACHA20_POLY1305_SHA256 │ 256 |
