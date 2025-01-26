@@ -111,17 +111,17 @@ alias ossl-server='openssl s_server \
 
 # Client/Server aliases with proper directory handling
 alias go-build="(cd ${BASE_PATH}/go/bin; \
-  go build ../simple-go-client.go; \
-  go build ../simple-go-server.go)"
+  go build ../go-kv-client.go; \
+  go build ../go-kv-server.go)"
 
-alias go-client="(cd ${BASE_PATH} && source env.sh && ./go/bin/simple-go-client)"
-alias go-server="(cd ${BASE_PATH} && source env.sh && ./go/bin/simple-go-server)"
+alias go-client="(cd ${BASE_PATH} && source env.sh && ./go/bin/go-kv-client)"
+alias go-server="(cd ${BASE_PATH} && source env.sh && ./go/bin/go-kv-server)"
 
-alias py-client="(cd ${BASE_PATH} && source env.sh && ./python/simple-py-client.py)"
-alias py-server="(cd ${BASE_PATH} && source env.sh && ./python/simple-py-server.py)"
+alias py-client="(cd ${BASE_PATH} && source env.sh && ./python/py-kv-client.py)"
+alias py-server="(cd ${BASE_PATH} && source env.sh && ./python/py-kv-server.py)"
 
-alias rb-client="(cd ${BASE_PATH} && source env.sh && ./ruby/simple-rb-client.rb)"
-alias rb-server="(cd ${BASE_PATH} && source env.sh && ./ruby/simple-rb-server.rb)"
+alias rb-client="(cd ${BASE_PATH} && source env.sh && ./ruby/rb-kv-client.rb)"
+alias rb-server="(cd ${BASE_PATH} && source env.sh && ./ruby/rb-kv-server.rb)"
 
 alias cs-build="(cd ${BASE_PATH}  && source env.sh && cd ./csharp && dotnet build)"
 alias cs-client="(cd ${BASE_PATH} && source env.sh && cd ./csharp && dotnet run)"
