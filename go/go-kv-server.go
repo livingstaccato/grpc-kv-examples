@@ -333,7 +333,7 @@ func logTLSConfig(config *tls.Config, logger *log.Logger) {
 }
 
 func main() {
-    logger := setupLogger()
+    logger := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
     logger.Printf("🚀 🔄 Starting gRPC server...")
     
     serverCertPEM := os.Getenv("PLUGIN_SERVER_CERT")
