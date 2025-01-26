@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # sqlite_client.py
 #
@@ -257,4 +256,3 @@ if __name__ == "__main__":
         logger.info(f"✨ Query result: {result}")
     except Exception as e:
         logger.error(f"❌ Client error: {e}")
-
