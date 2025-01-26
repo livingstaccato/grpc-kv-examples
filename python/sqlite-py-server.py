@@ -62,7 +62,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             cursor = conn.cursor()
             try:
                 cursor.execute(request.query, [param.string_value for param in request.params])
-                
+
                 response = celersql_pb2.QueryResponse()
                 if cursor.description:
                     response.column_names.extend([desc[0] for desc in cursor.description])
