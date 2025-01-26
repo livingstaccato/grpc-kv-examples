@@ -10,8 +10,8 @@ import logging
 from datetime import datetime
 from proto import celersql_pb2, celersql_pb2_grpc
 from utils.database import execute_query, execute_update, initialize_schema
-from certificate_helper import load_certificates_from_env, log_cert_info
-from logging_helper import (
+from utils.certificate_helper import load_certificates_from_env, log_cert_info
+from utils.logging_helper import (
     log_transaction,
     log_request_details,
     log_response_details,
