@@ -83,6 +83,7 @@ if [ -n "${RSA_BITS}" ]; then
         "rsa"
     echo
     echo
+    echo "====================================================================="
     generate_certificate "${_cert_name}-server" "localhost" "localhost,127.0.0.1" "${_cert_name}-server" "rsa"
     echo
     echo
