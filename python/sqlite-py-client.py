@@ -5,7 +5,7 @@ import grpc
 import logging
 from datetime import datetime, timezone
 from cryptography import x509
-from proto import sqlite_pb2, sqlite_pb2_grpc
+from proto import celersql_pb2, celersql_pb2_grpc
 from certificate_helper import log_cert_info, load_certificates_from_env
 
 # Configure logging
@@ -36,14 +36,14 @@ def create_channel_credentials(certs: dict):
 
 class CelerSQLClient:
     def __init__(self, channel):
-        self.stub = sqlite_pb2_grpc.CelerSQLStoreStub(channel)
+        self.stub = celersql_pb2_grpc.CelerSQLStoreStub(channel)
         logger.info("👥 Created SQL client stub")
 
     def execute_query(self, query: str, params=None):
         """Execute a SQL query with detailed logging"""
         logger.info(f"📝 Executing query: {query}")
         try:
-            request = sqlite_pb2.QueryRequest(query=query)
+            request = celersql_pb2.QueryRequest(query=query)
             if params:
                 request.params.extend([self._python_to_param(p) for p in params])
 
@@ -59,7 +59,7 @@ class CelerSQLClient:
         """Execute a SQL update with detailed logging"""
         logger.info(f"📝 Executing update: {query}")
         try:
-            request = sqlite_pb2.UpdateRequest(query=query)
+            request = celersql_pb2.UpdateRequest(query=query)
             if params:
                 request.params.extend([self._python_to_param(p) for p in params])
 
@@ -73,7 +73,7 @@ class CelerSQLClient:
 
     def _python_to_param(self, value):
         """Convert Python value to Parameter message"""
-        param = sqlite_pb2.Parameter()
+        param = celersql_pb2.Parameter()
         if isinstance(value, int):
             param.int_value = value
         elif isinstance(value, float):
