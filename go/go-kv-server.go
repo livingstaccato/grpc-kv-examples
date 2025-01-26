@@ -331,18 +331,21 @@ func monitorConnections(s *grpc.Server, logger *log.Logger) {
     }()
 }
 
-ffunc main() {
+func main() {
     logger := setupLogger()
     logger.Printf("🚀 🔄 Starting gRPC server...")
     
+    // Load certificates from environment
     serverCertPEM := os.Getenv("PLUGIN_SERVER_CERT")
     serverKeyPEM := os.Getenv("PLUGIN_SERVER_KEY")
     clientCertPEM := os.Getenv("PLUGIN_CLIENT_CERT")
 
+    // Validate certificates
     if err := validateCertificates(logger, serverCertPEM, serverKeyPEM, clientCertPEM); err != nil {
         logger.Fatalf("❌ 🔒 Certificate validation failed: %v", err)
     }
 
+    // Create certificate pool
     certPool := x509.NewCertPool()
     logger.Printf("🔒 🔄 Creating certificate pool")
 
@@ -358,19 +361,53 @@ ffunc main() {
         logger.Printf("✅ 🔒 Added server certificate to pool (self-signed mode)")
     }
 
+    // Parse server certificate for logging
     cert, err := tls.X509KeyPair([]byte(serverCertPEM), []byte(serverKeyPEM))
     if err != nil {
         logger.Fatalf("❌ 🔒 Failed to load server key pair: %v", err)
     }
-
     x509Cert, err := x509.ParseCertificate(cert.Certificate[0])
     if err != nil {
         logger.Fatalf("❌ 🔒 Failed to parse server certificate: %v", err)
     }
     logCertificateDetails(logger, x509Cert, "Server")
 
-    tlsConfig := createTLSConfig(cert, certPool, logger)
+    // Customize TLS Config for logging handshakes
+    tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+        logger.Printf("🔐 🤝 TLS Handshake attempt")
+        if len(rawCerts) > 0 {
+            cert, err := x509.ParseCertificate(rawCerts[0])
+            if err != nil {
+                logger.Printf("❌ 📜 Failed to parse client certificate: %v", err)
+                return err
+            }
+            logger.Printf("🔍 👤 Client certificate - Subject: %s", cert.Subject)
+            logger.Printf("🔍 🔑 Client certificate - Public Key Type: %T", cert.PublicKey)
+        }
+        logger.Printf("✅ 🤝 Certificate verification complete")
+        return nil
+    }
 
+    // Configure TLS
+    logger.Printf("🔒 ⚙️ Configuring TLS settings...")
+    tlsConfig := &tls.Config{
+        Certificates: []tls.Certificate{cert},
+        ClientAuth:   tls.RequireAndVerifyClientCert,
+        ClientCAs:    certPool,
+        MinVersion:   tls.VersionTLS12,
+        MaxVersion:   tls.VersionTLS13,
+        CipherSuites: []uint16{
+            tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+            tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+            tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+            tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+            tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+            tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+        },
+        PreferServerCipherSuites: true,
+    }
+
+    // Configure keepalive parameters
     kaep := keepalive.EnforcementPolicy{
         MinTime:             5 * time.Second,
         PermitWithoutStream: true,
@@ -383,32 +420,118 @@ ffunc main() {
         Timeout:              1 * time.Second,
     }
 
+    // Create listener
     lis, err := net.Listen("tcp", ":50051")
     if err != nil {
         logger.Fatalf("❌ 🌐 Failed to listen: %v", err)
     }
     logger.Printf("✅ 🌐 Server listening on :50051")
 
+    // Create server credentials with TLS config
+    tlsConfig := &tls.Config{
+        Certificates: []tls.Certificate{cert},
+        ClientAuth:   tls.RequireAndVerifyClientCert,
+        ClientCAs:    certPool,
+        MinVersion:   tls.VersionTLS12,
+        MaxVersion:   tls.VersionTLS13,
+        CipherSuites: []uint16{
+            tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+            tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+            tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+            tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+            tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+            tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+        },
+        PreferServerCipherSuites: true,
+        VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+            logger.Printf("🔐 🤝 TLS Handshake attempt")
+            if len(rawCerts) > 0 {
+                cert, err := x509.ParseCertificate(rawCerts[0])
+                if err != nil {
+                    logger.Printf("❌ 📜 Failed to parse client certificate: %v", err)
+                    return err
+                }
+                logger.Printf("🔍 👤 Client certificate - Subject: %s", cert.Subject)
+                logger.Printf("🔍 🔑 Client certificate - Public Key Type: %T", cert.PublicKey)
+            }
+            logger.Printf("✅ 🤝 Certificate verification complete")
+            return nil
+        },
+    }
+
+    // Create gRPC server with credentials
+    // Debug handler for TLS errors
+    tlsConfig.GetConfigForClient = func(info *tls.ClientHelloInfo) (*tls.Config, error) {
+        logger.Printf("🔍 🤝 Client Hello from %s", info.Conn.RemoteAddr())
+        logger.Printf("🔍 📜 Supported versions: %v", info.SupportedVersions)
+        logger.Printf("🔍 🔑 Supported curves: %v", info.SupportedCurves)
+        logger.Printf("🔍 🔒 Cipher suites: %v", info.CipherSuites)
+        
+        return tlsConfig, nil
+    }
+
+    // Configure curve preferences with fallback
+    tlsConfig.CurvePreferences = []tls.CurveID{
+        tls.CurveP521,  // Prefer P-521
+        tls.CurveP384,  // Allow P-384 fallback
+        tls.CurveP256,  // Allow P-256 fallback
+    }
+
     creds := credentials.NewTLS(tlsConfig)
     s := grpc.NewServer(
         grpc.Creds(creds),
         grpc.KeepaliveEnforcementPolicy(kaep),
         grpc.KeepaliveParams(kasp),
-        grpc.UnaryInterceptor(createUnaryInterceptor(logger)),
+        grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+            // Log connection attempt
+            if p, ok := peer.FromContext(ctx); ok {
+                logger.Printf("👋 🔄 Connection attempt from: %v", p.Addr)
+                if p.AuthInfo != nil {
+                    logger.Printf("🔒 🔑 Auth type: %T", p.AuthInfo)
+                }
+            }
+
+            start := time.Now()
+            logger.Printf("📥 🕒 Starting %s", info.FullMethod)
+
+            // Handle the request
+            resp, err := handler(ctx, req)
+            
+            duration := time.Since(start)
+            if err != nil {
+                logger.Printf("❌ ⚡ %s failed after %v: %v", info.FullMethod, duration, err)
+            } else {
+                logger.Printf("✅ ⚡ %s completed in %v", info.FullMethod, duration)
+            }
+            
+            return resp, err
+        }),
     )
 
+    // Register service
     proto.RegisterKVServer(s, &server{
         logger: logger,
     })
 
+    // Start connection monitoring
     monitorConnections(s, logger)
 
+    // Log server configuration
+    logger.Printf("🔧 ⚙️ Server Configuration:")
+    logger.Printf("🔒 🔐 TLS Version: %d-%d", tlsConfig.MinVersion, tlsConfig.MaxVersion)
+    logger.Printf("🔒 🔑 Client Auth Mode: %v", tlsConfig.ClientAuth)
+    logger.Printf("⏱️ 🔄 Keepalive: Time=%v, Timeout=%v", kasp.Time, kasp.Timeout)
+    logger.Printf("⏱️ ⚡ Max Connection Age: %v", kasp.MaxConnectionAge)
+    logger.Printf("📊 💻 Max Connection Idle: %v", kasp.MaxConnectionIdle)
+
+    // Create a context for graceful shutdown
     ctx, cancel := context.WithCancel(context.Background())
     defer cancel()
 
     // Handle shutdown signals
     go func() {
         sigChan := make(chan os.Signal, 1)
+        // signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
         <-sigChan
         logger.Printf("👋 💤 Received shutdown signal")
         cancel()
@@ -417,14 +540,12 @@ ffunc main() {
 
     // Add connection logging
     go func() {
-        ticker := time.NewTicker(30 * time.Second)
-        defer ticker.Stop()
-        
         for {
             select {
             case <-ctx.Done():
                 return
-            case <-ticker.C:
+            default:
+                time.Sleep(time.Second)
                 stats := s.GetServiceInfo()
                 if len(stats) > 0 {
                     logger.Printf("🔄 📊 Active services: %d", len(stats))
@@ -433,6 +554,28 @@ ffunc main() {
         }
     }()
 
+    // Debug logging for TLS config
+    logger.Printf("🔒 🛡️ Server TLS Configuration:")
+    logger.Printf("🔑 📝 Available cipher suites:")
+    for _, suite := range tlsConfig.CipherSuites {
+        var name string
+        switch suite {
+        case tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
+            name = "ECDHE-ECDSA-AES256-GCM-SHA384"
+        case tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:
+            name = "ECDHE-ECDSA-AES128-GCM-SHA256"
+        case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
+            name = "ECDHE-ECDSA-CHACHA20-POLY1305"
+        default:
+            name = fmt.Sprintf("Unknown (0x%04x)", suite)
+        }
+        logger.Printf("  • %s", name)
+    }
+    logger.Printf("🔐 🔄 Client auth mode: %v", tlsConfig.ClientAuth)
+    logger.Printf("🔒 📊 Min TLS version: %s", getTLSVersionString(tlsConfig.MinVersion))
+    logger.Printf("🔒 📊 Max TLS version: %s", getTLSVersionString(tlsConfig.MaxVersion))
+
+    // Start server
     logger.Printf("🚀 ✨ Starting gRPC server")
     if err := s.Serve(lis); err != nil {
         if ctx.Err() == context.Canceled {
