@@ -278,7 +278,7 @@ func main() {
         Certificates: []tls.Certificate{cert},
         ClientAuth:   tls.RequireAndVerifyClientCert,
         ClientCAs:    certPool,
-        MinVersion:   tls.VersionTLS12,
+        MinVersion:   tls.VersionTLS11,
         MaxVersion:   tls.VersionTLS13,
         /*
         CipherSuites: []uint16{
