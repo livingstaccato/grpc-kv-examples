@@ -57,28 +57,39 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
     async def ExecuteQuery(self, request, context):
         logger.info(f"📝 Query request: {request.query}")
         await self._log_request_details(context)
-
+        
         with self._get_db() as conn:
             cursor = conn.cursor()
             try:
                 cursor.execute(request.query, [param.string_value for param in request.params])
-
+                
+                # Create initial response with metadata
                 response = celersql_pb2.QueryResponse()
                 if cursor.description:
                     response.column_names.extend([desc[0] for desc in cursor.description])
                     response.column_types.extend([type(desc[1]).__name__ for desc in cursor.description])
-
-                    for row in cursor.fetchall():
+                
+                # Stream rows in batches
+                batch_size = 1000
+                while True:
+                    rows = cursor.fetchmany(batch_size)
+                    if not rows:
+                        break
+                        
+                    # Clear previous rows and add new batch
+                    response.ClearField("rows")
+                    for row in rows:
                         row_data = celersql_pb2.Row()
                         for value in row:
                             param = self._python_to_param(value)
                             row_data.values.append(param)
                         response.rows.append(row_data)
-
-                response.rows_affected = cursor.rowcount
+                    
+                    response.rows_affected = cursor.rowcount
+                    yield response
+                    
                 logger.info(f"✅ Query executed successfully. Rows affected: {cursor.rowcount}")
-                return response
-
+                
             except Exception as e:
                 logger.error(f"❌ Query execution error: {e}")
                 context.set_code(grpc.StatusCode.INTERNAL)
