@@ -30,7 +30,3 @@ go build -o ${KV_SERVER} ./simple-go-server.go
 echo "Build complete. Binary information:"
 file ${KV_CLIENT}
 file ${KV_SERVER}
-
-echo "\nNext steps:"
-echo "1. Set environment variables: source env.sh"
-echo "2. Run tests: ./test.sh"
