@@ -27,7 +27,7 @@ if _version_not_supported:
 
 
 class SimpleSQLStoreStub(object):
-    """Service definition for interacting with an SimpleSQL database
+    """Service definition for interacting with a SimpleSQL database
     """
 
     def __init__(self, channel):
@@ -41,6 +41,11 @@ class SimpleSQLStoreStub(object):
                 request_serializer=sqlite__pb2.QueryRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.QueryResponse.FromString,
                 _registered_method=True)
+        self.CancelQuery = channel.unary_unary(
+                '/proto.SimpleSQLStore/CancelQuery',
+                request_serializer=sqlite__pb2.CancelQueryRequest.SerializeToString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                _registered_method=True)
         self.ExecuteUpdate = channel.unary_unary(
                 '/proto.SimpleSQLStore/ExecuteUpdate',
                 request_serializer=sqlite__pb2.UpdateRequest.SerializeToString,
@@ -50,6 +55,11 @@ class SimpleSQLStoreStub(object):
                 '/proto.SimpleSQLStore/BatchExecute',
                 request_serializer=sqlite__pb2.BatchRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.BatchResponse.FromString,
+                _registered_method=True)
+        self.ExecuteBulkInsert = channel.unary_unary(
+                '/proto.SimpleSQLStore/ExecuteBulkInsert',
+                request_serializer=sqlite__pb2.BulkInsertRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.BulkInsertResponse.FromString,
                 _registered_method=True)
         self.GetSchema = channel.unary_unary(
                 '/proto.SimpleSQLStore/GetSchema',
@@ -109,12 +119,19 @@ class SimpleSQLStoreStub(object):
 
 
 class SimpleSQLStoreServicer(object):
-    """Service definition for interacting with an SimpleSQL database
+    """Service definition for interacting with a SimpleSQL database
     """
 
     def ExecuteQuery(self, request, context):
         """Query execution
         Execute a query and stream results
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CancelQuery(self, request, context):
+        """Cancel an ongoing query
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -129,6 +146,13 @@ class SimpleSQLStoreServicer(object):
 
     def BatchExecute(self, request, context):
         """Execute multiple queries/updates in a batch
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ExecuteBulkInsert(self, request, context):
+        """Perform bulk inserts into a table
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -222,6 +246,11 @@ def add_SimpleSQLStoreServicer_to_server(servicer, server):
                     request_deserializer=sqlite__pb2.QueryRequest.FromString,
                     response_serializer=sqlite__pb2.QueryResponse.SerializeToString,
             ),
+            'CancelQuery': grpc.unary_unary_rpc_method_handler(
+                    servicer.CancelQuery,
+                    request_deserializer=sqlite__pb2.CancelQueryRequest.FromString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            ),
             'ExecuteUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.ExecuteUpdate,
                     request_deserializer=sqlite__pb2.UpdateRequest.FromString,
@@ -231,6 +260,11 @@ def add_SimpleSQLStoreServicer_to_server(servicer, server):
                     servicer.BatchExecute,
                     request_deserializer=sqlite__pb2.BatchRequest.FromString,
                     response_serializer=sqlite__pb2.BatchResponse.SerializeToString,
+            ),
+            'ExecuteBulkInsert': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExecuteBulkInsert,
+                    request_deserializer=sqlite__pb2.BulkInsertRequest.FromString,
+                    response_serializer=sqlite__pb2.BulkInsertResponse.SerializeToString,
             ),
             'GetSchema': grpc.unary_unary_rpc_method_handler(
                     servicer.GetSchema,
@@ -296,7 +330,7 @@ def add_SimpleSQLStoreServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class SimpleSQLStore(object):
-    """Service definition for interacting with an SimpleSQL database
+    """Service definition for interacting with a SimpleSQL database
     """
 
     @staticmethod
@@ -316,6 +350,33 @@ class SimpleSQLStore(object):
             '/proto.SimpleSQLStore/ExecuteQuery',
             sqlite__pb2.QueryRequest.SerializeToString,
             sqlite__pb2.QueryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CancelQuery(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/CancelQuery',
+            sqlite__pb2.CancelQueryRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,
@@ -370,6 +431,33 @@ class SimpleSQLStore(object):
             '/proto.SimpleSQLStore/BatchExecute',
             sqlite__pb2.BatchRequest.SerializeToString,
             sqlite__pb2.BatchResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ExecuteBulkInsert(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/ExecuteBulkInsert',
+            sqlite__pb2.BulkInsertRequest.SerializeToString,
+            sqlite__pb2.BulkInsertResponse.FromString,
             options,
             channel_credentials,
             insecure,
