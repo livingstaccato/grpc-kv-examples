@@ -75,10 +75,6 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
                     )
                     response.rows.append(grpc_row)
 
-                logger.debug(f"📤 Sending QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
-            else:
-                logger.debug("🛑 Query returned no rows.")
-
             log_response_details(
                 response_id=transaction_id,
                 details={"rows": len(response.rows), "columns": response.column_names},
@@ -91,6 +87,10 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
                 status="success",
                 timestamp=datetime.now(timezone.utc),
             )
+
+            # Move the debug log here to reflect the final state of the response
+            logger.debug(f"📤 Sending QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
+
             return response
 
         except Exception as e:
