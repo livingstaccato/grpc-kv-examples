@@ -281,7 +281,7 @@ class SimpleSQLStoreServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetDatabaseInfo(self, request, context):
-        """Retrieves metadata about the database, such as size, page count, and SQLite version.
+        """Retrieves metadata about the database, such as size, page count, and database version.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
