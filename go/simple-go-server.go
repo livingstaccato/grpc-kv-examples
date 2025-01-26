@@ -1,20 +1,21 @@
 package main
 
 import (
+    "log"
+    "os"
+    "time"
+    "net"
+
     "context"
     "crypto/tls"
     "crypto/x509"
-    "log"
-    "net"
-    "os"
-    "time"
 
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/keepalive"
     "google.golang.org/grpc/peer"
 
-    "./proto"
+    "github.com/livingstaccato/grpc-kv-examples/proto"
 )
 
 type server struct {
