@@ -271,6 +271,22 @@ func main() {
     }
     logCertificateDetails(logger, x509Cert, "Server")
 
+    // Customize TLS Config for logging handshakes
+    tlsConfig.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+        logger.Printf("🔐 🤝 TLS Handshake attempt")
+        if len(rawCerts) > 0 {
+            cert, err := x509.ParseCertificate(rawCerts[0])
+            if err != nil {
+                logger.Printf("❌ 📜 Failed to parse client certificate: %v", err)
+                return err
+            }
+            logger.Printf("🔍 👤 Client certificate - Subject: %s", cert.Subject)
+            logger.Printf("🔍 🔑 Client certificate - Public Key Type: %T", cert.PublicKey)
+        }
+        logger.Printf("✅ 🤝 Certificate verification complete")
+        return nil
+    }
+
     // Configure TLS
     logger.Printf("🔒 ⚙️ Configuring TLS settings...")
     tlsConfig := &tls.Config{
@@ -310,17 +326,6 @@ func main() {
     }
     logger.Printf("✅ 🌐 Server listening on :50051")
 
-    // Connection attempt logging interceptor
-    connAttemptInterceptor := func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-        if p, ok := peer.FromContext(ctx); ok {
-            logger.Printf("👋 🔄 Connection attempt from: %v", p.Addr)
-            if p.AuthInfo != nil {
-                logger.Printf("🔒 🔑 Auth type: %T", p.AuthInfo)
-            }
-        }
-        return handler(ctx, req)
-    }
-
     // Create gRPC server with credentials
     creds := credentials.NewTLS(tlsConfig)
     s := grpc.NewServer(
@@ -328,21 +333,20 @@ func main() {
         grpc.KeepaliveEnforcementPolicy(kaep),
         grpc.KeepaliveParams(kasp),
         grpc.UnaryInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-            start := time.Now()
-            logger.Printf("📥 🕒 Starting %s", info.FullMethod)
-            
-            // Extract peer information for logging
+            // Log connection attempt
             if p, ok := peer.FromContext(ctx); ok {
-                logger.Printf("👤 🌐 Peer address: %v", p.Addr)
+                logger.Printf("👋 🔄 Connection attempt from: %v", p.Addr)
                 if p.AuthInfo != nil {
                     logger.Printf("🔒 🔑 Auth type: %T", p.AuthInfo)
                 }
             }
-            
+
+            start := time.Now()
+            logger.Printf("📥 🕒 Starting %s", info.FullMethod)
+
             // Handle the request
             resp, err := handler(ctx, req)
             
-            // Log the completion
             duration := time.Since(start)
             if err != nil {
                 logger.Printf("❌ ⚡ %s failed after %v: %v", info.FullMethod, duration, err)
