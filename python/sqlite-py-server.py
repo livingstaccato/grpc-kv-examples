@@ -3,7 +3,7 @@
 import grpc
 import logging
 from concurrent import futures
-from proto import sqlite_pb2, sqlite_pb2_grpc
+from proto import celersql_pb2, celersql_pb2_grpc
 import time
 import os
 import asyncio
@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class SQLServicer(sqlite_pb2_grpc.SimpleSQLStoreServicer):
+class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
     def __init__(self, db_path='database.db'):
         logger.info("🔧 🚀 Initializing SQLServicer with database: %s", db_path)
         self.db_path = db_path
@@ -63,13 +63,13 @@ class SQLServicer(sqlite_pb2_grpc.SimpleSQLStoreServicer):
             try:
                 cursor.execute(request.query)
                 
-                response = sqlite_pb2.QueryResponse()
+                response = celersql_pb2.QueryResponse()
                 if cursor.description:
                     response.column_names.extend([desc[0] for desc in cursor.description])
                     response.column_types.extend([type(desc[1]).__name__ for desc in cursor.description])
 
                     for row in cursor.fetchall():
-                        row_data = sqlite_pb2.Row()
+                        row_data = celersql_pb2.Row()
                         for value in row:
                             param = self._python_to_param(value)
                             row_data.values.append(param)
@@ -95,7 +95,7 @@ class SQLServicer(sqlite_pb2_grpc.SimpleSQLStoreServicer):
                 cursor.execute(request.query)
                 conn.commit()
                 
-                response = sqlite_pb2.UpdateResponse(
+                response = celersql_pb2.UpdateResponse(
                     rows_affected=cursor.rowcount,
                     last_insert_id=cursor.lastrowid
                 )
@@ -110,7 +110,7 @@ class SQLServicer(sqlite_pb2_grpc.SimpleSQLStoreServicer):
 
     def _python_to_param(self, value):
         """Convert Python value to Parameter message"""
-        param = sqlite_pb2.Parameter()
+        param = celersql_pb2.Parameter()
         if isinstance(value, int):
             param.int_value = value
         elif isinstance(value, float):
@@ -151,7 +151,7 @@ async def serve():
         ]
     )
 
-    sqlite_pb2_grpc.add_SimpleSQLStoreServicer_to_server(SQLServicer(), server)
+    celersql_pb2_grpc.add_CelerSQLStoreServicer_to_server(SQLServicer(), server)
 
     try:
         server.add_secure_port('[::]:50051', server_credentials)
