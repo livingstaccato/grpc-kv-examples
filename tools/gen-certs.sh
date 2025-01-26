@@ -86,11 +86,6 @@ if [ -n "${RSA_BITS}" ]; then
         "localhost,127.0.0.1" \
         "rsa"
 
-    local name=$1
-    local org=$2
-    local cn=$3
-    local san=$4
-    local algo=$5
     echo
     echo "====================================================================="
     echo "*** Server RSA Cert ***"
