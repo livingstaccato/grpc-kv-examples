@@ -1,13 +1,14 @@
 package main
 
 import (
-    "context"
-    "crypto/tls"
-    "crypto/x509"
-    "fmt"
     "log"
     "os"
     "time"
+    "fmt"
+
+    "context"
+    "crypto/tls"
+    "crypto/x509"
     "encoding/pem"
     "bytes"
 
