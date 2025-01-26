@@ -75,16 +75,16 @@ EOF
 
 # Generate certificates
 if [ -n "${RSA_BITS}" ]; then
-    _cert_name="rsa-${RSA_BITS}-mtls-client"
-    echo "Creating ${_cert_name} certificates..."
-    generate_certificate "rsa-${RSA_BITS}-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-client" "rsa"
-    generate_certificate "rsa-${RSA_BITS}-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-server" "rsa"
-    echo "Done creating certificates."
+    _cert_name="rsa-${RSA_BITS}-mtls
+    generate_certificate "${_cert_name}-client" "localhost" "localhost,127.0.0.1" "${_cert_name}-client" "rsa"
+    generate_certificate "${_cert_name}-server" "localhost" "localhost,127.0.0.1" "${_cert_name}-server" "rsa"
+    echo; echo;
 fi
 
 if [ -n "${ECDSA_CURVE}" ]; then
     generate_certificate "ec-${ECDSA_CURVE}-mtls-client" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-client" "ecdsa"
     generate_certificate "ec-${ECDSA_CURVE}-mtls-server" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-server" "ecdsa"
+    echo; echo;
 fi
 
 echo "All certificates generated successfully in $CERT_DIR."
