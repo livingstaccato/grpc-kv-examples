@@ -1,31 +1,116 @@
 #!/usr/bin/env python3
 
-import sqlite3
-from concurrent import futures
 import grpc
-import proto.sqlite_pb2 as pb2
-import proto.sqlite_pb2_grpc as pb2_grpc
+import logging
+from concurrent import futures
+from proto import sqlite_pb2, sqlite_pb2_grpc
+import time
+import os
+import asyncio
+import sqlite3
+from certificate_helper import log_cert_info, load_certificates_from_env, load_pem_certificate
 
-class SimpleSQLService(pb2_grpc.SimpleSQLStoreServicer):
-    def __init__(self, db_path):
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s.%(msecs)03d %(levelname)s %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
+
+class SQLServicer(sqlite_pb2_grpc.SimpleSQLStoreServicer):
+    def __init__(self, db_path='database.db'):
+        logger.info("🔧 🚀 Initializing SQLServicer with database: %s", db_path)
         self.db_path = db_path
+        self._ensure_db_exists()
+
+    def _ensure_db_exists(self):
+        """Ensure database exists and initialize if needed"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                logger.info("📦 Database connection successful")
+        except Exception as e:
+            logger.error(f"❌ Database initialization error: {e}")
+            raise
+
+    async def _log_request_details(self, context):
+        """Log gRPC request details"""
+        try:
+            logger.debug(f"🔎 🌐 Peer: {context.peer()}")
+            auth_context = context.auth_context()
+            for k, v in auth_context.items():
+                logger.debug(f"🔎 🔒 Auth Context {k}: {v}")
+            if b"x509_common_name" in auth_context:
+                common_name = auth_context[b"x509_common_name"][0].decode()
+                logger.info(f"🔑 Client Common Name: {common_name}")
+        except Exception as e:
+            logger.error(f"🔎 ❌ Logging error: {e}")
 
     def _get_db(self):
-        return sqlite3.connect(self.db_path)
+        """Get database connection with error handling"""
+        try:
+            return sqlite3.connect(self.db_path)
+        except Exception as e:
+            logger.error(f"❌ Database connection error: {e}")
+            raise
 
-    def _param_to_python(self, param):
-        if param.HasField('int_value'):
-            return param.int_value
-        elif param.HasField('float_value'):
-            return param.float_value
-        elif param.HasField('string_value'):
-            return param.string_value
-        elif param.HasField('blob_value'):
-            return param.blob_value
-        return None
+    def ExecuteQuery(self, request, context):
+        logger.info(f"📝 Query request: {request.query}")
+        await self._log_request_details(context)
+
+        with self._get_db() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute(request.query)
+                
+                response = sqlite_pb2.QueryResponse()
+                if cursor.description:
+                    response.column_names.extend([desc[0] for desc in cursor.description])
+                    response.column_types.extend([type(desc[1]).__name__ for desc in cursor.description])
+
+                    for row in cursor.fetchall():
+                        row_data = sqlite_pb2.Row()
+                        for value in row:
+                            param = self._python_to_param(value)
+                            row_data.values.append(param)
+                        response.rows.append(row_data)
+
+                response.rows_affected = cursor.rowcount
+                logger.info(f"✅ Query executed successfully. Rows affected: {cursor.rowcount}")
+                return response
+
+            except Exception as e:
+                logger.error(f"❌ Query execution error: {e}")
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details(str(e))
+                raise
+
+    def ExecuteUpdate(self, request, context):
+        logger.info(f"📝 Update request: {request.query}")
+        await self._log_request_details(context)
+
+        with self._get_db() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute(request.query)
+                conn.commit()
+                
+                response = sqlite_pb2.UpdateResponse(
+                    rows_affected=cursor.rowcount,
+                    last_insert_id=cursor.lastrowid
+                )
+                logger.info(f"✅ Update executed successfully. Rows affected: {cursor.rowcount}")
+                return response
+
+            except Exception as e:
+                logger.error(f"❌ Update execution error: {e}")
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details(str(e))
+                raise
 
     def _python_to_param(self, value):
-        param = pb2.Parameter()
+        """Convert Python value to Parameter message"""
+        param = sqlite_pb2.Parameter()
         if isinstance(value, int):
             param.int_value = value
         elif isinstance(value, float):
@@ -38,81 +123,51 @@ class SimpleSQLService(pb2_grpc.SimpleSQLStoreServicer):
             param.null_value = True
         return param
 
-    def ExecuteQuery(self, request, context):
-        with self._get_db() as conn:
-            cursor = conn.cursor()
-            params = [self._param_to_python(p) for p in request.params]
-            cursor.execute(request.query, params)
+async def serve():
+    logger.info("🚀 Starting SQL Server...")
 
-            response = pb2.QueryResponse()
-            response.column_names.extend([desc[0] for desc in cursor.description])
-            response.column_types.extend([type(desc[1]).__name__ for desc in cursor.description])
+    try:
+        certs = load_certificates_from_env()
+        server_cert = certs["PLUGIN_SERVER_CERT"]
+        server_key = certs["PLUGIN_SERVER_KEY"]
+        client_cert = certs.get("PLUGIN_CLIENT_CERT")
 
-            for row in cursor.fetchall():
-                row_set = pb2.RowSet()
-                row_set.values.extend([self._python_to_param(value) for value in row])
-                response.rows.append(row_set)
+        server_credentials = grpc.ssl_server_credentials(
+            [(server_key.encode(), server_cert.encode())],
+            root_certificates=client_cert.encode() if client_cert else None,
+            require_client_auth=True if client_cert else False
+        )
+        logger.info("🔒 SSL credentials created successfully")
 
-            response.rows_affected = cursor.rowcount
-            return response
+    except Exception as e:
+        logger.error(f"🔒 ❌ SSL credentials setup failed: {e}")
+        raise
 
-    def ExecuteUpdate(self, request, context):
-        with self._get_db() as conn:
-            cursor = conn.cursor()
-            params = [self._param_to_python(p) for p in request.params]
-            cursor.execute(request.query, params)
-            conn.commit()
+    server = grpc.aio.server(
+        futures.ThreadPoolExecutor(max_workers=10),
+        options=[
+            ('grpc.ssl_target_name_override', 'localhost'),
+            ('grpc.default_authority', 'localhost'),
+        ]
+    )
 
-            return pb2.UpdateResponse(
-                rows_affected=cursor.rowcount,
-                last_insert_id=cursor.lastrowid
-            )
+    sqlite_pb2_grpc.add_SimpleSQLStoreServicer_to_server(SQLServicer(), server)
 
-    def BatchExecute(self, request, context):
-        response = pb2.BatchResponse()
-        with self._get_db() as conn:
-            cursor = conn.cursor()
-            for query_request in request.queries:
-                params = [self._param_to_python(p) for p in query_request.params]
-                cursor.execute(query_request.query, params)
+    try:
+        server.add_secure_port('[::]:50051', server_credentials)
+        logger.info("🌐 Server port bound successfully")
+    except Exception as e:
+        logger.error(f"🌐 ❌ Port binding failed: {e}")
+        raise
 
-                query_response = pb2.QueryResponse()
-                if cursor.description:
-                    query_response.column_names.extend([desc[0] for desc in cursor.description])
-                    query_response.column_types.extend([type(desc[1]).__name__ for desc in cursor.description])
+    await server.start()
+    logger.info("✅ Server started successfully")
 
-                    for row in cursor.fetchall():
-                        row_set = pb2.RowSet()
-                        row_set.values.extend([self._python_to_param(value) for value in row])
-                        query_response.rows.append(row_set)
-
-                query_response.rows_affected = cursor.rowcount
-                response.results.append(query_response)
-            conn.commit()
-        return response
-
-    def GetSchema(self, request, context):
-        with self._get_db() as conn:
-            cursor = conn.cursor()
-            cursor.execute(f"PRAGMA table_info({request.table_name})")
-
-            response = pb2.SchemaResponse()
-            for row in cursor.fetchall():
-                column = pb2.ColumnInfo(
-                    name=row[1],
-                    type=row[2],
-                    nullable=not row[3],
-                    primary_key=bool(row[5])
-                )
-                response.columns.append(column)
-            return response
-
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb2_grpc.add_SimpleSQLStoreServicer_to_server(SimpleSQLService('database.db'), server)
-    server.add_insecure_port('[::]:50051')
-    server.start()
-    server.wait_for_termination()
+    try:
+        await server.wait_for_termination()
+    except KeyboardInterrupt:
+        logger.info("⚠️ Server shutdown initiated")
+        await server.stop(0)
 
 if __name__ == '__main__':
-    serve()
+    asyncio.run(serve())
