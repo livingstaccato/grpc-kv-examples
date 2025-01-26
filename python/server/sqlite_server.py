@@ -7,7 +7,7 @@ import asyncio
 import grpc
 from concurrent import futures
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from proto import celersql_pb2, celersql_pb2_grpc
 from utils.database import execute_query, execute_update, initialize_schema
 from utils.certificate_helper import load_certificates_from_env, log_cert_info
@@ -51,7 +51,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         Returns:
             celersql_pb2.QueryResponse: Streamed query results with metadata and rows.
         """
-        transaction_id = str(datetime.now(datetime.utc).timestamp())
+        transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
             client_id=context.peer(),
@@ -108,7 +108,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         Returns:
             celersql_pb2.UpdateResponse: Response containing rows affected and last insert ID.
         """
-        transaction_id = str(datetime.now(datetime.utc).timestamp())
+        transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
             client_id=context.peer(),
