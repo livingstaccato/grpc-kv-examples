@@ -7,6 +7,7 @@ verify return:1
 depth=0 O = ec-secp521r1-mtls-server, CN = localhost
 verify error:num=21:unable to verify the first certificate
 verify return:1
+---
 write W BLOCK
 ---
 Certificate chain
