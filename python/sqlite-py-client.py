@@ -155,8 +155,8 @@ def main():
             """)
 
             client.execute_update(
-                "INSERT INTO users (name) VALUES (?)", 
-                ["Test User"]  # Add the parameter value
+                "INSERT INTO users (name) VALUES (?)",
+                [celersql_pb2.Parameter(string_value="Test User")]
             )
 
             result = client.execute_query("SELECT * FROM users")
