@@ -359,6 +359,19 @@ func main() {
     }
 
     // Create gRPC server with credentials
+    // Debug handler for TLS errors
+    tlsConfig.GetConfigForClient = func(info *tls.ClientHelloInfo) (*tls.Config, error) {
+        logger.Printf("🔍 🤝 Client Hello from %s", info.Conn.RemoteAddr())
+        logger.Printf("🔍 📜 Supported versions: %v", info.SupportedVersions)
+        logger.Printf("🔍 🔑 Supported curves: %v", info.SupportedCurves)
+        logger.Printf("🔍 🔒 Cipher suites: %v", info.CipherSuites)
+        
+        return tlsConfig, nil
+    }
+
+    // Verify EC curve compatibility
+    tlsConfig.CurvePreferences = []tls.CurveID{tls.CurveP521}
+
     creds := credentials.NewTLS(tlsConfig)
     s := grpc.NewServer(
         grpc.Creds(creds),
