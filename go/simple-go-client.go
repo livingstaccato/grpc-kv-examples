@@ -12,11 +12,12 @@ import (
     "encoding/pem"
     "bytes"
 
-    "./proto"
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/keepalive"
     "google.golang.org/grpc/status"
+
+    "./proto"
 )
 
 func logCertInfo(cert *x509.Certificate, prefix string) {
