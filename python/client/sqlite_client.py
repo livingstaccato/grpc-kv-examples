@@ -258,6 +258,7 @@ if __name__ == "__main__":
             "INSERT INTO users (name) VALUES (?)", ["Test User"]
         )
 
+        print(client.execute_query("SELECT * FROM users"))
         result = client.execute_query("SELECT * FROM users")
         logger.info(f"✨ Query result:\n{result}")
     except Exception as e:
