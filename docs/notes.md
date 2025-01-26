@@ -68,3 +68,6 @@
 | Python | secp521r1 | 1.3 | TLS_AES_256_GCM_SHA384       | 256 |
 | Ruby   | secp521r1 | 1.3 | TLS_CHACHA20_POLY1305_SHA256 | 256 |
 |---------------------------------------------------------------|
+
+ossl-client
+go cipher: AEAD-CHACHA20-POLY1305-SHA256
