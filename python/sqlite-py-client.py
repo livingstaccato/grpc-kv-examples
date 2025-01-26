@@ -13,7 +13,7 @@ def create_channel_credentials():
     )
 
 
-class SQLiteClient:
+class SimpleSQLClient:
    def __init__(self, channel):
        self.stub = pb2_grpc.SQLiteStoreStub(channel)
 
@@ -77,7 +77,7 @@ def main():
     ]
     #channel = grpc.secure_channel('localhost:50051', channel_creds, options=options)
     channel = grpc.insecure_channel('[::]:50051')
-    client = SQLiteClient(channel)
+    client = SimpleSQLClient(channel)
 
     print("Let's add a test user first")
     client.execute_update("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)")
