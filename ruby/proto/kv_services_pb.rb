@@ -6,7 +6,7 @@
 #
 
 require 'grpc'
-require_relative 'kv_pb'
+require 'proto/kv_pb'
 
 module Proto
   module KV
