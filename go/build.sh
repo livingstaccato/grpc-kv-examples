@@ -2,8 +2,8 @@
 
 set -e # Exit on any error
 
-export KV_CLIENT="$(pwd)/bin/simple-go-client"
-export KV_SERVER="$(pwd)/bin/simple-go-server"
+export KV_CLIENT="$(pwd)/bin/go-kv-client"
+export KV_SERVER="$(pwd)/bin/go-kv-server"
 
 echo "Cleaning up previous builds..."
 rm -f ${KV_CLIENT} ${KV_SERVER}
@@ -24,8 +24,8 @@ echo "Updating Go dependencies..."
 go mod tidy
 
 echo "Building client and server..."
-go build -o ${KV_CLIENT} ./simple-go-client.go
-go build -o ${KV_SERVER} ./simple-go-server.go
+go build -o ${KV_CLIENT} ./go-kv-client.go
+go build -o ${KV_SERVER} ./go-kv-server.go
 
 echo "Build complete. Binary information:"
 file ${KV_CLIENT}
