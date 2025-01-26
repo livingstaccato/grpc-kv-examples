@@ -17,7 +17,14 @@ class SimpleSQLClient:
    def __init__(self, channel):
        self.stub = pb2_grpc.SimpleSQLStoreStub(channel)
 
-   def execute_query(self, query, params=None):
+    def execute_query(self, query):
+        request = sqlite_pb2.QueryRequest(query=query, connection_id="some_id")
+        response_stream = self.stub.ExecuteQuery(request)
+        for response in response_stream:  # Correctly iterating over the stream
+            for row in response.rows:
+                print(row)
+
+   def X_execute_query(self, query, params=None):
        request = pb2.QueryRequest(
            query=query,
            params=[self._python_to_param(p) for p in (params or [])]
