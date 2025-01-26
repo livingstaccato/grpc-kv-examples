@@ -67,7 +67,7 @@ class CelerSQLClient:
             logger.error(f"❌ Failed to initialize client: {e}")
             raise
 
-    def execute_query(self, query: str, params: list = None) -> dict:
+    def Xexecute_query(self, query: str, params: list = None) -> dict:
         """
         Execute a SQL query on the server and retrieve results.
 
@@ -135,6 +135,34 @@ class CelerSQLClient:
                 transaction_id,
                 error_message=f"{e.code()}: {e.details()}",
             )
+            raise
+
+    def execute_query(self, query: str, params: list = None) -> dict:
+        try:
+            request = celersql_pb2.QueryRequest(query=query)
+            if params:
+                request.params.extend([self._python_to_param(p) for p in params])
+
+            response = self.stub.ExecuteQuery(request)
+            results = []
+            metadata = None
+
+            for batch in response:
+                if not metadata:
+                    metadata = {
+                        "columns": list(batch.column_names),
+                        "types": list(batch.column_types),
+                    }
+
+                results.extend(self._parse_rows(batch.rows))
+
+            return {
+                "columns": metadata["columns"],
+                "types": metadata["types"],
+                "rows": results,
+            }
+        except grpc.RpcError as e:
+            logger.error(f"❌ RPC Error: {e}")
             raise
 
     def execute_update(self, query: str, params: list = None) -> int:
