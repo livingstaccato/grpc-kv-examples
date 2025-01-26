@@ -7,18 +7,61 @@ import "google/protobuf/empty.proto";
 
 // Service definition for interacting with a SimpleSQL database
 service SimpleSQLStore {
-  // Query execution
-  rpc ExecuteQuery(QueryRequest) returns (stream QueryResponse); // Execute a query and stream results
-  rpc CancelQuery(CancelQueryRequest) returns (google.protobuf.Empty); // Cancel an ongoing query
-  rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse); // Execute a non-SELECT statement
-  rpc BatchExecute(BatchRequest) returns (BatchResponse); // Execute multiple queries/updates in a batch
-  rpc ExecuteBulkInsert(BulkInsertRequest) returns (BulkInsertResponse); // Perform bulk inserts into a table
-  rpc GetSchema(SchemaRequest) returns (SchemaResponse); // Retrieve schema details for a table
-  rpc ExplainQueryPlan(ExplainQueryRequest) returns (ExplainQueryResponse); // Provide query plan for debugging
-  rpc VacuumDatabase(VacuumRequest) returns (VacuumResponse); // Perform database vacuum
-  rpc BackupDatabase(BackupRequest) returns (BackupResponse); // Create a backup of the database
-  rpc CheckIntegrity(IntegrityRequest) returns (IntegrityResponse); // Check database integrity
-  rpc GetDatabaseInfo(DatabaseInfoRequest) returns (DatabaseInfoResponse); // Retrieve database metadata
+  // Executes a SQL query and streams the results back to the client.
+  // This RPC is suitable for queries that may return a large number of rows.
+  // The server will send a stream of QueryResponse messages, each containing
+  // a subset of the result rows. The final QueryResponse message will contain
+  // the overall status of the query execution.
+  //
+  // Example Usage:
+  //   Client: ExecuteQuery(QueryRequest{ connection_id: "conn1", query: "SELECT * FROM large_table" })
+  //   Server: (streams multiple QueryResponse messages with row data)
+  //   Server: QueryResponse{ status: Status{ code: OK, message: "" } }
+  rpc ExecuteQuery(QueryRequest) returns (stream QueryResponse);
+
+  // Cancels an ongoing query.
+  //
+  // The client must provide the connection ID and the query ID of the query to cancel.
+  // The query ID should be obtained from the initial QueryResponse message
+  // returned by ExecuteQuery.
+  rpc CancelQuery(CancelQueryRequest) returns (google.protobuf.Empty);
+
+  // Executes an update SQL statement (e.g., INSERT, UPDATE, DELETE).
+  // Returns the number of rows affected and the ID of the last inserted row (if applicable).
+  rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse);
+
+  // Executes multiple queries or updates in a single batch.
+  // Each query or update can have its own parameters.
+  rpc BatchExecute(BatchRequest) returns (BatchResponse);
+
+  // Performs bulk inserts into a table, optimizing for large data loads.
+  // The client provides the table name, columns, and rows to insert.
+  rpc ExecuteBulkInsert(BulkInsertRequest) returns (BulkInsertResponse);
+
+  // Retrieves schema details for a specific table.
+  //
+  // Example Usage:
+  //   Client: GetSchema(SchemaRequest{ connection_id: "conn1", table_name: "users" })
+  //   Server: SchemaResponse{ columns: [...], status: Status{ code: OK, message: "" } }
+  rpc GetSchema(SchemaRequest) returns (SchemaResponse);
+
+  // Provides the query plan for debugging and optimization purposes.
+  // The client sends a SQL query, and the server responds with the execution plan steps.
+  rpc ExplainQueryPlan(ExplainQueryRequest) returns (ExplainQueryResponse);
+
+  // Performs database vacuum to optimize the database by cleaning up unused spaces.
+  rpc VacuumDatabase(VacuumRequest) returns (VacuumResponse);
+
+  // Creates a backup of the database.
+  // The client specifies the path where the backup should be stored.
+  rpc BackupDatabase(BackupRequest) returns (BackupResponse);
+
+  // Checks the integrity of the database.
+  // This ensures that the database is not corrupted and is in a consistent state.
+  rpc CheckIntegrity(IntegrityRequest) returns (IntegrityResponse);
+
+  // Retrieves metadata about the database, such as size, page count, and SQLite version.
+  rpc GetDatabaseInfo(DatabaseInfoRequest) returns (DatabaseInfoResponse);
 
   // Table management
   rpc CreateTable(CreateTableRequest) returns (CreateTableResponse); // Create a new table
@@ -51,24 +94,25 @@ service SimpleSQLStore {
   rpc CloseConnection(ConnectionRequest) returns (google.protobuf.Empty); // Close an active connection
 }
 
+// Status code and message for operations
 message Status {
   enum Code {
-    OK = 0; 
-    ERROR = 1;
-    CONSTRAINT_VIOLATION = 2;
-    SYNTAX_ERROR = 3;
-    INVALID_PARAMETER = 4;
-    TRANSACTION_ERROR = 5;
+    OK = 0; // Operation successful
+    ERROR = 1; // General error
+    CONSTRAINT_VIOLATION = 2; // Constraint violation error
+    SYNTAX_ERROR = 3; // SQL syntax error
+    INVALID_PARAMETER = 4; // Invalid input parameter
+    TRANSACTION_ERROR = 5; // Transaction-related error
     TIMEOUT = 6; // Timeout error
-    TABLE_NOT_FOUND = 7;
-    INDEX_NOT_FOUND = 8;
-    COLUMN_NOT_FOUND = 9;
-    CONNECTION_ERROR = 10;
-    STATEMENT_NOT_FOUND = 11;
-    DATABASE_LOCKED = 12;
+    TABLE_NOT_FOUND = 7; // Table not found
+    INDEX_NOT_FOUND = 8; // Index not found
+    COLUMN_NOT_FOUND = 9; // Column not found
+    CONNECTION_ERROR = 10; // Connection error
+    STATEMENT_NOT_FOUND = 11; // Prepared statement not found
+    DATABASE_LOCKED = 12; // Database is locked
   }
-  Code code = 1;
-  string message = 2;
+  Code code = 1; // Status code
+  string message = 2; // Human-readable error message
   Status sub_status = 3; // Nested status for more context
 }
 
@@ -98,12 +142,12 @@ message QueryRequest {
 
 message QueryResponse {
   string query_id = 1; // Unique identifier for the query
-  repeated Row rows = 2;
-  repeated string column_names = 3;
-  repeated string column_types = 4;
-  int32 rows_affected = 5;
-  Status status = 6;
-  optional QueryStatistics statistics = 7;
+  repeated Row rows = 2; // Result rows
+  repeated string column_names = 3; // Names of result columns
+  repeated string column_types = 4; // Types of result columns
+  int32 rows_affected = 5; // Number of rows affected (if applicable)
+  Status status = 6; // Status of the query execution
+  optional QueryStatistics statistics = 7; // Query execution statistics
 }
 
 message QueryStatistics {
@@ -114,6 +158,7 @@ message QueryStatistics {
   int32 page_writes = 5; // Number of page writes
 }
 
+// Additional detailed inline documentation added.
 message CancelQueryRequest {
   string connection_id = 1; // Connection identifier
   string query_id = 2; // Identifier of the query to cancel
@@ -382,6 +427,7 @@ message ExplainQueryResponse {
 // Connection management messages
 message ConnectionRequest {
   string database_path = 1; // Path to the SimpleSQL database or connection string
+  optional int32 global_timeout_ms = 2; // Default timeout for all operations on this connection
 }
 
 message ConnectionResponse {

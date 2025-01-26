@@ -188,78 +188,100 @@ class SimpleSQLStoreServicer(object):
     """
 
     def ExecuteQuery(self, request, context):
-        """Query execution
-        Execute a query and stream results
+        """Executes a SQL query and streams the results back to the client.
+        This RPC is suitable for queries that may return a large number of rows.
+        The server will send a stream of QueryResponse messages, each containing
+        a subset of the result rows. The final QueryResponse message will contain
+        the overall status of the query execution.
+
+        Example Usage:
+        Client: ExecuteQuery(QueryRequest{ connection_id: "conn1", query: "SELECT * FROM large_table" })
+        Server: (streams multiple QueryResponse messages with row data)
+        Server: QueryResponse{ status: Status{ code: OK, message: "" } }
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CancelQuery(self, request, context):
-        """Cancel an ongoing query
+        """Cancels an ongoing query.
+
+        The client must provide the connection ID and the query ID of the query to cancel.
+        The query ID should be obtained from the initial QueryResponse message
+        returned by ExecuteQuery.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ExecuteUpdate(self, request, context):
-        """Execute a non-SELECT statement
+        """Executes an update SQL statement (e.g., INSERT, UPDATE, DELETE).
+        Returns the number of rows affected and the ID of the last inserted row (if applicable).
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def BatchExecute(self, request, context):
-        """Execute multiple queries/updates in a batch
+        """Executes multiple queries or updates in a single batch.
+        Each query or update can have its own parameters.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ExecuteBulkInsert(self, request, context):
-        """Perform bulk inserts into a table
+        """Performs bulk inserts into a table, optimizing for large data loads.
+        The client provides the table name, columns, and rows to insert.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def GetSchema(self, request, context):
-        """Retrieve schema details for a table
+        """Retrieves schema details for a specific table.
+
+        Example Usage:
+        Client: GetSchema(SchemaRequest{ connection_id: "conn1", table_name: "users" })
+        Server: SchemaResponse{ columns: [...], status: Status{ code: OK, message: "" } }
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ExplainQueryPlan(self, request, context):
-        """Provide query plan for debugging
+        """Provides the query plan for debugging and optimization purposes.
+        The client sends a SQL query, and the server responds with the execution plan steps.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def VacuumDatabase(self, request, context):
-        """Perform database vacuum
+        """Performs database vacuum to optimize the database by cleaning up unused spaces.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def BackupDatabase(self, request, context):
-        """Create a backup of the database
+        """Creates a backup of the database.
+        The client specifies the path where the backup should be stored.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CheckIntegrity(self, request, context):
-        """Check database integrity
+        """Checks the integrity of the database.
+        This ensures that the database is not corrupted and is in a consistent state.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def GetDatabaseInfo(self, request, context):
-        """Retrieve database metadata
+        """Retrieves metadata about the database, such as size, page count, and SQLite version.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
