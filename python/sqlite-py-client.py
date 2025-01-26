@@ -34,9 +34,9 @@ def create_channel_credentials(certs: dict):
 
     return credentials
 
-class SimpleSQLClient:
+class CelerSQLClient:
     def __init__(self, channel):
-        self.stub = sqlite_pb2_grpc.SimpleSQLStoreStub(channel)
+        self.stub = sqlite_pb2_grpc.CelerSQLStoreStub(channel)
         logger.info("👥 Created SQL client stub")
 
     def execute_query(self, query: str, params=None):
@@ -143,7 +143,7 @@ def main():
                 raise
 
             # Create client and execute test queries
-            client = SimpleSQLClient(channel)
+            client = CelerSQLClient(channel)
             
             # Example operations
             client.execute_update("""
