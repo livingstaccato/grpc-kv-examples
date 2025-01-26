@@ -81,7 +81,7 @@ func main() {
         Certificates: []tls.Certificate{cert},
         ClientAuth:   tls.RequireAndVerifyClientCert,
         ClientCAs:    certPool,
-        MinVersion:   tls.VersionTLS12,
+        MinVersion:   tls.VersionTLS13,
         ServerName:   "localhost",
         CipherSuites: []uint16{
             tls.TLS_AES_128_GCM_SHA256,
