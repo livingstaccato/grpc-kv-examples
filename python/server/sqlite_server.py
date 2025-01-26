@@ -1,126 +1,161 @@
-#!/usr/bin/env python3
+#
+# sqlite_server.py
+#
 
-import grpc
-import logging
-from concurrent import futures
-from proto import celersql_pb2, celersql_pb2_grpc
-import time
-import os
 import asyncio
-import sqlite3
-from certificate_helper import log_cert_info, load_certificates_from_env, load_pem_certificate
-
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s.%(msecs)03d %(levelname)s %(name)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+import grpc
+from concurrent import futures
+import logging
+from datetime import datetime
+from proto import celersql_pb2, celersql_pb2_grpc
+from database import execute_query, execute_update, initialize_schema
+from certificate_helper import load_certificates_from_env, log_cert_info
+from logging_helper import (
+    log_transaction,
+    log_request_details,
+    log_response_details,
+    log_error,
+    log_metadata,
+    log_certificate_details,
 )
+
+# Configure root logger
 logger = logging.getLogger(__name__)
 
+
 class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
-    def __init__(self, db_path='database.db'):
-        logger.info("🔧 🚀 Initializing SQLServicer with database: %s", db_path)
-        self.db_path = db_path
-        self._ensure_db_exists()
+    """
+    gRPC Servicer for handling SQLite operations.
 
-    def _ensure_db_exists(self):
-        """Ensure database exists and initialize if needed"""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                logger.info("📦 Database connection successful")
-        except Exception as e:
-            logger.error(f"❌ Database initialization error: {e}")
-            raise
+    This class provides methods to execute SQL queries and updates
+    while logging metadata, transactions, and error details.
+    """
 
-    async def _log_request_details(self, context):
-        """Log gRPC request details"""
-        try:
-            logger.debug(f"🔎 🌐 Peer: {context.peer()}")
-            auth_context = context.auth_context()
-            #for k, v in auth_context.items():
-            #    logger.debug(f"🔎 🔒 Auth Context {k}: {v}")
-            if b"x509_common_name" in auth_context:
-                common_name = auth_context[b"x509_common_name"][0].decode()
-                logger.info(f"🔑 Client Common Name: {common_name}")
-        except Exception as e:
-            logger.error(f"🔎 ❌ Logging error: {e}")
-
-    def _get_db(self):
-        """Get database connection with error handling"""
-        try:
-            return sqlite3.connect(self.db_path)
-        except Exception as e:
-            logger.error(f"❌ Database connection error: {e}")
-            raise
+    def __init__(self):
+        """
+        Initialize the SQLServicer with logging and database bootstrapping.
+        """
+        logger.info("🔧 Initializing SQLServicer.")
+        initialize_schema()
+        logger.info("✅ Schema initialized successfully.")
 
     async def ExecuteQuery(self, request, context):
-        logger.info(f"📝 Query request: {request.query}")
-        await self._log_request_details(context)
-        
-        with self._get_db() as conn:
-            cursor = conn.cursor()
-            try:
-                cursor.execute(request.query, [param.string_value for param in request.params])
-                
-                # Create initial response with metadata
-                response = celersql_pb2.QueryResponse()
-                if cursor.description:
-                    response.column_names.extend([desc[0] for desc in cursor.description])
-                    response.column_types.extend([type(desc[1]).__name__ for desc in cursor.description])
-                
-                # Stream rows in batches
-                batch_size = 1000
-                while True:
-                    rows = cursor.fetchmany(batch_size)
-                    if not rows:
-                        break
-                        
-                    # Clear previous rows and add new batch
-                    response.ClearField("rows")
-                    for row in rows:
-                        row_data = celersql_pb2.Row()
-                        for value in row:
-                            param = self._python_to_param(value)
-                            row_data.values.append(param)
-                        response.rows.append(row_data)
-                    
-                    response.rows_affected = cursor.rowcount
-                    yield response
-                    
-                logger.info(f"✅ Query executed successfully. Rows affected: {cursor.rowcount}")
-                
-            except Exception as e:
-                logger.error(f"❌ Query execution error: {e}")
-                context.set_code(grpc.StatusCode.INTERNAL)
-                context.set_details(str(e))
-                raise
+        """
+        Handle a gRPC request to execute a SQL query.
+
+        Args:
+            request (celersql_pb2.QueryRequest): Query request containing SQL query and parameters.
+            context (grpc.aio.ServicerContext): gRPC context object for the request.
+
+        Returns:
+            celersql_pb2.QueryResponse: Streamed query results with metadata and rows.
+        """
+        transaction_id = str(datetime.utcnow().timestamp())
+        log_transaction(
+            transaction_id=transaction_id,
+            client_id=context.peer(),
+            request_type="ExecuteQuery",
+            status="pending",
+            timestamp=datetime.utcnow(),
+        )
+
+        log_request_details(
+            request_id=transaction_id,
+            details={"query": request.query, "params": [param.string_value for param in request.params]},
+        )
+
+        try:
+            logger.info(f"📝 Processing query: {request.query}")
+            rows = execute_query(request.query)
+            response = celersql_pb2.QueryResponse()
+
+            if rows:
+                response.column_names.extend(rows[0].keys())
+                response.column_types.extend([type(value).__name__ for value in rows[0].values()])
+                for row in rows:
+                    grpc_row = celersql_pb2.Row(values=[self._python_to_param(value) for value in row.values()])
+                    response.rows.append(grpc_row)
+
+            log_response_details(
+                response_id=transaction_id,
+                details={"rows": len(response.rows), "columns": response.column_names},
+            )
+
+            log_transaction(
+                transaction_id=transaction_id,
+                client_id=context.peer(),
+                request_type="ExecuteQuery",
+                status="success",
+                timestamp=datetime.utcnow(),
+            )
+            return response
+
+        except Exception as e:
+            log_error(transaction_id, error_message=str(e))
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            raise
 
     async def ExecuteUpdate(self, request, context):
-        logger.info(f"📝 Update request: {request.query}")
-        await self._log_request_details(context)
+        """
+        Handle a gRPC request to execute a SQL update/insert/delete.
 
-        with self._get_db() as conn:
-            cursor = conn.cursor()
-            try:
-                cursor.execute(request.query, [param.string_value for param in request.params])
-                conn.commit()
-                
-                response = celersql_pb2.UpdateResponse(
-                    rows_affected=cursor.rowcount,
-                    last_insert_id=cursor.lastrowid
-                )
-                logger.info(f"✅ Update executed successfully. Rows affected: {cursor.rowcount}")
-                return response
+        Args:
+            request (celersql_pb2.UpdateRequest): Update request containing SQL statement and parameters.
+            context (grpc.aio.ServicerContext): gRPC context object for the request.
 
-            except Exception as e:
-                logger.error(f"❌ Update execution error: {e}")
-                context.set_code(grpc.StatusCode.INTERNAL)
-                context.set_details(str(e))
-                raise
+        Returns:
+            celersql_pb2.UpdateResponse: Response containing rows affected and last insert ID.
+        """
+        transaction_id = str(datetime.utcnow().timestamp())
+        log_transaction(
+            transaction_id=transaction_id,
+            client_id=context.peer(),
+            request_type="ExecuteUpdate",
+            status="pending",
+            timestamp=datetime.utcnow(),
+        )
+
+        log_request_details(
+            request_id=transaction_id,
+            details={"query": request.query, "params": [param.string_value for param in request.params]},
+        )
+
+        try:
+            logger.info(f"📝 Processing update: {request.query}")
+            rows_affected = execute_update(request.query)
+            response = celersql_pb2.UpdateResponse(rows_affected=rows_affected)
+
+            log_response_details(
+                response_id=transaction_id,
+                details={"rows_affected": rows_affected},
+            )
+
+            log_transaction(
+                transaction_id=transaction_id,
+                client_id=context.peer(),
+                request_type="ExecuteUpdate",
+                status="success",
+                timestamp=datetime.utcnow(),
+            )
+            return response
+
+        except Exception as e:
+            log_error(transaction_id, error_message=str(e))
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            raise
 
     def _python_to_param(self, value):
-        """Convert Python value to Parameter message"""
+        """
+        Convert a Python value to a gRPC Parameter message.
+
+        Args:
+            value (Any): Python value to convert.
+
+        Returns:
+            celersql_pb2.Parameter: Converted gRPC Parameter message.
+        """
         param = celersql_pb2.Parameter()
         if isinstance(value, int):
             param.int_value = value
@@ -134,51 +169,45 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             param.null_value = True
         return param
 
+
 async def serve():
-    logger.info("🚀 Starting SQL Server...")
+    """
+    Starts the gRPC server with SSL credentials and sets up the SQLServicer.
+    """
+    logger.info("🚀 Starting SQL gRPC Server...")
 
     try:
         certs = load_certificates_from_env()
-        server_cert = certs["PLUGIN_SERVER_CERT"]
-        server_key = certs["PLUGIN_SERVER_KEY"]
-        client_cert = certs.get("PLUGIN_CLIENT_CERT")
-
         server_credentials = grpc.ssl_server_credentials(
-            [(server_key.encode(), server_cert.encode())],
-            root_certificates=client_cert.encode() if client_cert else None,
-            require_client_auth=True if client_cert else False
+            [(certs["PLUGIN_SERVER_KEY"].encode(), certs["PLUGIN_SERVER_CERT"].encode())],
+            root_certificates=certs["PLUGIN_CLIENT_CERT"].encode(),
+            require_client_auth=True,
         )
-        logger.info("🔒 SSL credentials created successfully")
+        log_certificate_details(cert=certs["PLUGIN_SERVER_CERT"], prefix="Server Certificate")
 
     except Exception as e:
-        logger.error(f"🔒 ❌ SSL credentials setup failed: {e}")
+        logger.error(f"❌ Failed to load SSL credentials: {e}")
         raise
 
-    server = grpc.aio.server(
-        futures.ThreadPoolExecutor(max_workers=10),
-        options=[
-            ('grpc.ssl_target_name_override', 'localhost'),
-            ('grpc.default_authority', 'localhost'),
-        ]
-    )
-
+    server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
     celersql_pb2_grpc.add_CelerSQLStoreServicer_to_server(SQLServicer(), server)
 
     try:
-        server.add_secure_port('[::]:50051', server_credentials)
-        logger.info("🌐 Server port bound successfully")
+        server.add_secure_port("[::]:50051", server_credentials)
+        logger.info("🌐 Server bound to port 50051 with SSL.")
     except Exception as e:
-        logger.error(f"🌐 ❌ Port binding failed: {e}")
+        logger.error(f"❌ Failed to bind server port: {e}")
         raise
 
     await server.start()
-    logger.info("✅ Server started successfully")
+    logger.info("✅ SQL Server started successfully.")
 
     try:
         await server.wait_for_termination()
     except KeyboardInterrupt:
-        logger.info("⚠️ Server shutdown initiated")
+        logger.info("⚠️ Server shutdown initiated.")
         await server.stop(0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asyncio.run(serve())
