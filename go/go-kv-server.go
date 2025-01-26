@@ -332,8 +332,9 @@ func monitorConnections(s *grpc.Server, logger *log.Logger) {
 }
 
 func main() {
+    logger := setupLogger()
     logger.Printf("🚀 🔄 Starting gRPC server...")
-    
+
     // Load certificates from environment
     serverCertPEM := os.Getenv("PLUGIN_SERVER_CERT")
     serverKeyPEM := os.Getenv("PLUGIN_SERVER_KEY")
