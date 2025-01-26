@@ -43,6 +43,7 @@ class DatabaseConnectionPool:
             raise
 
     def get_connection(self):
+        logger.debug("🔌 Fetched existing database connection.")
         return self.connections.get()
 
     def release_connection(self, conn):
