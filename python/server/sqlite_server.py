@@ -114,7 +114,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             client_id=context.peer(),
             request_type="ExecuteUpdate",
             status="pending",
-            timestamp=datetime.now(datetime.utc),
+            timestamp=datetime.now(timezone.utc),
         )
 
         log_request_details(
