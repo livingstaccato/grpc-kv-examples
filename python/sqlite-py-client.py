@@ -80,26 +80,24 @@ class CelerSQLClient:
 def _parse_rows(self, rows):
     """Parse row data from protobuf format"""
     return [[self._param_to_python(value) for value in row.values] for row in rows]
-    def execute_update(self, query: str, params=None):
-        """Execute a SQL update with detailed logging"""
-        logger.info(f"📝 Executing update: {query}")
-        try:
-            # request = celersql_pb2.UpdateRequest(query=query)
-            # if params:
-            #     request.params.extend([self._python_to_param(p) for p in params])
 
-            request = celersql_pb2.UpdateRequest(
-                query="INSERT INTO users (name) VALUES (?)",
-                params=[celersql_pb2.Parameter(string_value="Test User")]
-            )
-
-            response = self.stub.ExecuteUpdate(request)
-            logger.info(f"✅ Update successful. Rows affected: {response.rows_affected}")
-            return response.rows_affected
-
-        except grpc.RpcError as e:
-            logger.error(f"❌ Update execution failed: {e.code()}: {e.details()}")
-            raise
+def execute_update(self, query: str, params=None):
+    """Execute a SQL update with detailed logging"""
+    logger.info(f"📝 Executing update: {query}")
+    try:
+        # request = celersql_pb2.UpdateRequest(query=query)
+        # if params:
+        #     request.params.extend([self._python_to_param(p) for p in params])
+        request = celersql_pb2.UpdateRequest(
+            query="INSERT INTO users (name) VALUES (?)",
+            params=[celersql_pb2.Parameter(string_value="Test User")]
+        )
+        response = self.stub.ExecuteUpdate(request)
+        logger.info(f"✅ Update successful. Rows affected: {response.rows_affected}")
+        return response.rows_affected
+    except grpc.RpcError as e:
+        logger.error(f"❌ Update execution failed: {e.code()}: {e.details()}")
+        raise
 
     def _python_to_param(self, value):
         """Convert Python value to Parameter message"""
