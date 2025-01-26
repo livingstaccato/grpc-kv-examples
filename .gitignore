@@ -799,4 +799,4 @@ certs
 
 logs/
 
-
+*.db
