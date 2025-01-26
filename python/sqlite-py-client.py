@@ -40,7 +40,6 @@ class CelerSQLClient:
         logger.info("👥 Created SQL client stub")
 
     def execute_query(self, query: str, params=None):
-        """Execute a SQL query with streaming results"""
         logger.info(f"📝 Executing query: {query}")
         try:
             request = celersql_pb2.QueryRequest(query=query)
@@ -77,9 +76,48 @@ class CelerSQLClient:
             logger.error(f"❌ Query execution failed: {e.code()}: {e.details()}")
             raise
 
-def _parse_rows(self, rows):
-    """Parse row data from protobuf format"""
-    return [[self._param_to_python(value) for value in row.values] for row in rows]
+    def execute_update(self, query: str, params=None):
+        logger.info(f"📝 Executing update: {query}")
+        try:
+            request = celersql_pb2.UpdateRequest(query=query)
+            if params:
+                request.params.extend([self._python_to_param(p) for p in params])
+
+            response = self.stub.ExecuteUpdate(request)
+            logger.info(f"✅ Update successful. Rows affected: {response.rows_affected}")
+            return response.rows_affected
+        except grpc.RpcError as e:
+            logger.error(f"❌ Update execution failed: {e.code()}: {e.details()}")
+            raise
+
+    def _parse_rows(self, rows):
+        return [[self._param_to_python(value) for value in row.values] for row in rows]
+
+    def _python_to_param(self, value):
+        param = celersql_pb2.Parameter()
+        if isinstance(value, int):
+            param.int_value = value
+        elif isinstance(value, float):
+            param.float_value = value
+        elif isinstance(value, str):
+            param.string_value = value
+        elif isinstance(value, bytes):
+            param.blob_value = value
+        elif value is None:
+            param.null_value = True
+        return param
+
+    def _param_to_python(self, value):
+        if value.HasField('int_value'):
+            return value.int_value
+        elif value.HasField('float_value'):
+            return value.float_value
+        elif value.HasField('string_value'):
+            return value.string_value
+        elif value.HasField('blob_value'):
+            return value.blob_value
+        return None
+
 
 def execute_update(self, query: str, params=None):
     """Execute a SQL update with detailed logging"""
