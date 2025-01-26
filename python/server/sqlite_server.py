@@ -9,7 +9,7 @@ from concurrent import futures
 import logging
 from datetime import datetime
 from proto import celersql_pb2, celersql_pb2_grpc
-from database import execute_query, execute_update, initialize_schema
+from utils.database import execute_query, execute_update, initialize_schema
 from certificate_helper import load_certificates_from_env, log_cert_info
 from logging_helper import (
     log_transaction,
