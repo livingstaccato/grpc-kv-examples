@@ -221,12 +221,22 @@ message SchemaResponse {
 
 message ColumnInfo {
   string name = 1; // Column name
-  string type = 2; // Column data type
-  bool nullable = 3; // Whether the column allows NULL
-  bool primary_key = 4; // Whether the column is part of the primary key
-  string default_value = 5; // Default value of the column
-  bool auto_increment = 6; // Whether the column is auto-incrementing
-  repeated string foreign_key = 7; // Foreign key references (if any)
+  oneof column_type {
+    string text_type = 2;      // For TEXT or VARCHAR columns
+    bool int_type = 3;       // For INTEGER columns (boolean indicates presence of the type)
+    bool real_type = 4;      // For REAL or FLOAT or DOUBLE columns (boolean indicates presence of the type)
+    bool blob_type = 5;      // For BLOB columns (boolean indicates presence of the type)
+    string numeric_type = 6;   // For NUMERIC or DECIMAL columns (can include precision/scale in the string)
+    string date_type = 7;     // For DATE columns
+    string time_type = 8;      // For TIME columns
+    string datetime_type = 9; // For DATETIME or TIMESTAMP columns
+    // Add other types as needed for your specific use cases
+  }
+  bool nullable = 10; // Whether the column allows NULL
+  bool primary_key = 11; // Whether the column is part of the primary key
+  string default_value = 12; // Default value of the column
+  bool auto_increment = 13; // Whether the column is auto-incrementing
+  repeated string foreign_key = 14; // Foreign key references (if any) - might need a more complex structure here too
 }
 
 // Table management messages
