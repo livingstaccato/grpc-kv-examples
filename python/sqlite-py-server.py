@@ -38,8 +38,8 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         try:
             logger.debug(f"🔎 🌐 Peer: {context.peer()}")
             auth_context = context.auth_context()
-            for k, v in auth_context.items():
-                logger.debug(f"🔎 🔒 Auth Context {k}: {v}")
+            #for k, v in auth_context.items():
+            #    logger.debug(f"🔎 🔒 Auth Context {k}: {v}")
             if b"x509_common_name" in auth_context:
                 common_name = auth_context[b"x509_common_name"][0].decode()
                 logger.info(f"🔑 Client Common Name: {common_name}")
