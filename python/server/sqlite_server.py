@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# sqlite_server.py
+# server/sqlite_server.py
 #
 
 import asyncio
