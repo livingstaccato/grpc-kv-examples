@@ -98,16 +98,6 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             raise
 
     async def ExecuteUpdate(self, request, context):
-        """
-        Handle a gRPC request to execute a SQL update/insert/delete.
-
-        Args:
-            request (celersql_pb2.UpdateRequest): Update request containing SQL statement and parameters.
-            context (grpc.aio.ServicerContext): gRPC context object for the request.
-
-        Returns:
-            celersql_pb2.UpdateResponse: Response containing rows affected and last insert ID.
-        """
         transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
@@ -124,7 +114,12 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
 
         try:
             logger.info(f"📝 Processing update: {request.query}")
-            rows_affected = execute_update(request.query)
+            
+            # Extract parameters from the request
+            params = [self._param_to_python(param) for param in request.params]
+
+            # Execute the update
+            rows_affected = execute_update(request.query, params)
             response = celersql_pb2.UpdateResponse(rows_affected=rows_affected)
 
             log_response_details(
