@@ -85,5 +85,6 @@ fi
 if [ -n "${ECDSA_CURVE}" ]; then
 generate_certificate "ec-${ECDSA_CURVE}-mtls-client" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-client" "ecdsa"
 generate_certificate "ec-${ECDSA_CURVE}-mtls-server" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-server" "ecdsa"
+fi
 
 echo "All certificates generated successfully in $CERT_DIR."
