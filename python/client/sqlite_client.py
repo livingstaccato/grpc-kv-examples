@@ -41,7 +41,13 @@ class CelerSQLClient:
                 private_key=certs["PLUGIN_CLIENT_KEY"].encode(),
                 certificate_chain=certs["PLUGIN_CLIENT_CERT"].encode(),
             )
-            log_cert_info(cert=certs["PLUGIN_CLIENT_CERT"], prefix="Client Certificate")
+
+            # Logging parsed certificates
+            if "PLUGIN_SERVER_CERT_OBJ" in certs:
+                log_cert_info(certs["PLUGIN_SERVER_CERT_OBJ"], "Server Certificate")
+            if "PLUGIN_CLIENT_CERT_OBJ" in certs:
+                log_cert_info(certs["PLUGIN_CLIENT_CERT_OBJ"], "Client Certificate")
+
 
             self.channel = grpc.secure_channel(
                 server_endpoint,
