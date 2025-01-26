@@ -1,4 +1,4 @@
-Okay, here's a comprehensive C# gRPC client implementation based on your `simple-go-client`, designed to work on Linux and be compatible with your existing infrastructure.
+Okay, here's a comprehensive C# gRPC client implementation based on your `go-kv-client`, designed to work on Linux and be compatible with your existing infrastructure.
 
 **Project Setup:**
 
