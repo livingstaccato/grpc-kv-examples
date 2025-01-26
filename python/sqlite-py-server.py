@@ -85,7 +85,7 @@ class SQLServicer(sqlite_pb2_grpc.SimpleSQLStoreServicer):
                 context.set_details(str(e))
                 raise
 
-    def ExecuteUpdate(self, request, context):
+    async def ExecuteUpdate(self, request, context):
         logger.info(f"📝 Update request: {request.query}")
         await self._log_request_details(context)
 
