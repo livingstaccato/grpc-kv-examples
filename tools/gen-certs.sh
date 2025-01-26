@@ -102,15 +102,20 @@ fi
 if [ -n "${ECDSA_CURVE}" ]; then
     _cert_name="ec-${ECDSA_CURVE}-mtls"
 
+    echo
     echo "====================================================================="
     echo "*** Client Cert ***"
+    echo "====================================================================="
     generate_certificate "${_cert_name}-client" \
         "${_cert_name}-client" \
         "localhost" \
         "localhost,127.0.0.1" \
         "ecdsa"
+
     echo
-    echo
+    echo "====================================================================="
+    echo "*** Server RSA Cert ***"
+    echo "====================================================================="
     generate_certificate "${_cert_name}-server" \
         "${_cert_name}-server" \
         "localhost" \
