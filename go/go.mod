@@ -1,4 +1,4 @@
-module github.com/livingstaccato/simple-grpc-example
+module github.com/livingstaccato/grpc-kv-examples
 
 go 1.23.5
 
