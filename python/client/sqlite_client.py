@@ -14,6 +14,7 @@ from utils.logging_helper import (
     log_response_details,
     log_error,
 )
+from tabulate import tabulate
 
 # Configure root logger
 logger = logging.getLogger(__name__)
@@ -21,6 +22,9 @@ logger = logging.getLogger(__name__)
 class CelerSQLClient:
     """
     Client for interacting with the CelerSQL gRPC Server.
+
+    Provides methods to execute SQL queries and updates, manage transactions,
+    and log detailed request/response information for debugging and auditing.
     """
 
     def __init__(self, server_endpoint: str):
@@ -48,7 +52,6 @@ class CelerSQLClient:
             if "PLUGIN_CLIENT_CERT_OBJ" in certs:
                 log_cert_info(certs["PLUGIN_CLIENT_CERT_OBJ"], "Client Certificate")
 
-
             self.channel = grpc.secure_channel(
                 server_endpoint,
                 credentials,
@@ -68,7 +71,16 @@ class CelerSQLClient:
             raise
 
     def execute_query(self, query: str, params: list = None) -> str:
-        from tabulate import tabulate
+        """
+        Execute a SQL query on the server and retrieve results.
+
+        Args:
+            query (str): The SQL query string to execute.
+            params (list, optional): Parameters to bind to the query.
+
+        Returns:
+            str: Tabulated results of the query or a "No results found." message.
+        """
         transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
@@ -96,6 +108,7 @@ class CelerSQLClient:
 
             # Process the gRPC response stream
             for batch in response:
+                logger.debug(f"📤 Received batch: {batch}")
                 if not columns:  # Extract metadata only once
                     columns = list(batch.column_names)
                     types = list(batch.column_types)
@@ -103,7 +116,9 @@ class CelerSQLClient:
 
                 # Parse rows
                 for row in batch.rows:
-                    results.append([self._param_to_python(value) for value in row.values])
+                    parsed_row = [self._param_to_python(value) for value in row.values]
+                    logger.debug(f"🔍 Parsed row: {parsed_row}")
+                    results.append(parsed_row)
 
             log_response_details(
                 response_id=transaction_id,
@@ -137,7 +152,7 @@ class CelerSQLClient:
 
         Args:
             query (str): SQL update string.
-            params (list, optional): List of parameters for the update.
+            params (list, optional): Parameters to bind to the update query.
 
         Returns:
             int: Number of rows affected by the update.
@@ -209,18 +224,6 @@ class CelerSQLClient:
             param.null_value = True
         return param
 
-    def _parse_rows(self, rows):
-        """
-        Parse rows from gRPC response into a Python structure.
-
-        Args:
-            rows (list): List of gRPC Row messages.
-
-        Returns:
-            list: Parsed rows as a list of dictionaries.
-        """
-        return [[self._param_to_python(value) for value in row.values] for row in rows]
-
     def _param_to_python(self, value):
         """
         Convert a gRPC Parameter message to a Python value.
@@ -241,7 +244,6 @@ class CelerSQLClient:
             return value.blob_value
         return None
 
-
 if __name__ == "__main__":
     try:
         logger.info("🚀 Starting SQLite client...")
@@ -256,9 +258,6 @@ if __name__ == "__main__":
         )
 
         result = client.execute_query("SELECT * FROM users")
-        logger.debug(f"🔍 Rows fetched from database: {result}")
-
-        logger.info(f"✨ Query result: {result}")
+        logger.info(f"✨ Query result:\n{result}")
     except Exception as e:
         logger.error(f"❌ Client error: {e}")
-
