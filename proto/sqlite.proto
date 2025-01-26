@@ -15,6 +15,10 @@ service SimpleSQLStore {
   rpc ExecuteBulkInsert(BulkInsertRequest) returns (BulkInsertResponse); // Perform bulk inserts into a table
   rpc GetSchema(SchemaRequest) returns (SchemaResponse); // Retrieve schema details for a table
   rpc ExplainQueryPlan(ExplainQueryRequest) returns (ExplainQueryResponse); // Provide query plan for debugging
+  rpc VacuumDatabase(VacuumRequest) returns (VacuumResponse); // Perform database vacuum
+  rpc BackupDatabase(BackupRequest) returns (BackupResponse); // Create a backup of the database
+  rpc CheckIntegrity(IntegrityRequest) returns (IntegrityResponse); // Check database integrity
+  rpc GetDatabaseInfo(DatabaseInfoRequest) returns (DatabaseInfoResponse); // Retrieve database metadata
 
   // Statement preparation and execution
   rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse); // Prepare a SQL statement
@@ -76,6 +80,15 @@ message QueryResponse {
   repeated string column_types = 3; // Types of result columns
   int32 rows_affected = 4; // Number of rows affected (if applicable)
   Status status = 5; // Status of the query execution
+  optional QueryStatistics statistics = 6; // Query execution statistics
+}
+
+message QueryStatistics {
+  int64 execution_time_ms = 1; // Query execution time in milliseconds
+  int64 rows_processed = 2; // Number of rows processed
+  int64 memory_used = 3; // Memory used in bytes
+  int32 page_reads = 4; // Number of page reads
+  int32 page_writes = 5; // Number of page writes
 }
 
 message CancelQueryRequest {
@@ -187,6 +200,49 @@ message TransactionStateResponse {
   string transaction_id = 1; // Identifier for the transaction
   string state = 2; // Current state of the transaction (e.g., active, committed)
   Status status = 3; // Status of the request
+}
+
+// Vacuum database messages
+message VacuumRequest {
+  string connection_id = 1; // Connection identifier
+}
+
+message VacuumResponse {
+  Status status = 1; // Status of the vacuum operation
+}
+
+// Backup database messages
+message BackupRequest {
+  string connection_id = 1; // Connection identifier
+  string backup_path = 2; // Path to store the backup
+}
+
+message BackupResponse {
+  Status status = 1; // Status of the backup operation
+  int64 backup_size = 2; // Size of the backup in bytes
+}
+
+// Database integrity messages
+message IntegrityRequest {
+  string connection_id = 1; // Connection identifier
+}
+
+message IntegrityResponse {
+  Status status = 1; // Status of the integrity check
+}
+
+// Database information messages
+message DatabaseInfoRequest {
+  string connection_id = 1; // Connection identifier
+}
+
+message DatabaseInfoResponse {
+  int64 size_bytes = 1; // Total size of the database in bytes
+  int32 page_size = 2; // Page size of the database
+  int32 page_count = 3; // Number of pages in the database
+  repeated string attached_databases = 4; // List of attached databases
+  string sqlite_version = 5; // SQLite version
+  Status status = 6; // Status of the request
 }
 
 // Explain query plan messages
