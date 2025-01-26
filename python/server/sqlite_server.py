@@ -57,7 +57,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             client_id=context.peer(),
             request_type="ExecuteQuery",
             status="pending",
-            timestamp=datetime.now(datetime.utc),
+            timestamp=datetime.now(timezone.utc),
         )
 
         log_request_details(
@@ -87,7 +87,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
                 client_id=context.peer(),
                 request_type="ExecuteQuery",
                 status="success",
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
             )
             return response
 
