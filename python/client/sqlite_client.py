@@ -81,6 +81,7 @@ class CelerSQLClient:
         Returns:
             str: Tabulated results of the query or a "No results found." message.
         """
+        from tabulate import tabulate
         transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
@@ -112,7 +113,7 @@ class CelerSQLClient:
                 if not columns:  # Extract metadata only once
                     columns = list(batch.column_names)
                     types = list(batch.column_types)
-                    logger.debug(f"📊 Metadata: columns={columns}, types={types}")
+                    logger.debug(f"📊 Extracted metadata: columns={columns}, types={types}")
 
                 # Parse rows
                 for row in batch.rows:
