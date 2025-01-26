@@ -6,7 +6,6 @@ import (
     "time"
     "net"
     "fmt"
-    "crypto/x509/pkix"
     "encoding/asn1"
     "strings"
 
