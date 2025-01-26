@@ -67,6 +67,65 @@ class CelerSQLClient:
             logger.error(f"❌ Failed to initialize client: {e}")
             raise
 
+    def execute_query(self, query: str, params: list = None) -> str:
+        from tabulate import tabulate
+
+        transaction_id = str(datetime.now(timezone.utc).timestamp())
+        log_transaction(
+            transaction_id=transaction_id,
+            client_id="sqlite_client",
+            request_type="ExecuteQuery",
+            status="pending",
+            timestamp=datetime.now(timezone.utc),
+        )
+
+        log_request_details(
+            request_id=transaction_id,
+            details={"query": query, "params": params or []},
+        )
+
+        try:
+            logger.info(f"📝 Sending query request: {query}")
+            request = celersql_pb2.QueryRequest(query=query)
+            if params:
+                request.params.extend([self._python_to_param(p) for p in params])
+
+            response = self.stub.ExecuteQuery(request)
+            rows = []
+            columns = []
+            types = []
+
+            for batch in response:
+                if not columns:
+                    columns = list(batch.column_names)
+                    types = list(batch.column_types)
+                rows.extend(self._parse_rows(batch.rows))
+
+            log_response_details(
+                response_id=transaction_id,
+                details={"columns": columns, "rows": len(rows)},
+            )
+
+            log_transaction(
+                transaction_id=transaction_id,
+                client_id="sqlite_client",
+                request_type="ExecuteQuery",
+                status="success",
+                timestamp=datetime.now(timezone.utc),
+            )
+
+            if rows:
+                return tabulate(rows, headers=columns, tablefmt="pretty")
+            else:
+                return "No results found."
+
+        except grpc.RpcError as e:
+            log_error(
+                transaction_id,
+                error_message=f"{e.code()}: {e.details()}",
+            )
+            raise
+
     def execute_query(self, query: str, params: list = None) -> dict:
         transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
