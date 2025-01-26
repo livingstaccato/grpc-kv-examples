@@ -72,8 +72,8 @@ EOF
 }
 
 # Generate certificates
-#generate_certificate "rsa-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-mtls-client" "rsa"
-#generate_certificate "rsa-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-mtls-server" "rsa"
+generate_certificate "rsa-${RSA_BITS}-mtls-client" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-client" "rsa"
+generate_certificate "rsa-${RSA_BITS}-mtls-server" "localhost" "localhost,127.0.0.1" "rsa-${RSA_BITS}-mtls-server" "rsa"
 
 generate_certificate "ec-${ECDSA_CURVE}-mtls-client" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-client" "ecdsa"
 generate_certificate "ec-${ECDSA_CURVE}-mtls-server" "localhost" "localhost,127.0.0.1" "ec-${ECDSA_CURVE}-mtls-server" "ecdsa"
