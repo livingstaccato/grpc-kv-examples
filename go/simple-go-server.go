@@ -9,7 +9,7 @@ import (
     "os"
     "time"
 
-    "github.com/livingstaccato/grpc-kv-examples/proto"
+    "github.com/livingstaccato/grpc-kv-examples"
     "google.golang.org/grpc"
     "google.golang.org/grpc/credentials"
     "google.golang.org/grpc/keepalive"
