@@ -23,6 +23,7 @@ class SimpleSQLClient:
         for response in response_stream:  # Correctly iterating over the stream
             for row in response.rows:
                 print(row)
+
     def X_execute_query(self, query, params=None):
        request = pb2.QueryRequest(
            query=query,
