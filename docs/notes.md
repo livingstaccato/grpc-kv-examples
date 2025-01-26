@@ -101,4 +101,6 @@ the client has:
     }
 ```
 
+The MinVersion ust be TLS12 for the C# client to work.
+
 If the MinVersion is set to TLS13 it will break the C# client.
