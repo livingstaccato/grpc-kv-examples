@@ -5,8 +5,8 @@ package proto;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
-// Service definition for interacting with a SimpleSQL database
-service SimpleSQLStore {
+// Service definition for interacting with a CelerSQL database
+service CelerSQLStore {
   // Executes a SQL query and streams the results back to the client.
   // This RPC is suitable for queries that may return a large number of rows.
   // The server will send a stream of QueryResponse messages, each containing
@@ -449,7 +449,7 @@ message ExplainQueryResponse {
 
 // Connection management messages
 message ConnectionRequest {
-  string database_path = 1; // Path to the SimpleSQL database or connection string
+  string database_path = 1; // Path to the CelerSQL database or connection string
   optional int32 global_timeout_ms = 2; // Default timeout for all operations on this connection
 }
 
