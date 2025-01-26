@@ -20,6 +20,21 @@ service SimpleSQLStore {
   rpc CheckIntegrity(IntegrityRequest) returns (IntegrityResponse); // Check database integrity
   rpc GetDatabaseInfo(DatabaseInfoRequest) returns (DatabaseInfoResponse); // Retrieve database metadata
 
+  // Table management
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse); // Create a new table
+  rpc DropTable(DropTableRequest) returns (DropTableResponse); // Drop an existing table
+  rpc ListTables(ListTablesRequest) returns (ListTablesResponse); // List all tables
+  rpc AlterTable(AlterTableRequest) returns (AlterTableResponse); // Alter a table structure
+
+  // Index management
+  rpc CreateIndex(CreateIndexRequest) returns (CreateIndexResponse); // Create a new index
+  rpc DropIndex(DropIndexRequest) returns (DropIndexResponse); // Drop an existing index
+  rpc ListIndexes(ListIndexesRequest) returns (ListIndexesResponse); // List all indexes
+
+  // Connection pool management
+  rpc GetConnectionPoolStats(ConnectionPoolStatsRequest) returns (ConnectionPoolStatsResponse); // Get connection pool statistics
+  rpc SetConnectionPoolSize(ConnectionPoolSizeRequest) returns (ConnectionPoolSizeResponse); // Set the connection pool size
+
   // Statement preparation and execution
   rpc PrepareStatement(PrepareStatementRequest) returns (PrepareStatementResponse); // Prepare a SQL statement
   rpc ExecutePreparedStatement(ExecutePreparedStatementRequest) returns (stream QueryResponse); // Execute a prepared statement
@@ -36,18 +51,25 @@ service SimpleSQLStore {
   rpc CloseConnection(ConnectionRequest) returns (google.protobuf.Empty); // Close an active connection
 }
 
-// Status code and message for operations
 message Status {
   enum Code {
-    OK = 0; // Operation successful
-    ERROR = 1; // General error
-    CONSTRAINT_VIOLATION = 2; // Constraint violation error
-    SYNTAX_ERROR = 3; // SQL syntax error
-    INVALID_PARAMETER = 4; // Invalid input parameter
-    TRANSACTION_ERROR = 5; // Transaction-related error
+    OK = 0; 
+    ERROR = 1;
+    CONSTRAINT_VIOLATION = 2;
+    SYNTAX_ERROR = 3;
+    INVALID_PARAMETER = 4;
+    TRANSACTION_ERROR = 5;
+    TIMEOUT = 6; // Timeout error
+    TABLE_NOT_FOUND = 7;
+    INDEX_NOT_FOUND = 8;
+    COLUMN_NOT_FOUND = 9;
+    CONNECTION_ERROR = 10;
+    STATEMENT_NOT_FOUND = 11;
+    DATABASE_LOCKED = 12;
   }
-  Code code = 1; // Status code
-  string message = 2; // Human-readable error message
+  Code code = 1;
+  string message = 2;
+  Status sub_status = 3; // Nested status for more context
 }
 
 // Parameter for queries/statements
@@ -159,6 +181,106 @@ message ColumnInfo {
   string default_value = 5; // Default value of the column
   bool auto_increment = 6; // Whether the column is auto-incrementing
   repeated string foreign_key = 7; // Foreign key references (if any)
+}
+
+// Table management messages
+message CreateTableRequest {
+  string connection_id = 1; // Connection identifier
+  string table_name = 2; // Name of the table to create
+  repeated ColumnDefinition columns = 3; // Columns for the table
+  repeated string constraints = 4; // Additional table constraints
+}
+
+message CreateTableResponse {
+  Status status = 1; // Status of the create table operation
+}
+
+message DropTableRequest {
+  string connection_id = 1; // Connection identifier
+  string table_name = 2; // Name of the table to drop
+}
+
+message DropTableResponse {
+  Status status = 1; // Status of the drop table operation
+}
+
+message ListTablesRequest {
+  string connection_id = 1; // Connection identifier
+}
+
+message ListTablesResponse {
+  repeated string tables = 1; // List of table names
+  Status status = 2; // Status of the list tables operation
+}
+
+message AlterTableRequest {
+  string connection_id = 1; // Connection identifier
+  string table_name = 2; // Name of the table to alter
+  repeated ColumnDefinition new_columns = 3; // New columns to add
+}
+
+message AlterTableResponse {
+  Status status = 1; // Status of the alter table operation
+}
+
+message ColumnDefinition {
+  string name = 1; // Column name
+  string type = 2; // Column type
+  bool nullable = 3; // Whether the column allows NULL
+  string default_value = 4; // Default value of the column
+  repeated string constraints = 5; // Column constraints
+}
+
+// Index management messages
+message CreateIndexRequest {
+  string connection_id = 1; // Connection identifier
+  string index_name = 2; // Name of the index to create
+  string table_name = 3; // Name of the table
+  repeated string columns = 4; // Columns to index
+}
+
+message CreateIndexResponse {
+  Status status = 1; // Status of the create index operation
+}
+
+message DropIndexRequest {
+  string connection_id = 1; // Connection identifier
+  string index_name = 2; // Name of the index to drop
+}
+
+message DropIndexResponse {
+  Status status = 1; // Status of the drop index operation
+}
+
+message ListIndexesRequest {
+  string connection_id = 1; // Connection identifier
+  string table_name = 2; // Name of the table
+}
+
+message ListIndexesResponse {
+  repeated string indexes = 1; // List of index names
+  Status status = 2; // Status of the list indexes operation
+}
+
+// Connection pool management messages
+message ConnectionPoolStatsRequest {
+  string connection_id = 1; // Connection identifier
+}
+
+message ConnectionPoolStatsResponse {
+  int32 total_connections = 1; // Total number of connections
+  int32 active_connections = 2; // Number of active connections
+  int32 idle_connections = 3; // Number of idle connections
+  Status status = 4; // Status of the request
+}
+
+message ConnectionPoolSizeRequest {
+  string connection_id = 1; // Connection identifier
+  int32 max_size = 2; // Maximum number of connections in the pool
+}
+
+message ConnectionPoolSizeResponse {
+  Status status = 1; // Status of the request
 }
 
 // Prepared statement messages
