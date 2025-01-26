@@ -40,21 +40,46 @@ class CelerSQLClient:
         logger.info("👥 Created SQL client stub")
 
     def execute_query(self, query: str, params=None):
-        """Execute a SQL query with detailed logging"""
+        """Execute a SQL query with streaming results"""
         logger.info(f"📝 Executing query: {query}")
         try:
             request = celersql_pb2.QueryRequest(query=query)
             if params:
                 request.params.extend([self._python_to_param(p) for p in params])
 
-            response = self.stub.ExecuteQuery(request)
-            self._log_query_response(response)
-            return self._parse_response(response)
+            results = []
+            metadata = None
+            total_rows = 0
+
+            for response in self.stub.ExecuteQuery(request):
+                if not metadata:
+                    metadata = {
+                        'column_names': list(response.column_names),
+                        'column_types': list(response.column_types),
+                        'rows_affected': response.rows_affected
+                    }
+                    logger.debug(f"📊 Metadata received: {len(metadata['column_names'])} columns")
+
+                batch_rows = self._parse_rows(response.rows)
+                results.extend(batch_rows)
+                total_rows += len(batch_rows)
+                logger.debug(f"📊 Received batch of {len(batch_rows)} rows. Total: {total_rows}")
+
+            logger.info(f"✅ Query complete. Total rows: {total_rows}")
+            return {
+                'columns': metadata['column_names'],
+                'types': metadata['column_types'],
+                'rows': results,
+                'rows_affected': metadata['rows_affected']
+            }
 
         except grpc.RpcError as e:
             logger.error(f"❌ Query execution failed: {e.code()}: {e.details()}")
             raise
 
+def _parse_rows(self, rows):
+    """Parse row data from protobuf format"""
+    return [[self._param_to_python(value) for value in row.values] for row in rows]
     def execute_update(self, query: str, params=None):
         """Execute a SQL update with detailed logging"""
         logger.info(f"📝 Executing update: {query}")
