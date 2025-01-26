@@ -236,9 +236,9 @@ func createTLSConfig(cert tls.Certificate, certPool *x509.CertPool, logger *log.
         MaxVersion:            tls.VersionTLS13,
         PreferServerCipherSuites: true,
         CurvePreferences: []tls.CurveID{
-            tls.CurveP521,
-            tls.CurveP384,
             tls.CurveP256,
+            tls.CurveP384,
+            tls.CurveP521,
         },
         CipherSuites: []uint16{
             tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
