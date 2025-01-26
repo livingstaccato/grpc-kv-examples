@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "N3SsKgdzAOU=",
+  "dgSpecHash": "tXbE4Az3DAI=",
   "success": true,
-  "projectFilePath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
+  "projectFilePath": "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/CSharpGrpcClient.csproj",
   "expectedPackageFiles": [
     "/Users/tim.perkins/.nuget/packages/google.protobuf/3.29.3/google.protobuf.3.29.3.nupkg.sha512",
     "/Users/tim.perkins/.nuget/packages/grpc.core.api/2.67.0/grpc.core.api.2.67.0.nupkg.sha512",

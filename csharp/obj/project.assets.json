@@ -1206,11 +1206,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
+      "projectUniqueName": "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/CSharpGrpcClient.csproj",
       "projectName": "CSharpGrpcClient",
-      "projectPath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/CSharpGrpcClient.csproj",
+      "projectPath": "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/CSharpGrpcClient.csproj",
       "packagesPath": "/Users/tim.perkins/.nuget/packages/",
-      "outputPath": "/Users/tim.perkins/code/py/simple-grpc-example/csharp/obj/",
+      "outputPath": "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/tim.perkins/.nuget/NuGet/NuGet.Config"
