@@ -165,6 +165,25 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             param.null_value = True
         return param
 
+    def _param_to_python(self, value):
+        """
+        Convert a gRPC Parameter message to a Python value.
+
+        Args:
+            value (celersql_pb2.Parameter): gRPC Parameter message.
+
+        Returns:
+            Any: Python representation of the value.
+        """
+        if value.HasField("int_value"):
+            return value.int_value
+        elif value.HasField("float_value"):
+            return value.float_value
+        elif value.HasField("string_value"):
+            return value.string_value
+        elif value.HasField("blob_value"):
+            return value.blob_value
+        return None
 
 async def serve():
     """
