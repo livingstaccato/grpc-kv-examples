@@ -5,8 +5,8 @@ package proto;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
-// Service definition for interacting with an SQLite database
-service SQLiteStore {
+// Service definition for interacting with an SimpleSQL database
+service SimpleSQLStore {
   // Query execution
   rpc ExecuteQuery(QueryRequest) returns (stream QueryResponse); // Execute a query and stream results
   rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse); // Execute a non-SELECT statement
@@ -178,7 +178,7 @@ message ExplainQueryResponse {
 
 // Connection management messages
 message ConnectionRequest {
-  string database_path = 1; // Path to the SQLite database or connection string
+  string database_path = 1; // Path to the SimpleSQL database or connection string
 }
 
 message ConnectionResponse {
