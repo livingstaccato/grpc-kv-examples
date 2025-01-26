@@ -101,7 +101,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             # Move the debug log here to reflect the final state of the response
             logger.debug(f"📤 Sending QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
 
-            return response
+            return  response
 
         except Exception as e:
             log_error(transaction_id, error_message=str(e))
@@ -146,7 +146,6 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
                 status="success",
                 timestamp=datetime.now(timezone.utc),
             )
-            return response
 
         except Exception as e:
             log_error(transaction_id, error_message=str(e))
