@@ -17,7 +17,7 @@ import (
     "google.golang.org/grpc/keepalive"
     "google.golang.org/grpc/status"
 
-    "./proto"
+    "github.com/livingstaccato/grpc-kv-examples/proto"
 )
 
 func logCertInfo(cert *x509.Certificate, prefix string) {
