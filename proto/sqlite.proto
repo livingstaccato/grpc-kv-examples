@@ -5,12 +5,14 @@ package proto;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
-// Service definition for interacting with an SimpleSQL database
+// Service definition for interacting with a SimpleSQL database
 service SimpleSQLStore {
   // Query execution
   rpc ExecuteQuery(QueryRequest) returns (stream QueryResponse); // Execute a query and stream results
+  rpc CancelQuery(CancelQueryRequest) returns (google.protobuf.Empty); // Cancel an ongoing query
   rpc ExecuteUpdate(UpdateRequest) returns (UpdateResponse); // Execute a non-SELECT statement
   rpc BatchExecute(BatchRequest) returns (BatchResponse); // Execute multiple queries/updates in a batch
+  rpc ExecuteBulkInsert(BulkInsertRequest) returns (BulkInsertResponse); // Perform bulk inserts into a table
   rpc GetSchema(SchemaRequest) returns (SchemaResponse); // Retrieve schema details for a table
   rpc ExplainQueryPlan(ExplainQueryRequest) returns (ExplainQueryResponse); // Provide query plan for debugging
 
@@ -63,9 +65,9 @@ message QueryRequest {
   string query = 2; // SQL query string
   repeated Parameter params = 3; // Parameters for the query
   string transaction_id = 4; // Associated transaction ID
-  optional int32 timeout_ms = 5;
-  optional int32 limit = 6;
-  optional int32 offset = 7;
+  optional int32 timeout_ms = 5; // Optional query timeout in milliseconds
+  optional int32 limit = 6; // Optional limit for query results
+  optional int32 offset = 7; // Optional offset for query results
 }
 
 message QueryResponse {
@@ -74,6 +76,11 @@ message QueryResponse {
   repeated string column_types = 3; // Types of result columns
   int32 rows_affected = 4; // Number of rows affected (if applicable)
   Status status = 5; // Status of the query execution
+}
+
+message CancelQueryRequest {
+  string connection_id = 1; // Connection identifier
+  string query_id = 2; // Identifier of the query to cancel
 }
 
 message Row {
@@ -104,6 +111,20 @@ message BatchRequest {
 message BatchResponse {
   repeated QueryResponse results = 1; // Results of the batch execution
   Status status = 2; // Status of the batch execution
+}
+
+// Bulk insert messages
+message BulkInsertRequest {
+  string connection_id = 1; // Connection identifier
+  string table_name = 2; // Table to insert data into
+  repeated string columns = 3; // Columns for the bulk insert
+  repeated Row rows = 4; // Rows to insert
+  string transaction_id = 5; // Associated transaction ID
+}
+
+message BulkInsertResponse {
+  int32 rows_affected = 1; // Number of rows inserted
+  Status status = 2; // Status of the bulk insert operation
 }
 
 // Schema inspection messages
