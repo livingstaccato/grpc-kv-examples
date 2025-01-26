@@ -50,8 +50,8 @@ if [ ! -f "${PLUGIN_SERVER_KEY_FILE}" ]; then
     exit 1
 fi
 
-PLUGIN_SERVER_CERT="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.crt)"
-PLUGIN_SERVER_KEY="$(cat ./certs/${PLUGIN_SERVER_ALGO}-mtls-server.key)"
+PLUGIN_SERVER_CERT="$(cat ${PLUGIN_SERVER_CERT_FILE})"
+PLUGIN_SERVER_KEY="$(cat  ${PLUGIN_SERVER_KEY_FILE})"
 
 # Endpoint configuration
 PLUGIN_SERVER_ENDPOINT="tcp:${PLUGIN_HOST}:${PLUGIN_PORT}"
