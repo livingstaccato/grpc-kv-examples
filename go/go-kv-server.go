@@ -292,6 +292,8 @@ func logTLSConfig(config *tls.Config, logger *log.Logger) {
     logger.Printf("🔒 📊 Min TLS version: %s", getTLSVersionString(config.MinVersion))
     logger.Printf("🔒 📊 Max TLS version: %s", getTLSVersionString(config.MaxVersion))
 }
+    return log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
+}
 
 func validateCertificates(logger *log.Logger, serverCertPEM, serverKeyPEM, clientCertPEM string) error {
     if serverCertPEM == "" || serverKeyPEM == "" {
