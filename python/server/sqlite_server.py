@@ -41,6 +41,58 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         logger.info("✅ Schema initialized successfully.")
 
     async def ExecuteQuery(self, request, context):
+        transaction_id = str(datetime.now(timezone.utc).timestamp())
+        log_transaction(
+            transaction_id=transaction_id,
+            client_id=context.peer(),
+            request_type="ExecuteQuery",
+            status="pending",
+            timestamp=datetime.now(timezone.utc),
+        )
+
+        log_request_details(
+            request_id=transaction_id,
+            details={"query": request.query, "params": [param.string_value for param in request.params]},
+        )
+
+        try:
+            logger.info(f"📝 Processing query: {request.query}")
+            rows = execute_query(request.query)
+            response = celersql_pb2.QueryResponse()
+
+            if rows:
+                response.column_names.extend(rows[0].keys())
+                response.column_types.extend([type(value).__name__ for value in rows[0].values()])
+                for row in rows:
+                    grpc_row = celersql_pb2.Row(values=[self._python_to_param(value) for value in row.values()])
+                    response.rows.append(grpc_row)
+            else:
+                # Always send a valid response, even if no rows are returned
+                response.column_names.extend([])
+                response.column_types.extend([])
+                logger.debug("🛑 Query returned no rows.")
+
+            log_response_details(
+                response_id=transaction_id,
+                details={"rows": len(response.rows), "columns": response.column_names},
+            )
+
+            log_transaction(
+                transaction_id=transaction_id,
+                client_id=context.peer(),
+                request_type="ExecuteQuery",
+                status="success",
+                timestamp=datetime.now(timezone.utc),
+            )
+            return response
+
+        except Exception as e:
+            log_error(transaction_id, error_message=str(e))
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            raise
+
+    async def X_ExecuteQuery(self, request, context):
         """
         Handle a gRPC request to execute a SQL query.
 
