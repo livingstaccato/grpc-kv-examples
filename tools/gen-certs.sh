@@ -125,4 +125,10 @@ if [ -n "${ECDSA_CURVE}" ]; then
     echo
 fi
 
-echo "All certificates generated successfully in $CERT_DIR."
+echo "All certificates generated in ${CERT_DIR}."
+
+echo "Issuers for all certs:"
+(for i in certs/*.crt; do
+    openssl x509 -noout -text
+done) |
+    grep Issuer
