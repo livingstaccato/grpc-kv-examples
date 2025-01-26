@@ -71,3 +71,4 @@
 
 ossl-client
 go cipher: AEAD-CHACHA20-POLY1305-SHA256
+python:    AEAD-CHACHA20-POLY1305-SHA256
