@@ -91,6 +91,51 @@ class SimpleSQLStoreStub(object):
                 request_serializer=sqlite__pb2.DatabaseInfoRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.DatabaseInfoResponse.FromString,
                 _registered_method=True)
+        self.CreateTable = channel.unary_unary(
+                '/proto.SimpleSQLStore/CreateTable',
+                request_serializer=sqlite__pb2.CreateTableRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.CreateTableResponse.FromString,
+                _registered_method=True)
+        self.DropTable = channel.unary_unary(
+                '/proto.SimpleSQLStore/DropTable',
+                request_serializer=sqlite__pb2.DropTableRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.DropTableResponse.FromString,
+                _registered_method=True)
+        self.ListTables = channel.unary_unary(
+                '/proto.SimpleSQLStore/ListTables',
+                request_serializer=sqlite__pb2.ListTablesRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.ListTablesResponse.FromString,
+                _registered_method=True)
+        self.AlterTable = channel.unary_unary(
+                '/proto.SimpleSQLStore/AlterTable',
+                request_serializer=sqlite__pb2.AlterTableRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.AlterTableResponse.FromString,
+                _registered_method=True)
+        self.CreateIndex = channel.unary_unary(
+                '/proto.SimpleSQLStore/CreateIndex',
+                request_serializer=sqlite__pb2.CreateIndexRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.CreateIndexResponse.FromString,
+                _registered_method=True)
+        self.DropIndex = channel.unary_unary(
+                '/proto.SimpleSQLStore/DropIndex',
+                request_serializer=sqlite__pb2.DropIndexRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.DropIndexResponse.FromString,
+                _registered_method=True)
+        self.ListIndexes = channel.unary_unary(
+                '/proto.SimpleSQLStore/ListIndexes',
+                request_serializer=sqlite__pb2.ListIndexesRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.ListIndexesResponse.FromString,
+                _registered_method=True)
+        self.GetConnectionPoolStats = channel.unary_unary(
+                '/proto.SimpleSQLStore/GetConnectionPoolStats',
+                request_serializer=sqlite__pb2.ConnectionPoolStatsRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.ConnectionPoolStatsResponse.FromString,
+                _registered_method=True)
+        self.SetConnectionPoolSize = channel.unary_unary(
+                '/proto.SimpleSQLStore/SetConnectionPoolSize',
+                request_serializer=sqlite__pb2.ConnectionPoolSizeRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.ConnectionPoolSizeResponse.FromString,
+                _registered_method=True)
         self.PrepareStatement = channel.unary_unary(
                 '/proto.SimpleSQLStore/PrepareStatement',
                 request_serializer=sqlite__pb2.PrepareStatementRequest.SerializeToString,
@@ -220,6 +265,72 @@ class SimpleSQLStoreServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def CreateTable(self, request, context):
+        """Table management
+        Create a new table
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DropTable(self, request, context):
+        """Drop an existing table
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListTables(self, request, context):
+        """List all tables
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AlterTable(self, request, context):
+        """Alter a table structure
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateIndex(self, request, context):
+        """Index management
+        Create a new index
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DropIndex(self, request, context):
+        """Drop an existing index
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListIndexes(self, request, context):
+        """List all indexes
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetConnectionPoolStats(self, request, context):
+        """Connection pool management
+        Get connection pool statistics
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SetConnectionPoolSize(self, request, context):
+        """Set the connection pool size
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def PrepareStatement(self, request, context):
         """Statement preparation and execution
         Prepare a SQL statement
@@ -343,6 +454,51 @@ def add_SimpleSQLStoreServicer_to_server(servicer, server):
                     servicer.GetDatabaseInfo,
                     request_deserializer=sqlite__pb2.DatabaseInfoRequest.FromString,
                     response_serializer=sqlite__pb2.DatabaseInfoResponse.SerializeToString,
+            ),
+            'CreateTable': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateTable,
+                    request_deserializer=sqlite__pb2.CreateTableRequest.FromString,
+                    response_serializer=sqlite__pb2.CreateTableResponse.SerializeToString,
+            ),
+            'DropTable': grpc.unary_unary_rpc_method_handler(
+                    servicer.DropTable,
+                    request_deserializer=sqlite__pb2.DropTableRequest.FromString,
+                    response_serializer=sqlite__pb2.DropTableResponse.SerializeToString,
+            ),
+            'ListTables': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListTables,
+                    request_deserializer=sqlite__pb2.ListTablesRequest.FromString,
+                    response_serializer=sqlite__pb2.ListTablesResponse.SerializeToString,
+            ),
+            'AlterTable': grpc.unary_unary_rpc_method_handler(
+                    servicer.AlterTable,
+                    request_deserializer=sqlite__pb2.AlterTableRequest.FromString,
+                    response_serializer=sqlite__pb2.AlterTableResponse.SerializeToString,
+            ),
+            'CreateIndex': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateIndex,
+                    request_deserializer=sqlite__pb2.CreateIndexRequest.FromString,
+                    response_serializer=sqlite__pb2.CreateIndexResponse.SerializeToString,
+            ),
+            'DropIndex': grpc.unary_unary_rpc_method_handler(
+                    servicer.DropIndex,
+                    request_deserializer=sqlite__pb2.DropIndexRequest.FromString,
+                    response_serializer=sqlite__pb2.DropIndexResponse.SerializeToString,
+            ),
+            'ListIndexes': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListIndexes,
+                    request_deserializer=sqlite__pb2.ListIndexesRequest.FromString,
+                    response_serializer=sqlite__pb2.ListIndexesResponse.SerializeToString,
+            ),
+            'GetConnectionPoolStats': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetConnectionPoolStats,
+                    request_deserializer=sqlite__pb2.ConnectionPoolStatsRequest.FromString,
+                    response_serializer=sqlite__pb2.ConnectionPoolStatsResponse.SerializeToString,
+            ),
+            'SetConnectionPoolSize': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetConnectionPoolSize,
+                    request_deserializer=sqlite__pb2.ConnectionPoolSizeRequest.FromString,
+                    response_serializer=sqlite__pb2.ConnectionPoolSizeResponse.SerializeToString,
             ),
             'PrepareStatement': grpc.unary_unary_rpc_method_handler(
                     servicer.PrepareStatement,
@@ -688,6 +844,249 @@ class SimpleSQLStore(object):
             '/proto.SimpleSQLStore/GetDatabaseInfo',
             sqlite__pb2.DatabaseInfoRequest.SerializeToString,
             sqlite__pb2.DatabaseInfoResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CreateTable(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/CreateTable',
+            sqlite__pb2.CreateTableRequest.SerializeToString,
+            sqlite__pb2.CreateTableResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DropTable(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/DropTable',
+            sqlite__pb2.DropTableRequest.SerializeToString,
+            sqlite__pb2.DropTableResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListTables(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/ListTables',
+            sqlite__pb2.ListTablesRequest.SerializeToString,
+            sqlite__pb2.ListTablesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AlterTable(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/AlterTable',
+            sqlite__pb2.AlterTableRequest.SerializeToString,
+            sqlite__pb2.AlterTableResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CreateIndex(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/CreateIndex',
+            sqlite__pb2.CreateIndexRequest.SerializeToString,
+            sqlite__pb2.CreateIndexResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DropIndex(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/DropIndex',
+            sqlite__pb2.DropIndexRequest.SerializeToString,
+            sqlite__pb2.DropIndexResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListIndexes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/ListIndexes',
+            sqlite__pb2.ListIndexesRequest.SerializeToString,
+            sqlite__pb2.ListIndexesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetConnectionPoolStats(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/GetConnectionPoolStats',
+            sqlite__pb2.ConnectionPoolStatsRequest.SerializeToString,
+            sqlite__pb2.ConnectionPoolStatsResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SetConnectionPoolSize(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/SetConnectionPoolSize',
+            sqlite__pb2.ConnectionPoolSizeRequest.SerializeToString,
+            sqlite__pb2.ConnectionPoolSizeResponse.FromString,
             options,
             channel_credentials,
             insecure,
