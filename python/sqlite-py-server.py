@@ -92,7 +92,7 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         with self._get_db() as conn:
             cursor = conn.cursor()
             try:
-                cursor.execute(request.query)
+                cursor.execute(request.query, [param.string_value for param in request.params])
                 conn.commit()
                 
                 response = celersql_pb2.UpdateResponse(
