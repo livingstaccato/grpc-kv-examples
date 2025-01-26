@@ -326,6 +326,38 @@ func main() {
     }
     logger.Printf("✅ 🌐 Server listening on :50051")
 
+    // Create server credentials with TLS config
+    tlsConfig := &tls.Config{
+        Certificates: []tls.Certificate{cert},
+        ClientAuth:   tls.RequireAndVerifyClientCert,
+        ClientCAs:    certPool,
+        MinVersion:   tls.VersionTLS12,
+        MaxVersion:   tls.VersionTLS13,
+        CipherSuites: []uint16{
+            tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+            tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+            tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+            tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+            tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+            tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+        },
+        PreferServerCipherSuites: true,
+        VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+            logger.Printf("🔐 🤝 TLS Handshake attempt")
+            if len(rawCerts) > 0 {
+                cert, err := x509.ParseCertificate(rawCerts[0])
+                if err != nil {
+                    logger.Printf("❌ 📜 Failed to parse client certificate: %v", err)
+                    return err
+                }
+                logger.Printf("🔍 👤 Client certificate - Subject: %s", cert.Subject)
+                logger.Printf("🔍 🔑 Client certificate - Public Key Type: %T", cert.PublicKey)
+            }
+            logger.Printf("✅ 🤝 Certificate verification complete")
+            return nil
+        },
+    }
+
     // Create gRPC server with credentials
     creds := credentials.NewTLS(tlsConfig)
     s := grpc.NewServer(
