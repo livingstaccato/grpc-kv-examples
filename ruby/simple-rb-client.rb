@@ -35,6 +35,12 @@ class GrpcClient
     
     tcp_socket = TCPSocket.new(*addr.split(':'))
     ssl_context = OpenSSL::SSL::SSLContext.new
+
+    ssl_context.ciphers = [
+      'ECDHE-ECDSA-AES128-GCM-SHA256',
+      'ECDHE-ECDSA-AES256-GCM-SHA384',
+      'ECDHE-ECDSA-CHACHA20-POLY1305'
+    ]
     ssl_context.verify_mode = OpenSSL::SSL::VERIFY_NONE
     
     ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, ssl_context)
