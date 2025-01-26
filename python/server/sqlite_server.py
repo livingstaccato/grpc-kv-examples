@@ -41,6 +41,16 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
         logger.info("✅ Schema initialized successfully.")
 
     async def ExecuteQuery(self, request, context):
+        """
+        Handles the gRPC ExecuteQuery request and streams QueryResponse messages.
+
+        Args:
+            request: QueryRequest containing the SQL query and parameters.
+            context: gRPC context for the request.
+
+        Yields:
+            QueryResponse: A message containing rows and metadata for the query.
+        """
         transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
@@ -60,35 +70,32 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
             rows = execute_query(request.query)  # Fetch rows
             logger.debug(f"🔍 Rows fetched: {rows}")
 
-            #response = celersql_pb2.QueryResponse()
-
-            # Streaming implementation:
-            batch_size = 100  # Adjust as needed
-            for i in range(0, len(rows), batch_size):
-                batch = rows[i:i + batch_size]
-                response = celersql_pb2.QueryResponse()
-
-                if i == 0:  # Send column metadata with the first batch
-                    response.column_names.extend(rows[0].keys())
-                    response.column_types.extend([type(value).__name__ for value in rows[0].values()])
-                    logger.debug(f"📊 Added column metadata: {response.column_names}")
-
-                for row in batch:
+            # Stream responses
+            if rows:
+                metadata_sent = False
+                for row in rows:
                     grpc_row = celersql_pb2.Row(
                         values=[self._python_to_param(value) for value in row.values()]
                     )
-                    logger.debug(f"🔍 Adding row to response: {row}")
-                    response.rows.append(grpc_row)
 
-                logger.debug(f"📤 Sending batch: rows={len(response.rows)}")
-                yield response
+                    if not metadata_sent:
+                        # First response contains metadata
+                        response = celersql_pb2.QueryResponse(
+                            column_names=list(row.keys()),
+                            column_types=[type(value).__name__ for value in row.values()],
+                            rows=[grpc_row],
+                        )
+                        metadata_sent = True
+                    else:
+                        response = celersql_pb2.QueryResponse(rows=[grpc_row])
 
-            logger.debug(f"📤 Sending final QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
+                    logger.debug(f"📤 Streaming QueryResponse: {response}")
+                    yield response
 
-            log_response_details(
-                response_id=transaction_id,
-                details={"rows": len(response.rows), "columns": response.column_names},
-            )
+            # Handle case where no rows are returned
+            else:
+                logger.debug("🛑 Query returned no rows.")
+                yield celersql_pb2.QueryResponse(column_names=[], column_types=[], rows=[])
 
             log_transaction(
                 transaction_id=transaction_id,
@@ -97,10 +104,6 @@ class SQLServicer(celersql_pb2_grpc.CelerSQLStoreServicer):
                 status="success",
                 timestamp=datetime.now(timezone.utc),
             )
-
-            # Move the debug log here to reflect the final state of the response
-            logger.debug(f"📤 Sending QueryResponse: columns={response.column_names}, rows={len(response.rows)}")
-
 
         except Exception as e:
             log_error(transaction_id, error_message=str(e))
