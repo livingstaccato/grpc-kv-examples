@@ -71,6 +71,26 @@ class SimpleSQLStoreStub(object):
                 request_serializer=sqlite__pb2.ExplainQueryRequest.SerializeToString,
                 response_deserializer=sqlite__pb2.ExplainQueryResponse.FromString,
                 _registered_method=True)
+        self.VacuumDatabase = channel.unary_unary(
+                '/proto.SimpleSQLStore/VacuumDatabase',
+                request_serializer=sqlite__pb2.VacuumRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.VacuumResponse.FromString,
+                _registered_method=True)
+        self.BackupDatabase = channel.unary_unary(
+                '/proto.SimpleSQLStore/BackupDatabase',
+                request_serializer=sqlite__pb2.BackupRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.BackupResponse.FromString,
+                _registered_method=True)
+        self.CheckIntegrity = channel.unary_unary(
+                '/proto.SimpleSQLStore/CheckIntegrity',
+                request_serializer=sqlite__pb2.IntegrityRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.IntegrityResponse.FromString,
+                _registered_method=True)
+        self.GetDatabaseInfo = channel.unary_unary(
+                '/proto.SimpleSQLStore/GetDatabaseInfo',
+                request_serializer=sqlite__pb2.DatabaseInfoRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.DatabaseInfoResponse.FromString,
+                _registered_method=True)
         self.PrepareStatement = channel.unary_unary(
                 '/proto.SimpleSQLStore/PrepareStatement',
                 request_serializer=sqlite__pb2.PrepareStatementRequest.SerializeToString,
@@ -167,6 +187,34 @@ class SimpleSQLStoreServicer(object):
 
     def ExplainQueryPlan(self, request, context):
         """Provide query plan for debugging
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def VacuumDatabase(self, request, context):
+        """Perform database vacuum
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def BackupDatabase(self, request, context):
+        """Create a backup of the database
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CheckIntegrity(self, request, context):
+        """Check database integrity
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetDatabaseInfo(self, request, context):
+        """Retrieve database metadata
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -275,6 +323,26 @@ def add_SimpleSQLStoreServicer_to_server(servicer, server):
                     servicer.ExplainQueryPlan,
                     request_deserializer=sqlite__pb2.ExplainQueryRequest.FromString,
                     response_serializer=sqlite__pb2.ExplainQueryResponse.SerializeToString,
+            ),
+            'VacuumDatabase': grpc.unary_unary_rpc_method_handler(
+                    servicer.VacuumDatabase,
+                    request_deserializer=sqlite__pb2.VacuumRequest.FromString,
+                    response_serializer=sqlite__pb2.VacuumResponse.SerializeToString,
+            ),
+            'BackupDatabase': grpc.unary_unary_rpc_method_handler(
+                    servicer.BackupDatabase,
+                    request_deserializer=sqlite__pb2.BackupRequest.FromString,
+                    response_serializer=sqlite__pb2.BackupResponse.SerializeToString,
+            ),
+            'CheckIntegrity': grpc.unary_unary_rpc_method_handler(
+                    servicer.CheckIntegrity,
+                    request_deserializer=sqlite__pb2.IntegrityRequest.FromString,
+                    response_serializer=sqlite__pb2.IntegrityResponse.SerializeToString,
+            ),
+            'GetDatabaseInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDatabaseInfo,
+                    request_deserializer=sqlite__pb2.DatabaseInfoRequest.FromString,
+                    response_serializer=sqlite__pb2.DatabaseInfoResponse.SerializeToString,
             ),
             'PrepareStatement': grpc.unary_unary_rpc_method_handler(
                     servicer.PrepareStatement,
@@ -512,6 +580,114 @@ class SimpleSQLStore(object):
             '/proto.SimpleSQLStore/ExplainQueryPlan',
             sqlite__pb2.ExplainQueryRequest.SerializeToString,
             sqlite__pb2.ExplainQueryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def VacuumDatabase(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/VacuumDatabase',
+            sqlite__pb2.VacuumRequest.SerializeToString,
+            sqlite__pb2.VacuumResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def BackupDatabase(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/BackupDatabase',
+            sqlite__pb2.BackupRequest.SerializeToString,
+            sqlite__pb2.BackupResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CheckIntegrity(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/CheckIntegrity',
+            sqlite__pb2.IntegrityRequest.SerializeToString,
+            sqlite__pb2.IntegrityResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetDatabaseInfo(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/proto.SimpleSQLStore/GetDatabaseInfo',
+            sqlite__pb2.DatabaseInfoRequest.SerializeToString,
+            sqlite__pb2.DatabaseInfoResponse.FromString,
             options,
             channel_credentials,
             insecure,
