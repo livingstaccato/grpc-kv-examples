@@ -6,6 +6,8 @@ import (
     "time"
     "net"
     "fmt"
+    "crypto/x509/pkix"
+    "encoding/asn1"
     "strings"
 
     "context"
@@ -94,8 +96,32 @@ func (s *server) logClientConnection(ctx context.Context) {
     if p, ok := peer.FromContext(ctx); ok {
         s.logger.Printf("🔌 🌐 New connection from: %v", p.Addr)
         if mtls, ok := p.AuthInfo.(credentials.TLSInfo); ok {
-            s.logger.Printf("🔒 🔐 TLS version: 0x%x", mtls.State.Version)
-            s.logger.Printf("🔒 🔑 Cipher suite: 0x%x", mtls.State.CipherSuite)
+            tlsVersion := "Unknown"
+            switch mtls.State.Version {
+            case tls.VersionTLS10:
+                tlsVersion = "TLS 1.0"
+            case tls.VersionTLS11:
+                tlsVersion = "TLS 1.1"
+            case tls.VersionTLS12:
+                tlsVersion = "TLS 1.2"
+            case tls.VersionTLS13:
+                tlsVersion = "TLS 1.3"
+            }
+            s.logger.Printf("🔒 🔐 TLS version: %s", tlsVersion)
+            
+            // Log cipher suite name
+            var cipherSuite string
+            switch mtls.State.CipherSuite {
+            case tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:
+                cipherSuite = "ECDHE-ECDSA-AES128-GCM-SHA256"
+            case tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
+                cipherSuite = "ECDHE-ECDSA-AES256-GCM-SHA384"
+            case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
+                cipherSuite = "ECDHE-ECDSA-CHACHA20-POLY1305"
+            default:
+                cipherSuite = fmt.Sprintf("Unknown (0x%04x)", mtls.State.CipherSuite)
+            }
+            s.logger.Printf("🔒 🔑 Cipher suite: %s", cipherSuite)
             
             // Log all certificates in the chain
             for i, cert := range mtls.State.PeerCertificates {
@@ -143,6 +169,21 @@ func (s *server) Get(ctx context.Context, req *proto.GetRequest) (*proto.GetResp
 
     s.logger.Printf("✅ 🔍 Get request completed successfully")
     return &proto.GetResponse{Value: []byte("OK")}, nil
+}
+
+func getTLSVersionString(version uint16) string {
+    switch version {
+    case tls.VersionTLS10:
+        return "TLS 1.0"
+    case tls.VersionTLS11:
+        return "TLS 1.1"
+    case tls.VersionTLS12:
+        return "TLS 1.2"
+    case tls.VersionTLS13:
+        return "TLS 1.3"
+    default:
+        return fmt.Sprintf("Unknown (0x%04x)", version)
+    }
 }
 
 func setupLogger() *log.Logger {
@@ -271,6 +312,17 @@ func main() {
     }
     logger.Printf("✅ 🌐 Server listening on :50051")
 
+    // Connection attempt logging interceptor
+    connAttemptInterceptor := func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+        if p, ok := peer.FromContext(ctx); ok {
+            logger.Printf("👋 🔄 Connection attempt from: %v", p.Addr)
+            if p.AuthInfo != nil {
+                logger.Printf("🔒 🔑 Auth type: %T", p.AuthInfo)
+            }
+        }
+        return handler(ctx, req)
+    }
+
     // Create gRPC server with credentials
     creds := credentials.NewTLS(tlsConfig)
     s := grpc.NewServer(
@@ -330,6 +382,43 @@ func main() {
         cancel()
         s.GracefulStop()
     }()
+
+    // Add connection logging
+    go func() {
+        for {
+            select {
+            case <-ctx.Done():
+                return
+            default:
+                time.Sleep(time.Second)
+                stats := s.GetServiceInfo()
+                if len(stats) > 0 {
+                    logger.Printf("🔄 📊 Active services: %d", len(stats))
+                }
+            }
+        }
+    }()
+
+    // Debug logging for TLS config
+    logger.Printf("🔒 🛡️ Server TLS Configuration:")
+    logger.Printf("🔑 📝 Available cipher suites:")
+    for _, suite := range tlsConfig.CipherSuites {
+        var name string
+        switch suite {
+        case tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
+            name = "ECDHE-ECDSA-AES256-GCM-SHA384"
+        case tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:
+            name = "ECDHE-ECDSA-AES128-GCM-SHA256"
+        case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
+            name = "ECDHE-ECDSA-CHACHA20-POLY1305"
+        default:
+            name = fmt.Sprintf("Unknown (0x%04x)", suite)
+        }
+        logger.Printf("  • %s", name)
+    }
+    logger.Printf("🔐 🔄 Client auth mode: %v", tlsConfig.ClientAuth)
+    logger.Printf("🔒 📊 Min TLS version: %s", getTLSVersionString(tlsConfig.MinVersion))
+    logger.Printf("🔒 📊 Max TLS version: %s", getTLSVersionString(tlsConfig.MaxVersion))
 
     // Start server
     logger.Printf("🚀 ✨ Starting gRPC server")
