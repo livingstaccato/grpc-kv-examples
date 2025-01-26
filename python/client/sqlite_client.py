@@ -55,6 +55,7 @@ class CelerSQLClient:
                 options=[
                     ("grpc.ssl_target_name_override", "localhost"),
                     ("grpc.default_authority", "localhost"),
+                    ("grpc.keepalive_timeout_ms", 5000),
                 ],
             )
             grpc.channel_ready_future(self.channel).result(timeout=5)
