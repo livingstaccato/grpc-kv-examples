@@ -311,7 +311,6 @@ func main() {
     logger.Printf("✅ 🌐 Server listening on :50051")
 
     // Connection attempt logging interceptor
-    /*
     connAttemptInterceptor := func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
         if p, ok := peer.FromContext(ctx); ok {
             logger.Printf("👋 🔄 Connection attempt from: %v", p.Addr)
@@ -321,7 +320,6 @@ func main() {
         }
         return handler(ctx, req)
     }
-    */
 
     // Create gRPC server with credentials
     creds := credentials.NewTLS(tlsConfig)
@@ -336,6 +334,9 @@ func main() {
             // Extract peer information for logging
             if p, ok := peer.FromContext(ctx); ok {
                 logger.Printf("👤 🌐 Peer address: %v", p.Addr)
+                if p.AuthInfo != nil {
+                    logger.Printf("🔒 🔑 Auth type: %T", p.AuthInfo)
+                }
             }
             
             // Handle the request
