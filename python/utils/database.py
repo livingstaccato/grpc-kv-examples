@@ -162,13 +162,13 @@ def execute_query(query: str, params: Optional[Dict[str, Any]] = None) -> list:
             raise
 
 
-def execute_update(query: str, params: Optional[Dict[str, Any]] = None) -> int:
+def execute_update(query: str, params: Optional[list] = None) -> int:
     """
     Execute a SQL update/insert/delete and return the affected row count.
 
     Args:
         query (str): The SQL query to execute.
-        params (Dict[str, Any], optional): Parameters to bind to the query.
+        params (list, optional): Parameters to bind to the query.
 
     Returns:
         int: Number of rows affected by the query.
@@ -176,8 +176,9 @@ def execute_update(query: str, params: Optional[Dict[str, Any]] = None) -> int:
     with connect_db() as conn:
         cursor = conn.cursor()
         try:
+            # Default params to an empty list if None
             logger.debug(f"📝 Executing update: {query} with params: {params}")
-            cursor.execute(query, params or {})
+            cursor.execute(query, params or [])
             conn.commit()
             logger.debug(f"✅ Update executed successfully. Rows affected: {cursor.rowcount}")
             return cursor.rowcount
