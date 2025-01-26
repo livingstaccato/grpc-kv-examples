@@ -62,7 +62,7 @@ def connect_db() -> Generator[sqlite3.Connection, None, None]:
         db_pool.release_connection(conn)
 
 @contextmanager
-def connect_db() -> Generator[sqlite3.Connection, None, None]:
+def x_connect_db() -> Generator[sqlite3.Connection, None, None]:
     """
     Context manager to handle SQLite database connection.
     Yields:
