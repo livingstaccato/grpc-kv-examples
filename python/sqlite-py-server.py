@@ -54,7 +54,7 @@ class SQLServicer(sqlite_pb2_grpc.SimpleSQLStoreServicer):
             logger.error(f"❌ Database connection error: {e}")
             raise
 
-    def ExecuteQuery(self, request, context):
+    async def ExecuteQuery(self, request, context):
         logger.info(f"📝 Query request: {request.query}")
         await self._log_request_details(context)
 
