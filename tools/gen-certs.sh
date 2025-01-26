@@ -128,7 +128,7 @@ fi
 echo "All certificates generated in ${CERT_DIR}."
 
 echo "Issuers for all certs:"
-(for i in certs/*.crt; do
-    openssl x509 -noout -text -in $i
-done) |
-    grep Issuer
+for i in certs/*.crt; do
+    openssl x509 -noout -text -in $i | grep -e '(Issuer|Public-Key)'
+    echo
+done
