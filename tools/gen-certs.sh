@@ -86,6 +86,7 @@ if [ -n "${RSA_BITS}" ]; then
     generate_certificate "${_cert_name}-server" "localhost" "localhost,127.0.0.1" "${_cert_name}-server" "rsa"
     echo
     echo
+    echo "---------------------------------------------------------------------"
 fi
 
 if [ -n "${ECDSA_CURVE}" ]; then
