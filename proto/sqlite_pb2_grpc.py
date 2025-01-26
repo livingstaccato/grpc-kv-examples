@@ -168,8 +168,8 @@ class SimpleSQLStoreStub(object):
                 _registered_method=True)
         self.GetTransactionState = channel.unary_unary(
                 '/proto.SimpleSQLStore/GetTransactionState',
-                request_serializer=sqlite__pb2.TransactionRequest.SerializeToString,
-                response_deserializer=sqlite__pb2.TransactionStateResponse.FromString,
+                request_serializer=sqlite__pb2.GetTransactionStateRequest.SerializeToString,
+                response_deserializer=sqlite__pb2.GetTransactionStateResponse.FromString,
                 _registered_method=True)
         self.CreateConnection = channel.unary_unary(
                 '/proto.SimpleSQLStore/CreateConnection',
@@ -554,8 +554,8 @@ def add_SimpleSQLStoreServicer_to_server(servicer, server):
             ),
             'GetTransactionState': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTransactionState,
-                    request_deserializer=sqlite__pb2.TransactionRequest.FromString,
-                    response_serializer=sqlite__pb2.TransactionStateResponse.SerializeToString,
+                    request_deserializer=sqlite__pb2.GetTransactionStateRequest.FromString,
+                    response_serializer=sqlite__pb2.GetTransactionStateResponse.SerializeToString,
             ),
             'CreateConnection': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateConnection,
@@ -1296,8 +1296,8 @@ class SimpleSQLStore(object):
             request,
             target,
             '/proto.SimpleSQLStore/GetTransactionState',
-            sqlite__pb2.TransactionRequest.SerializeToString,
-            sqlite__pb2.TransactionStateResponse.FromString,
+            sqlite__pb2.GetTransactionStateRequest.SerializeToString,
+            sqlite__pb2.GetTransactionStateResponse.FromString,
             options,
             channel_credentials,
             insecure,
