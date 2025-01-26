@@ -15,7 +15,7 @@ def create_channel_credentials():
 
 class SimpleSQLClient:
    def __init__(self, channel):
-       self.stub = pb2_grpc.SQLiteStoreStub(channel)
+       self.stub = pb2_grpc.SimpleSQLStoreStub(channel)
 
    def execute_query(self, query, params=None):
        request = pb2.QueryRequest(
