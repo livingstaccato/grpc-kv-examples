@@ -5,7 +5,7 @@
 
 import grpc
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from proto import celersql_pb2, celersql_pb2_grpc
 from utils.certificate_helper import load_certificates_from_env, log_cert_info
 from utils.logging_helper import (
@@ -77,13 +77,13 @@ class CelerSQLClient:
         Returns:
             dict: A dictionary containing column names, types, and rows.
         """
-        transaction_id = str(datetime.utcnow().timestamp())
+        transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
             client_id="sqlite_client",
             request_type="ExecuteQuery",
             status="pending",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
         log_request_details(
@@ -121,7 +121,7 @@ class CelerSQLClient:
                 client_id="sqlite_client",
                 request_type="ExecuteQuery",
                 status="success",
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
             )
 
             return {
@@ -147,13 +147,13 @@ class CelerSQLClient:
         Returns:
             int: Number of rows affected by the update.
         """
-        transaction_id = str(datetime.utcnow().timestamp())
+        transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
             client_id="sqlite_client",
             request_type="ExecuteUpdate",
             status="pending",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
         log_request_details(
@@ -180,7 +180,7 @@ class CelerSQLClient:
                 client_id="sqlite_client",
                 request_type="ExecuteUpdate",
                 status="success",
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
             )
 
             return response.rows_affected
