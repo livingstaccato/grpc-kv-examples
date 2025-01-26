@@ -67,17 +67,7 @@ class CelerSQLClient:
             logger.error(f"❌ Failed to initialize client: {e}")
             raise
 
-    def Xexecute_query(self, query: str, params: list = None) -> dict:
-        """
-        Execute a SQL query on the server and retrieve results.
-
-        Args:
-            query (str): SQL query string.
-            params (list, optional): List of parameters for the query.
-
-        Returns:
-            dict: A dictionary containing column names, types, and rows.
-        """
+    def execute_query(self, query: str, params: list = None) -> dict:
         transaction_id = str(datetime.now(timezone.utc).timestamp())
         log_transaction(
             transaction_id=transaction_id,
@@ -112,6 +102,9 @@ class CelerSQLClient:
 
                 results.extend(self._parse_rows(batch.rows))
 
+            if not metadata:
+                metadata = {"columns": [], "types": []}  # Handle empty metadata
+
             log_response_details(
                 response_id=transaction_id,
                 details={"columns": metadata["columns"], "rows": len(results)},
@@ -135,34 +128,6 @@ class CelerSQLClient:
                 transaction_id,
                 error_message=f"{e.code()}: {e.details()}",
             )
-            raise
-
-    def execute_query(self, query: str, params: list = None) -> dict:
-        try:
-            request = celersql_pb2.QueryRequest(query=query)
-            if params:
-                request.params.extend([self._python_to_param(p) for p in params])
-
-            response = self.stub.ExecuteQuery(request)
-            results = []
-            metadata = None
-
-            for batch in response:
-                if not metadata:
-                    metadata = {
-                        "columns": list(batch.column_names),
-                        "types": list(batch.column_types),
-                    }
-
-                results.extend(self._parse_rows(batch.rows))
-
-            return {
-                "columns": metadata["columns"],
-                "types": metadata["types"],
-                "rows": results,
-            }
-        except grpc.RpcError as e:
-            logger.error(f"❌ RPC Error: {e}")
             raise
 
     def execute_update(self, query: str, params: list = None) -> int:
