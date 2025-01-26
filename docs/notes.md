@@ -1,13 +1,4 @@
 
-/Users/tim.perkins/code/opensource/grpc/test/core/network_benchmarks/low_level_ping_pong.cc
-
-static const char* socket_type_usage =
-    "Type of socket used, one of:\n"
-    "  tcp: fds are endpoints of a TCP connection\n"
-    "  socketpair: fds come from socketpair()\n"
-    "  pipe: fds come from pipe()\n";
-
-
 ## Compatibility Matrix
 
 ### macOS 15.2
@@ -65,3 +56,10 @@ static const char* socket_type_usage =
 | Ruby   | secp384r1 | Ruby   | secp521r1 | No  |
 | Ruby   | secp384r1 | C#     | secp521r1 | Yes |
 |-----------------------------------------------|
+
+--------------------------------------------------------------------------------
+
+## TLS Check
+
+| Go     | secp521r1 | 1.3 | TLS_AES_128_GCM_SHA256 | 128 |
+| Python | secp521r1 | 1.3 | TLS_AES_256_GCM_SHA384 | 256 |
