@@ -87,7 +87,7 @@ service SimpleSQLStore {
   rpc BeginTransaction(google.protobuf.Empty) returns (TransactionResponse); // Start a new transaction
   rpc CommitTransaction(TransactionRequest) returns (TransactionResponse); // Commit the active transaction
   rpc RollbackTransaction(TransactionRequest) returns (TransactionResponse); // Rollback the active transaction
-  rpc GetTransactionState(TransactionRequest) returns (TransactionStateResponse); // Get the current transaction state
+  rpc GetTransactionState(GetTransactionStateRequest) returns (GetTransactionStateResponse); // Get the current transaction state
 
   // Connection management
   rpc CreateConnection(ConnectionRequest) returns (ConnectionResponse); // Establish a new connection
@@ -377,6 +377,19 @@ message TransactionResponse {
 message TransactionStateResponse {
   string transaction_id = 1; // Identifier for the transaction
   string state = 2; // Current state of the transaction (e.g., active, committed)
+  Status status = 3; // Status of the request
+}
+
+// Request message for getting the state of a transaction.
+message GetTransactionStateRequest {
+  string connection_id = 1; // Connection identifier
+  string transaction_id = 2; // Identifier for the transaction
+}
+
+// Response message for getting the state of a transaction.
+message GetTransactionStateResponse {
+  string transaction_id = 1; // Identifier for the transaction
+  string state = 2; // Current state of the transaction (e.g., "active", "committed", "rolledback")
   Status status = 3; // Status of the request
 }
 
