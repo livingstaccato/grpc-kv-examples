@@ -54,4 +54,3 @@ SSL-Session:
     Timeout   : 7200 (sec)
     Verify return code: 21 (unable to verify the first certificate)
 ---
-closed
