@@ -275,3 +275,21 @@ grpc_tools_ruby_protoc --ruby_out=ruby --grpc_out=ruby proto/kv.proto
 
 
 * C# Worked with 521 at 1/26 12:26
+
+Go Server is currently:
+
+```
+No ALPN negotiated
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : AEAD-CHACHA20-POLY1305-SHA256
+    Session-ID: 
+    Session-ID-ctx: 
+    Master-Key: 
+    Start Time: 1737923891
+    Timeout   : 7200 (sec)
+    Verify return code: 21 (unable to verify the first certificate)
+---
+closed
+
+2025-01-26 - slightly before 1:30 after i modified the go server i broke python.
