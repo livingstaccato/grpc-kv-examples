@@ -11,7 +11,7 @@ local PLUGIN_PORT="50051"
 
 # TLS algorithm configuration
 #PLUGIN_ALGO=${PLUGIN_ALGO:-${DEFAULT_PLUGIN_ALGO}}
-PLUGIN_CLIENT_ALGO="ec-secp384r1"
+PLUGIN_CLIENT_ALGO="ec-secp521r1"
 PLUGIN_SERVER_ALGO="ec-secp521r1"
 
 # Certificate paths
@@ -119,6 +119,21 @@ alias rb-server="(cd ${BASE_PATH} && source env.sh && ./ruby/rb-kv-server.rb)"
 
 alias cs-build="(cd ${BASE_PATH}  && source env.sh && cd ./csharp && dotnet build)"
 alias cs-client="(cd ${BASE_PATH} && source env.sh && cd ./csharp && dotnet run)"
+
+alias rpcenv-refresh=" \
+  unset PLUGIN_CLIENT_CERT \
+    PLUGIN_CLIENT_KEY \
+    PLUGIN_CLIENT_ALGO \
+    PLUGIN_SERVER_CERT \
+    PLUGIN_SERVER_KEY \
+    PLUGIN_SERVER_ALGO;
+
+    pushd ${BASE_PATH};
+
+    source env.sh;
+
+    popd;
+"
 
 echo ""
 echo "🔐 TLS Configuration:"

@@ -1,12 +1,12 @@
 [req]
-default_bits        = 
+default_bits        = 2048
 distinguished_name  = req_distinguished_name
 req_extensions      = req_ext
 x509_extensions     = v3_ext
 prompt              = no
 
 [req_distinguished_name]
-O  = ec-secp256r1-mtls-server
+O  = HashiCorp
 CN = localhost
 
 [req_ext]
@@ -21,4 +21,3 @@ subjectKeyIdentifier = hash
 
 [alt_names]
 DNS.1 = localhost
-IP.1  = 127.0.0.1
