@@ -63,7 +63,7 @@ async def serve():
     try:
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
-            root_certificates=client_cert.encode() if client_cert else None,
+            #root_certificates=client_cert.encode() if client_cert else None,
             #require_client_auth=True
             #require_client_auth=True if client_cert else False
         )
