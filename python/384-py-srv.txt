@@ -1,0 +1,86 @@
+2025-02-08 09:26:59.347 DEBUG asyncio: Using selector: KqueueSelector
+2025-02-08 09:26:59.347 INFO __main__: 🚀 🔄 Starting gRPC KV Server...
+2025-02-08 09:26:59.347 INFO __main__: 🔐 📦 Loading server certificates and keys from environment variables...
+2025-02-08 09:26:59.347 DEBUG __main__: 🔍 Checking for required environment variables: ['PLUGIN_SERVER_CERT', 'PLUGIN_SERVER_KEY', 'PLUGIN_CLIENT_CERT']
+2025-02-08 09:26:59.347 DEBUG __main__: ✅ Environment variable 'PLUGIN_SERVER_CERT' found.
+2025-02-08 09:26:59.347 DEBUG __main__: ✅ Environment variable 'PLUGIN_SERVER_KEY' found.
+2025-02-08 09:26:59.347 DEBUG __main__: ✅ Environment variable 'PLUGIN_CLIENT_CERT' found.
+2025-02-08 09:26:59.347 DEBUG __main__: 🔐 📊 Certificate data lengths - Server Cert: 744 bytes, Server Key: 287 bytes, Client CA Cert: 744 bytes
+2025-02-08 09:26:59.347 INFO __main__: 🔐 ✅ Certificates loaded successfully from environment variables.
+2025-02-08 09:26:59.347 INFO __main__: 🔒 ⚙️ Configuring gRPC server credentials for mTLS...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1739035619.347633 8650131 log.cc:109] Log level DEBUG is not suitable for production. Prefer WARNING or ERROR. However if you see this message in a debug environment or test environment it is safe to ignore this message.
+I0000 00:00:1739035619.347676 8650131 trace.cc:94] gRPC Tracers: chaotic_good, op_failure, apple_polling, event_engine_endpoint_data, handshaker, xds_cluster_manager_lb, dns_resolver, event_engine_client_channel_resolver, inproc, timer, timer_check, weighted_target_lb, http1, http_keepalive, cronet, channel_stack, event_engine_poller, xds_client_refcount, outlier_detection_lb, pick_first, cds_lb, plugin_credentials, connectivity_state, glb, http, fuzzing_ee_writes, queue_pluck, executor, retry, resource_quota, metadata_query, fork, http2_ping, subchannel_pool, xds_override_host_lb, orca_client, secure_endpoint, http2_stream_state, cares_address_sorting, event_engine, grpc_authz_api, flowctl, bdp_estimator, rls_lb, server_channel, xds_cluster_impl_lb, environment_autodetect, xds_unittest, backend_metric, backend_metric_filter, weighted_round_robin_lb, stateful_session_filter, client_channel_call, xds_server_config_fetcher, api, round_robin, xds_wrr_locality_lb, cares_resolver, call, channel, chttp2_hpack_parser, client_idle_filter, call_error, subchannel, fuzzing_ee_timers, client_channel, priority_lb, tcp, client_channel_lb_call, chttp2_new_stream, event_engine_dns, event_engine_endpoint, ring_hash_lb, compression, fault_injection_filter, token_fetcher_credentials, health_check_client, xds_client, tsi, xds_resolver
+I0000 00:00:1739035619.347683 8650131 executor.cc:371] Executor::InitAll() enter
+I0000 00:00:1739035619.347684 8650131 executor.cc:129] EXECUTOR (default-executor) SetThreading(true) begin
+I0000 00:00:1739035619.347713 8650131 executor.cc:202] EXECUTOR (default-executor) SetThreading(true) done
+I0000 00:00:1739035619.347715 8650131 executor.cc:129] EXECUTOR (resolver-executor) SetThreading(true) begin
+I0000 00:00:1739035619.347718 8650142 executor.cc:216] EXECUTOR (default-executor) [0]: step (sub_depth=0)
+I0000 00:00:1739035619.347731 8650131 executor.cc:202] EXECUTOR (resolver-executor) SetThreading(true) done
+I0000 00:00:1739035619.347732 8650131 executor.cc:387] Executor::InitAll() done
+I0000 00:00:1739035619.347737 8650143 executor.cc:216] EXECUTOR (resolver-executor) [0]: step (sub_depth=0)
+I0000 00:00:1739035619.347750 8650131 timer_manager.cc:87] Spawn timer thread
+I0000 00:00:1739035619.347759 8650131 init.cc:133] grpc_init(void)
+2025-02-08 09:26:59.347 INFO __main__: 🔒 ✅ gRPC server credentials configured successfully for secure transport.
+I0000 00:00:1739035619.347799 8650144 timer_manager.cc:182] sleep for a 1 milliseconds
+I0000 00:00:1739035619.348699 8650144 timer_manager.cc:196] wait ended: was_timed:true kicked:false
+I0000 00:00:1739035619.348707 8650144 timer_manager.cc:182] sleep for a 1001 milliseconds
+2025-02-08 09:26:59.348 DEBUG grpc._cython.cygrpc: Using AsyncIOEngine.POLLER as I/O engine
+I0000 00:00:1739035619.348835 8650131 init.cc:133] grpc_init(void)
+I0000 00:00:1739035619.348840 8650131 completion_queue.cc:513] grpc_completion_queue_create_internal(completion_type=0, polling_type=0)
+I0000 00:00:1739035619.348902 8650145 completion_queue.cc:957] grpc_completion_queue_next(cq=0x14cfabf00, deadline=gpr_timespec { tv_sec: 9223372036854775807, tv_nsec: 0, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739035619.348945 8650131 init.cc:133] grpc_init(void)
+I0000 00:00:1739035619.348953 8650131 server.cc:2069] grpc_server_create(0x106413270, 0x0)
+I0000 00:00:1739035619.348988 8650131 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_CHANNEL:
+I0000 00:00:1739035619.348991 8650131 channel_init.cc:395]   legacy_channel_idle_filter.cc:295:  client_idle    [Default/V2]
+I0000 00:00:1739035619.348993 8650131 channel_init.cc:406]   client_channel_plugin.cc:35:        client-channel [terminal]
+I0000 00:00:1739035619.348999 8650131 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_SUBCHANNEL:
+I0000 00:00:1739035619.349002 8650131 channel_init.cc:395]   client_authority_filter.cc:80:  authority             [Default/Any]
+I0000 00:00:1739035619.349004 8650131 channel_init.cc:395]   init.cc:75:                     client-auth-filter    after authority [Default/V2]
+I0000 00:00:1739035619.349005 8650131 channel_init.cc:395]   grpclb.cc:1891:                 client_load_reporting [Default/Any]
+I0000 00:00:1739035619.349006 8650131 channel_init.cc:395]   message_size_filter.cc:246:     message_size          [Default/Any]
+I0000 00:00:1739035619.349007 8650131 channel_init.cc:395]   http_filters_plugin.cc:56:      http-client           after message_size [Default/Any]
+I0000 00:00:1739035619.349008 8650131 channel_init.cc:395]   http_filters_plugin.cc:41:      compression           after http-client, message_size [Default/Any]
+I0000 00:00:1739035619.349009 8650131 channel_init.cc:406]   connected_channel.cc:311:       connected             [terminal]
+I0000 00:00:1739035619.349010 8650131 channel_init.cc:406]   connected_channel.cc:326:       connected             [terminal]
+I0000 00:00:1739035619.349011 8650131 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_DYNAMIC_CHANNEL:
+I0000 00:00:1739035619.349012 8650131 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_LAME_CHANNEL:
+I0000 00:00:1739035619.349014 8650131 channel_init.cc:406]   grpc_plugin_registry.cc:80:  lame-client [terminal]
+I0000 00:00:1739035619.349016 8650131 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_DIRECT_CHANNEL:
+I0000 00:00:1739035619.349018 8650131 channel_init.cc:395]   client_authority_filter.cc:84:             authority                  [Default/Any]
+I0000 00:00:1739035619.349021 8650131 channel_init.cc:395]   init.cc:78:                                client-auth-filter         after authority [Default/V2]
+I0000 00:00:1739035619.349022 8650131 channel_init.cc:395]   service_config_channel_arg_filter.cc:131:  service_config_channel_arg [Default/Any]
+I0000 00:00:1739035619.349023 8650131 channel_init.cc:395]   message_size_filter.cc:249:                message_size               after service_config_channel_arg [Default/Any]
+I0000 00:00:1739035619.349024 8650131 channel_init.cc:395]   http_filters_plugin.cc:60:                 http-client                after message_size [Default/Any]
+I0000 00:00:1739035619.349025 8650131 channel_init.cc:395]   http_filters_plugin.cc:46:                 compression                after http-client, message_size [Default/Any]
+I0000 00:00:1739035619.349026 8650131 channel_init.cc:406]   connected_channel.cc:315:                  connected                  [terminal]
+I0000 00:00:1739035619.349027 8650131 channel_init.cc:406]   connected_channel.cc:330:                  connected                  [terminal]
+I0000 00:00:1739035619.349031 8650131 channel_init.cc:336] ORDERED CHANNEL STACK SERVER_CHANNEL:
+I0000 00:00:1739035619.349034 8650131 channel_init.cc:395]   grpc_plugin_registry.cc:83:         server             [Default/V2]
+I0000 00:00:1739035619.349035 8650131 channel_init.cc:395]   backend_metric_filter.cc:149:       backend_metric     after server [Default/Any]
+I0000 00:00:1739035619.349036 8650131 channel_init.cc:395]   legacy_channel_idle_filter.cc:301:  max_age            after server [Default/V2]
+I0000 00:00:1739035619.349037 8650131 channel_init.cc:395]   message_size_filter.cc:253:         message_size       after server [Default/Any]
+I0000 00:00:1739035619.349039 8650131 channel_init.cc:395]   http_filters_plugin.cc:64:          http-server        after message_size, server [Default/Any]
+I0000 00:00:1739035619.349040 8650131 channel_init.cc:395]   http_filters_plugin.cc:51:          compression        after http-server, message_size, server [Default/Any]
+I0000 00:00:1739035619.349041 8650131 channel_init.cc:395]   init.cc:81:                         server-auth        after server [Default/Any]
+I0000 00:00:1739035619.349042 8650131 channel_init.cc:395]   init.cc:84:                         grpc-server-authz  after server-auth, server [Default/Any]
+I0000 00:00:1739035619.349043 8650131 channel_init.cc:395]   server_call_tracer_filter.cc:113:   server_call_tracer after server [Default/Any]
+I0000 00:00:1739035619.349053 8650131 channel_init.cc:406]   connected_channel.cc:320:           connected          [terminal]
+I0000 00:00:1739035619.349055 8650131 channel_init.cc:406]   connected_channel.cc:334:           connected          [terminal]
+I0000 00:00:1739035619.349068 8650131 init.cc:133] grpc_init(void)
+I0000 00:00:1739035619.349246 8650131 default_event_engine.cc:86] Created DefaultEventEngine::0x600003f4c000. Called from [src/core/lib/event_engine/default_event_engine.cc:97]
+I0000 00:00:1739035619.349266 8650131 server.cc:2081] grpc_server_register_completion_queue(server=0x14cfc6240, cq=0x14cfabf00, reserved=0x0)
+2025-02-08 09:26:59.349 INFO __main__: 🔧 🚀 Initializing KVServicer Service
+2025-02-08 09:26:59.349 INFO __main__: 🌐 👂 Adding secure port [::]:50051 to gRPC server...
+I0000 00:00:1739035619.349352 8650131 chttp2_server.cc:1636] grpc_server_add_http2_port(server=0x14cfc6240, addr=[::]:50051, creds=0x600002248600)
+I0000 00:00:1739035619.350403 8650131 socket_utils_common_posix.cc:409] TCP_USER_TIMEOUT not supported for this platform
+2025-02-08 09:26:59.350 INFO __main__: 🌐 ✅ Secure port [::]:50051 added successfully.
+I0000 00:00:1739035619.350552 8650131 server.cc:2108] grpc_server_start(server=0x14cfc6240)
+I0000 00:00:1739035619.350570 8650131 metadata_array.cc:27] grpc_metadata_array_init(array=0x106388dd0)
+I0000 00:00:1739035619.350572 8650131 call_details.cc:28] grpc_call_details_init(details=0x106388d80)
+I0000 00:00:1739035619.350577 8650131 server.cc:2144] grpc_server_request_call(server=0x14cfc6240, call=0x106388d70, details=0x106388d80, initial_metadata=0x106388dd0, cq_bound_to_call=0x14cfabf00, cq_for_notification=0x14cfabf00, tag=0x1063b99b8
+2025-02-08 09:26:59.350 INFO __main__: 🚀 ✅ gRPC KV Server started and listening securely on [::]:50051
+I0000 00:00:1739035620.349827 8650144 timer_manager.cc:196] wait ended: was_timed:true kicked:false
+I0000 00:00:1739035620.349889 8650144 timer_manager.cc:182] sleep for a 1001 milliseconds
+I0000 00:00:1739035621.352268 8650144 timer_manager.cc:196] wait ended: was_timed:true kicked:false
+I0000 00:00:1739035621.352558 8650144 timer_manager.cc:182] sleep for a 1000 milliseconds
