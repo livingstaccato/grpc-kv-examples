@@ -1,0 +1,519 @@
+2025/02/08 09:42:18.233 INFO __main__: 🚀 Starting gRPC client... 🌟
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔐 Loading certificates from environment...
+2025/02/08 09:42:18.233 DEBUG utils.certificate_helper: 📦 Parsed Server certificate: 850 bytes
+2025/02/08 09:42:18.233 DEBUG utils.certificate_helper: 📦 Parsed Client certificate: 850 bytes
+2025/02/08 09:42:18.233 INFO __main__: 🔒 Creating channel credentials...
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍 Server Certificate Details: 📋
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Subject: <Name(O=HashiCorp,CN=localhost)> 📝
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Issuer: <Name(O=HashiCorp,CN=localhost)> 📝
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Valid From: 2025-02-05 23:19:15+00:00 ⏰
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Valid Until: 2026-02-05 23:19:15+00:00 ⏰
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Serial Number: 12110372057149940253 🔢
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Version: Version.v3 📊
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Signature Algorithm: 1.2.840.10045.4.3.4 ✍️
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Key Usage: <KeyUsage(digital_signature=True, content_commitment=False, key_encipherment=True, data_encipherment=False, key_agreement=True, key_cert_sign=False, crl_sign=False, encipher_only=False, decipher_only=False)> 🔑
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Extended Key Usage: <ExtendedKeyUsage([<ObjectIdentifier(oid=1.3.6.1.5.5.7.3.2, name=clientAuth)>, <ObjectIdentifier(oid=1.3.6.1.5.5.7.3.1, name=serverAuth)>])> 🔐
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   DNS Names: ['localhost'] 🌐
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Basic Constraints: CA=True, Path Length=None 📏
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍 Client Certificate Details: 📋
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Subject: <Name(O=HashiCorp,CN=localhost)> 📝
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Issuer: <Name(O=HashiCorp,CN=localhost)> 📝
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Valid From: 2025-02-05 23:19:15+00:00 ⏰
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Valid Until: 2026-02-05 23:19:15+00:00 ⏰
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Serial Number: 11000614750172861264 🔢
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Version: Version.v3 📊
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Signature Algorithm: 1.2.840.10045.4.3.4 ✍️
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Key Usage: <KeyUsage(digital_signature=True, content_commitment=False, key_encipherment=True, data_encipherment=False, key_agreement=True, key_cert_sign=False, crl_sign=False, encipher_only=False, decipher_only=False)> 🔑
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Extended Key Usage: <ExtendedKeyUsage([<ObjectIdentifier(oid=1.3.6.1.5.5.7.3.2, name=clientAuth)>, <ObjectIdentifier(oid=1.3.6.1.5.5.7.3.1, name=serverAuth)>])> 🔐
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   DNS Names: ['localhost'] 🌐
+2025/02/08 09:42:18.233 INFO utils.certificate_helper: 🔍   Basic Constraints: CA=True, Path Length=None 📏
+2025/02/08 09:42:18.233 INFO __main__: 🌐 Connecting to server: localhost:50051
+2025/02/08 09:42:18.233 INFO __main__: 🔌 Creating gRPC connection...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1739036538.235532 8776139 log.cc:109] Log level DEBUG is not suitable for production. Prefer WARNING or ERROR. However if you see this message in a debug environment or test environment it is safe to ignore this message.
+I0000 00:00:1739036538.235577 8776139 trace.cc:94] gRPC Tracers: backend_metric_filter, grpc_authz_api, executor, event_engine_poller, glb, tsi, fork, channel_stack, cares_resolver, chttp2_hpack_parser, compression, http, orca_client, subchannel, api, channel, cds_lb, event_engine_endpoint, fuzzing_ee_writes, flowctl, subchannel_pool, health_check_client, xds_client_refcount, client_channel_call, timer, xds_client, xds_resolver, xds_server_config_fetcher, server_channel, outlier_detection_lb, xds_unittest, xds_override_host_lb, handshaker, bdp_estimator, http2_ping, inproc, xds_cluster_manager_lb, environment_autodetect, http1, xds_cluster_impl_lb, client_channel, weighted_round_robin_lb, event_engine_dns, cares_address_sorting, dns_resolver, event_engine_client_channel_resolver, event_engine_endpoint_data, fuzzing_ee_timers, resource_quota, retry, rls_lb, token_fetcher_credentials, timer_check, queue_pluck, http_keepalive, client_channel_lb_call, weighted_target_lb, metadata_query, pick_first, tcp, round_robin, apple_polling, op_failure, call, event_engine, call_error, chttp2_new_stream, cronet, http2_stream_state, secure_endpoint, fault_injection_filter, xds_wrr_locality_lb, backend_metric, client_idle_filter, ring_hash_lb, chaotic_good, connectivity_state, stateful_session_filter, priority_lb, plugin_credentials
+I0000 00:00:1739036538.235584 8776139 executor.cc:371] Executor::InitAll() enter
+I0000 00:00:1739036538.235586 8776139 executor.cc:129] EXECUTOR (default-executor) SetThreading(true) begin
+I0000 00:00:1739036538.235611 8776139 executor.cc:202] EXECUTOR (default-executor) SetThreading(true) done
+I0000 00:00:1739036538.235614 8776139 executor.cc:129] EXECUTOR (resolver-executor) SetThreading(true) begin
+I0000 00:00:1739036538.235624 8776139 executor.cc:202] EXECUTOR (resolver-executor) SetThreading(true) done
+I0000 00:00:1739036538.235625 8776139 executor.cc:387] Executor::InitAll() done
+I0000 00:00:1739036538.235639 8776146 executor.cc:216] EXECUTOR (resolver-executor) [0]: step (sub_depth=0)
+I0000 00:00:1739036538.235646 8776139 timer_manager.cc:87] Spawn timer thread
+I0000 00:00:1739036538.235627 8776145 executor.cc:216] EXECUTOR (default-executor) [0]: step (sub_depth=0)
+I0000 00:00:1739036538.235659 8776139 init.cc:133] grpc_init(void)
+I0000 00:00:1739036538.235666 8776147 timer_manager.cc:182] sleep for a 1 milliseconds
+I0000 00:00:1739036538.235670 8776139 completion_queue.cc:513] grpc_completion_queue_create_internal(completion_type=0, polling_type=0)
+I0000 00:00:1739036538.235674 8776139 completion_queue.cc:513] grpc_completion_queue_create_internal(completion_type=0, polling_type=0)
+I0000 00:00:1739036538.235681 8776139 ssl_credentials.cc:225] grpc_ssl_credentials_create(pem_root_certs=-----BEGIN CERTIFICATE-----
+MIICRjCCAaegAwIBAgIJAKgQrzj0PSIdMAoGCCqGSM49BAMEMCgxEjAQBgNVBAoM
+CUhhc2hpQ29ycDESMBAGA1UEAwwJbG9jYWxob3N0MB4XDTI1MDIwNTIzMTkxNVoX
+DTI2MDIwNTIzMTkxNVowKDESMBAGA1UECgwJSGFzaGlDb3JwMRIwEAYDVQQDDAls
+b2NhbGhvc3QwgZswEAYHKoZIzj0CAQYFK4EEACMDgYYABAGL0Q05pUHUZ5bGSPkj
+miSvuP5Jeu7M/QVdX6zAfdleA6z2F0W9X4cm8YkKJ/kl4qIRuhRFG0cSttSAAAC+
+Rm/10QBuPB94u01q1p8wPDX6AZU2Es/8g+CpPVJdDD0qkQJvzzjODKE51oj4n473
+Q0n19l8lSA9NHJf3B2KhNFMvk5tXkKN3MHUwDwYDVR0TAQH/BAUwAwEB/zAUBgNV
+HREEDTALgglsb2NhbGhvc3QwHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMB
+MA4GA1UdDwEB/wQEAwIDqDAdBgNVHQ4EFgQUtwsmDmZgpix/Zayk7n4O+5Mo93Mw
+CgYIKoZIzj0EAwQDgYwAMIGIAkIBEPS/l2OIRCBcoZf++YDEhuxf1DpzmRaeWQ6P
+RTbg3se6iL1ZkjVV99kgcDhn0GjNw1CrZou1UH7daZwvyrNzwpwCQgCYx6YD2W99
+tCCAXHLsJr2mSwQzjEjgqKew1GdLlkPQeDLJQQb/CE8XuDL1hY3S6LJzZfr4S1ZM
+WcDg4e2rllpFKw==
+-----END CERTIFICATE-----, pem_key_cert_pair=0x16dc29250, verify_options=0x0, reserved=0x0)
+I0000 00:00:1739036538.236733 8776147 timer_manager.cc:196] wait ended: was_timed:true kicked:false
+I0000 00:00:1739036538.236747 8776147 timer_manager.cc:182] sleep for a 1001 milliseconds
+I0000 00:00:1739036538.236913 8776139 chttp2_connector.cc:308] grpc_channel_create(target=localhost:50051, creds=0x600002e54060, args=0x103aedbf0)
+I0000 00:00:1739036538.236954 8776139 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_CHANNEL:
+I0000 00:00:1739036538.236959 8776139 channel_init.cc:395]   legacy_channel_idle_filter.cc:295:  client_idle    [Default/V2]
+I0000 00:00:1739036538.236961 8776139 channel_init.cc:406]   client_channel_plugin.cc:35:        client-channel [terminal]
+I0000 00:00:1739036538.236965 8776139 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_SUBCHANNEL:
+I0000 00:00:1739036538.236968 8776139 channel_init.cc:395]   client_authority_filter.cc:80:  authority             [Default/Any]
+I0000 00:00:1739036538.236969 8776139 channel_init.cc:395]   init.cc:75:                     client-auth-filter    after authority [Default/V2]
+I0000 00:00:1739036538.236970 8776139 channel_init.cc:395]   grpclb.cc:1891:                 client_load_reporting [Default/Any]
+I0000 00:00:1739036538.236971 8776139 channel_init.cc:395]   message_size_filter.cc:246:     message_size          [Default/Any]
+I0000 00:00:1739036538.236973 8776139 channel_init.cc:395]   http_filters_plugin.cc:56:      http-client           after message_size [Default/Any]
+I0000 00:00:1739036538.236974 8776139 channel_init.cc:395]   http_filters_plugin.cc:41:      compression           after http-client, message_size [Default/Any]
+I0000 00:00:1739036538.236975 8776139 channel_init.cc:406]   connected_channel.cc:311:       connected             [terminal]
+I0000 00:00:1739036538.236976 8776139 channel_init.cc:406]   connected_channel.cc:326:       connected             [terminal]
+I0000 00:00:1739036538.236977 8776139 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_DYNAMIC_CHANNEL:
+I0000 00:00:1739036538.236978 8776139 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_LAME_CHANNEL:
+I0000 00:00:1739036538.236979 8776139 channel_init.cc:406]   grpc_plugin_registry.cc:80:  lame-client [terminal]
+I0000 00:00:1739036538.236981 8776139 channel_init.cc:336] ORDERED CHANNEL STACK CLIENT_DIRECT_CHANNEL:
+I0000 00:00:1739036538.236984 8776139 channel_init.cc:395]   client_authority_filter.cc:84:             authority                  [Default/Any]
+I0000 00:00:1739036538.236985 8776139 channel_init.cc:395]   init.cc:78:                                client-auth-filter         after authority [Default/V2]
+I0000 00:00:1739036538.236986 8776139 channel_init.cc:395]   service_config_channel_arg_filter.cc:131:  service_config_channel_arg [Default/Any]
+I0000 00:00:1739036538.236988 8776139 channel_init.cc:395]   message_size_filter.cc:249:                message_size               after service_config_channel_arg [Default/Any]
+I0000 00:00:1739036538.236989 8776139 channel_init.cc:395]   http_filters_plugin.cc:60:                 http-client                after message_size [Default/Any]
+I0000 00:00:1739036538.236991 8776139 channel_init.cc:395]   http_filters_plugin.cc:46:                 compression                after http-client, message_size [Default/Any]
+I0000 00:00:1739036538.236992 8776139 channel_init.cc:406]   connected_channel.cc:315:                  connected                  [terminal]
+I0000 00:00:1739036538.236993 8776139 channel_init.cc:406]   connected_channel.cc:330:                  connected                  [terminal]
+I0000 00:00:1739036538.236996 8776139 channel_init.cc:336] ORDERED CHANNEL STACK SERVER_CHANNEL:
+I0000 00:00:1739036538.236999 8776139 channel_init.cc:395]   grpc_plugin_registry.cc:83:         server             [Default/V2]
+I0000 00:00:1739036538.237001 8776139 channel_init.cc:395]   backend_metric_filter.cc:149:       backend_metric     after server [Default/Any]
+I0000 00:00:1739036538.237002 8776139 channel_init.cc:395]   legacy_channel_idle_filter.cc:301:  max_age            after server [Default/V2]
+I0000 00:00:1739036538.237003 8776139 channel_init.cc:395]   message_size_filter.cc:253:         message_size       after server [Default/Any]
+I0000 00:00:1739036538.237004 8776139 channel_init.cc:395]   http_filters_plugin.cc:64:          http-server        after message_size, server [Default/Any]
+I0000 00:00:1739036538.237005 8776139 channel_init.cc:395]   http_filters_plugin.cc:51:          compression        after http-server, message_size, server [Default/Any]
+I0000 00:00:1739036538.237006 8776139 channel_init.cc:395]   init.cc:81:                         server-auth        after server [Default/Any]
+I0000 00:00:1739036538.237009 8776139 channel_init.cc:395]   init.cc:84:                         grpc-server-authz  after server-auth, server [Default/Any]
+I0000 00:00:1739036538.237010 8776139 channel_init.cc:395]   server_call_tracer_filter.cc:113:   server_call_tracer after server [Default/Any]
+I0000 00:00:1739036538.237011 8776139 channel_init.cc:406]   connected_channel.cc:320:           connected          [terminal]
+I0000 00:00:1739036538.237012 8776139 channel_init.cc:406]   connected_channel.cc:334:           connected          [terminal]
+I0000 00:00:1739036538.237019 8776139 init.cc:133] grpc_init(void)
+I0000 00:00:1739036538.237178 8776139 default_event_engine.cc:86] Created DefaultEventEngine::0x6000033440e0. Called from [src/core/lib/event_engine/default_event_engine.cc:97]
+I0000 00:00:1739036538.237200 8776139 channel_stack.cc:120] CHANNEL_STACK: init CLIENT_CHANNEL
+I0000 00:00:1739036538.237204 8776139 channel_stack.cc:122] CHANNEL_STACK:   filter client_idle
+I0000 00:00:1739036538.237205 8776139 channel_stack.cc:122] CHANNEL_STACK:   filter client-channel
+I0000 00:00:1739036538.237211 8776139 client_channel_filter.cc:1092] chand=0x107115c30: creating client_channel for channel stack 0x107115b60
+I0000 00:00:1739036538.237224 8776139 memory_quota.cc:558] Adding allocator 0x6000033441d8
+I0000 00:00:1739036538.237228 8776139 init.cc:133] grpc_init(void)
+I0000 00:00:1739036538.237230 8776139 credentials.cc:35] grpc_channel_credentials_release(creds=0x600002e54060)
+2025/02/08 09:42:18.237 DEBUG __main__: ⏳ Waiting for channel ready...
+I0000 00:00:1739036538.237383 8776159 channel.cc:189] grpc_channel_check_connectivity_state(channel=0x600003f503c0, try_to_connect=1)
+I0000 00:00:1739036538.237388 8776159 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: IDLE
+I0000 00:00:1739036538.237415 8776152 client_channel_filter.cc:1537] chand=0x107115c30: starting name resolution for dns:///localhost:50051
+I0000 00:00:1739036538.237430 8776152 polling_resolver.cc:61] [polling resolver 0x107085d90] created
+I0000 00:00:1739036538.237433 8776152 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: IDLE
+I0000 00:00:1739036538.237435 8776152 connectivity_state.cc:151] ConnectivityStateTracker client_channel[0x107115db0]: IDLE -> CONNECTING (started resolving, OK)
+I0000 00:00:1739036538.237473 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 437468928, clock_type: 1 }, cq=0x1071075a0, tag=0x103b08100)
+I0000 00:00:1739036538.237484 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 437483000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.237714 8776152 polling_resolver.cc:248] [polling resolver 0x107085d90] starting resolution, request_=0x600003541c20
+I0000 00:00:1739036538.237718 8776152 client_channel_filter.cc:1549] chand=0x107115c30: created resolver=0x107085d90
+I0000 00:00:1739036538.237730 8776152 grpc_ares_wrapper.cc:580] (c-ares resolver) request:0x600003b5cbe0 c-ares address sorting: input[0]=[::1]:50051
+I0000 00:00:1739036538.237733 8776152 grpc_ares_wrapper.cc:580] (c-ares resolver) request:0x600003b5cbe0 c-ares address sorting: input[1]=127.0.0.1:50051
+I0000 00:00:1739036538.237750 8776154 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002440200,0000000000000000}
+I0000 00:00:1739036538.237761 8776154 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x60000295c3c0
+I0000 00:00:1739036538.237763 8776154 connectivity_state.cc:123] ConnectivityStateTracker client_channel[0x107115db0]: notifying watcher 0x60000295c3c0: IDLE -> CONNECTING
+I0000 00:00:1739036538.237772 8776154 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103b08100, error=OK, done=true, done_arg=0x6000033442a0, storage=0x6000033442d0)
+I0000 00:00:1739036538.237783 8776155 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x60000295c3c0
+I0000 00:00:1739036538.237801 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103b08100 OK
+I0000 00:00:1739036538.237805 8776152 grpc_ares_wrapper.cc:580] (c-ares resolver) request:0x600003b5cbe0 c-ares address sorting: output[0]=[::1]:50051
+I0000 00:00:1739036538.237809 8776152 grpc_ares_wrapper.cc:580] (c-ares resolver) request:0x600003b5cbe0 c-ares address sorting: output[1]=127.0.0.1:50051
+I0000 00:00:1739036538.237816 8776152 polling_resolver.cc:151] [polling resolver 0x107085d90] request complete
+I0000 00:00:1739036538.237817 8776152 polling_resolver.cc:156] [polling resolver 0x107085d90] returning result: addresses=<2 addresses>, service_config=<null>, resolution_note=
+I0000 00:00:1739036538.237820 8776152 client_channel_filter.cc:1254] chand=0x107115c30: got resolver result
+I0000 00:00:1739036538.237821 8776152 client_channel_filter.cc:1312] chand=0x107115c30: resolver returned no service config. Using default service config for channel.
+I0000 00:00:1739036538.237828 8776152 client_channel_filter.cc:1467] chand=0x107115c30: using service config: "{}"
+I0000 00:00:1739036538.237829 8776152 client_channel_filter.cc:1480] chand=0x107115c30: using ConfigSelector 0x0
+I0000 00:00:1739036538.237830 8776159 channel.cc:189] grpc_channel_check_connectivity_state(channel=0x600003f503c0, try_to_connect=0)
+I0000 00:00:1739036538.237831 8776152 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: CONNECTING
+I0000 00:00:1739036538.237844 8776152 client_channel_filter.cc:1456] chand=0x107115c30: created new LB policy 0x600002e58a80
+I0000 00:00:1739036538.237846 8776152 client_channel_filter.cc:1432] chand=0x107115c30: Updating child policy 0x600002e58a80
+I0000 00:00:1739036538.237833 8776159 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: CONNECTING
+I0000 00:00:1739036538.237848 8776152 child_policy_handler.cc:225] [child_policy_handler 0x600002e58a80] creating new child policy pick_first
+I0000 00:00:1739036538.237858 8776152 pick_first.cc:426] Pick First 0x124ed3970 created.
+I0000 00:00:1739036538.237860 8776152 child_policy_handler.cc:287] [child_policy_handler 0x600002e58a80] created new LB policy "pick_first" (0x124ed3970)
+I0000 00:00:1739036538.237862 8776152 child_policy_handler.cc:244] [child_policy_handler 0x600002e58a80] updating child policy 0x124ed3970
+I0000 00:00:1739036538.237864 8776152 pick_first.cc:513] Pick First 0x124ed3970 received update
+I0000 00:00:1739036538.237869 8776152 pick_first.cc:997] [PF 0x124ed3970] Creating subchannel list 0x600003844120 - channel args: {grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.channelz_channel_node=0x107115a00, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000868300, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}
+I0000 00:00:1739036538.237884 8776152 init.cc:133] grpc_init(void)
+I0000 00:00:1739036538.237896 8776152 client_channel_filter.cc:498] chand=0x107115c30: creating subchannel wrapper 0x600002958b90 for subchannel 0x10708aac0
+I0000 00:00:1739036538.237899 8776152 pick_first.cc:1015] [PF 0x124ed3970] subchannel list 0x600003844120 index 0: Created subchannel 0x600002958b90 for address addrs=[[::1]:50051]
+I0000 00:00:1739036538.237902 8776152 pick_first.cc:791] [PF 0x124ed3970] subchannel list 0x600003844120 index 0: creating subchannel data
+I0000 00:00:1739036538.237903 8776152 pick_first.cc:674] [PF 0x124ed3970] subchannel state 0x600000459050 (subchannel 0x600002958b90): starting watch
+I0000 00:00:1739036538.237912 8776152 init.cc:133] grpc_init(void)
+I0000 00:00:1739036538.237915 8776152 client_channel_filter.cc:498] chand=0x107115c30: creating subchannel wrapper 0x600002958c30 for subchannel 0x10708ae60
+I0000 00:00:1739036538.237917 8776152 pick_first.cc:1015] [PF 0x124ed3970] subchannel list 0x600003844120 index 1: Created subchannel 0x600002958c30 for address addrs=[127.0.0.1:50051]
+I0000 00:00:1739036538.237920 8776152 pick_first.cc:791] [PF 0x124ed3970] subchannel list 0x600003844120 index 1: creating subchannel data
+I0000 00:00:1739036538.237921 8776152 pick_first.cc:674] [PF 0x124ed3970] subchannel state 0x600000459230 (subchannel 0x600002958c30): starting watch
+I0000 00:00:1739036538.237925 8776152 client_channel_filter.cc:1491] chand=0x107115c30: switching to ConfigSelector 0x0
+I0000 00:00:1739036538.237926 8776157 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60hopping into work_serializer
+I0000 00:00:1739036538.237933 8776157 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0hopping into work_serializer
+I0000 00:00:1739036538.237928 8776152 channel_stack.cc:120] CHANNEL_STACK: init DynamicFilters
+I0000 00:00:1739036538.237939 8776152 channel_stack.cc:122] CHANNEL_STACK:   filter retry_filter
+I0000 00:00:1739036538.237956 8776152 polling_resolver.cc:184] [polling resolver 0x107085d90] result status from channel: OK
+I0000 00:00:1739036538.237943 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=1, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 437940992, clock_type: 1 }, cq=0x1071075a0, tag=0x103b080d0)
+I0000 00:00:1739036538.237967 8776152 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60 watcher=0x600000854e30 state=IDLE status=OK
+I0000 00:00:1739036538.237970 8776152 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459230 (subchannel 0x600002958c30): connectivity changed: new_state=IDLE, status=OK, watcher=0x600000854e30, subchannel_data_=0x600000459200, pick_first_->selected_=0x0
+I0000 00:00:1739036538.237973 8776152 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 1 of 2 (subchannel_state 0x600000459230): connectivity changed: old_state=N/A, new_state=IDLE, status=OK, seen_transient_failure=false, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036538.237979 8776152 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0 watcher=0x600000854e60 state=IDLE status=OK
+I0000 00:00:1739036538.237979 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 437979000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.237981 8776152 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459050 (subchannel 0x600002958b90): connectivity changed: new_state=IDLE, status=OK, watcher=0x600000854e60, subchannel_data_=0x600000458f30, pick_first_->selected_=0x0
+I0000 00:00:1739036538.237984 8776152 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 0 of 2 (subchannel_state 0x600000459050): connectivity changed: old_state=N/A, new_state=IDLE, status=OK, seen_transient_failure=false, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036538.237992 8776151 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0hopping into work_serializer
+I0000 00:00:1739036538.237995 8776152 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker tcp_connect [0x154f04210] at index 0
+I0000 00:00:1739036538.238004 8776152 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker http_connect [0x15581ee00] at index 1
+I0000 00:00:1739036538.238007 8776152 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker endpoint_info [0x600000840010] at index 2
+I0000 00:00:1739036538.238030 8776152 ssl_transport_security.cc:236]      HANDSHAKE START - TLS client start_connect  - !!!!!!
+I0000 00:00:1739036538.238076 8776152 ssl_transport_security.cc:236]                 LOOP - TLS client enter_early_data  - !!!!!!
+I0000 00:00:1739036538.238080 8776152 ssl_transport_security.cc:236]                 LOOP - TLS client read_server_hello  - !!!!!!
+I0000 00:00:1739036538.238083 8776152 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker security [0x154f0fdb0] at index 3
+I0000 00:00:1739036538.238086 8776152 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c080,0000000000000001}
+I0000 00:00:1739036538.238088 8776152 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=0, args={endpoint=(nil), args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.internal.tcp_handshaker_bind_endpoint_to_pollset=1, grpc.internal.tcp_handshaker_resolved_address=ipv6:%5B::1%5D:50051, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.238094 8776152 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker tcp_connect [0x154f04210] at index 0
+I0000 00:00:1739036538.238119 8776152 socket_utils_common_posix.cc:409] TCP_USER_TIMEOUT not supported for this platform
+I0000 00:00:1739036538.238167 8776152 tcp_client_posix.cc:380] CLIENT_CONNECT: ipv6:%5B::1%5D:50051: asynchronously connecting fd 0x600003548000
+I0000 00:00:1739036538.238172 8776152 pick_first.cc:951] Pick First 0x124ed3970 subchannel list 0x600003844120: starting Connection Attempt Delay timer for 250ms for index 0
+I0000 00:00:1739036538.238178 8776152 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c100,0000000000000002}
+I0000 00:00:1739036538.238182 8776152 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c180,0000000000000003}
+I0000 00:00:1739036538.238183 8776152 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x6000029400a0
+I0000 00:00:1739036538.238186 8776152 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0 watcher=0x600000854e60 state=CONNECTING status=OK
+I0000 00:00:1739036538.238188 8776152 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459050 (subchannel 0x600002958b90): connectivity changed: new_state=CONNECTING, status=OK, watcher=0x600000854e60, subchannel_data_=0x600000458f30, pick_first_->selected_=0x0
+I0000 00:00:1739036538.238190 8776152 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 0 of 2 (subchannel_state 0x600000459050): connectivity changed: old_state=IDLE, new_state=CONNECTING, status=OK, seen_transient_failure=false, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036538.238202 8776152 client_channel_filter.cc:982] chand=0x107115c30: update: state=CONNECTING status=(OK) picker=0x600002e58b40
+I0000 00:00:1739036538.238204 8776152 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: CONNECTING
+I0000 00:00:1739036538.238309 8776159 tcp_client_posix.cc:180] CLIENT_CONNECT: ipv6:%5B::1%5D:50051: on_writable: error=OK
+I0000 00:00:1739036538.238317 8776159 memory_quota.cc:558] Adding allocator 0x6000033407f8
+I0000 00:00:1739036538.238321 8776159 executor.cc:294] EXECUTOR (default-executor) try to schedule 0x154f04338 (short) to thread 0
+I0000 00:00:1739036538.238326 8776159 tcp_client_posix.cc:142] CLIENT_CONNECT: ipv6:%5B::1%5D:50051: on_alarm: error=CANCELLED
+I0000 00:00:1739036538.238335 8776145 executor.cc:239] EXECUTOR (default-executor) [0]: execute
+I0000 00:00:1739036538.238337 8776145 executor.cc:108] EXECUTOR (default-executor) run 0x154f04338
+I0000 00:00:1739036538.238341 8776145 executor.cc:216] EXECUTOR (default-executor) [0]: step (sub_depth=1)
+I0000 00:00:1739036538.238345 8776149 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=1, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.238350 8776149 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker http_connect [0x15581ee00] at index 1
+I0000 00:00:1739036538.238354 8776149 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=2, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.238357 8776149 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker endpoint_info [0x600000840010] at index 2
+I0000 00:00:1739036538.238374 8776149 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=3, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv6:%5B::1%5D:52371, grpc.internal.endpoint_peer_address=ipv6:%5B::1%5D:50051, grpc.internal.event_engine=0x600000854ef0, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.238388 8776149 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker security [0x154f0fdb0] at index 3
+I0000 00:00:1739036538.238391 8776149 tcp_posix.cc:1810] WRITE 0x10708a280 (peer=ipv6:%5B::1%5D:50051)
+I0000 00:00:1739036538.238409 8776149 tcp_posix.cc:1855] write: OK
+I0000 00:00:1739036538.238418 8776149 tcp_posix.cc:699] TCP:0x10708a280 notify_on_read
+I0000 00:00:1739036538.238665 8776159 tcp_posix.cc:1106] TCP:0x10708a280 got_read: OK
+I0000 00:00:1739036538.238671 8776159 tcp_posix.cc:895] TCP:0x10708a280 do_read
+I0000 00:00:1739036538.238675 8776159 tcp_posix.cc:831] TCP:0x10708a280 call_cb 0x60000044c2a0 true:0x60000044c2a0
+I0000 00:00:1739036538.238677 8776159 tcp_posix.cc:834] READ 0x10708a280 (peer=ipv6:%5B::1%5D:50051) error=INTERNAL:Socket closed {fd:29, grpc_status:14}
+I0000 00:00:1739036538.238716 8776151 handshaker.cc:152] handshake_manager 0x154f12940: error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:18.238684+00:00'] [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34'] shutdown=false index=4, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv6:%5B::1%5D:52371, grpc.internal.endpoint_peer_address=ipv6:%5B::1%5D:50051, grpc.internal.event_engine=0x600000854ef0, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.238729 8776151 handshaker.cc:166] handshake_manager 0x154f12940: handshaking complete -- scheduling on_handshake_done with error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:18.238684+00:00'] [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34']
+I0000 00:00:1739036538.238737 8776151 memory_quota.cc:569] Removing allocator 0x6000033407f8
+I0000 00:00:1739036538.238757 8776151 subchannel.cc:803] subchannel 0x10708aac0 {address=ipv6:%5B::1%5D:50051, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}}: connect failed (UNKNOWN:Handshake read failed {created_time:"2025-02-08T09:42:18.238684-08:00", children:[INTERNAL:Socket closed {grpc_status:14, fd:29}]}), backing off for 1030 ms
+I0000 00:00:1739036538.239620 8776151 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c580,0000000000000004}
+I0000 00:00:1739036538.239623 8776151 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0hopping into work_serializer
+I0000 00:00:1739036538.239627 8776151 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0 watcher=0x600000854e60 state=TRANSIENT_FAILURE status=UNAVAILABLE: ipv6:%5B::1%5D:50051: Socket closed
+I0000 00:00:1739036538.239629 8776151 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459050 (subchannel 0x600002958b90): connectivity changed: new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv6:%5B::1%5D:50051: Socket closed, watcher=0x600000854e60, subchannel_data_=0x600000458f30, pick_first_->selected_=0x0
+I0000 00:00:1739036538.239631 8776151 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 0 of 2 (subchannel_state 0x600000459050): connectivity changed: old_state=CONNECTING, new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv6:%5B::1%5D:50051: Socket closed, seen_transient_failure=false, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036538.239641 8776152 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60hopping into work_serializer
+I0000 00:00:1739036538.239645 8776151 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker tcp_connect [0x154f13240] at index 0
+I0000 00:00:1739036538.239647 8776151 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker http_connect [0x15582aa00] at index 1
+I0000 00:00:1739036538.239649 8776151 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker endpoint_info [0x6000008400c0] at index 2
+I0000 00:00:1739036538.239656 8776151 ssl_transport_security.cc:236]      HANDSHAKE START - TLS client start_connect  - !!!!!!
+I0000 00:00:1739036538.239675 8776151 ssl_transport_security.cc:236]                 LOOP - TLS client enter_early_data  - !!!!!!
+I0000 00:00:1739036538.239677 8776151 ssl_transport_security.cc:236]                 LOOP - TLS client read_server_hello  - !!!!!!
+I0000 00:00:1739036538.239679 8776151 handshaker.cc:81] handshake_manager 0x154f12940: adding handshaker security [0x154f0e650] at index 3
+I0000 00:00:1739036538.239681 8776151 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c100,0000000000000005}
+I0000 00:00:1739036538.239683 8776151 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=0, args={endpoint=(nil), args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.internal.tcp_handshaker_bind_endpoint_to_pollset=1, grpc.internal.tcp_handshaker_resolved_address=ipv4:127.0.0.1:50051, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.239687 8776151 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker tcp_connect [0x154f13240] at index 0
+I0000 00:00:1739036538.239707 8776151 socket_utils_common_posix.cc:409] TCP_USER_TIMEOUT not supported for this platform
+I0000 00:00:1739036538.239738 8776151 tcp_client_posix.cc:380] CLIENT_CONNECT: ipv4:127.0.0.1:50051: asynchronously connecting fd 0x6000035480f0
+I0000 00:00:1739036538.239745 8776151 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60 watcher=0x600000854e30 state=CONNECTING status=OK
+I0000 00:00:1739036538.239748 8776151 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459230 (subchannel 0x600002958c30): connectivity changed: new_state=CONNECTING, status=OK, watcher=0x600000854e30, subchannel_data_=0x600000459200, pick_first_->selected_=0x0
+I0000 00:00:1739036538.239751 8776151 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 1 of 2 (subchannel_state 0x600000459230): connectivity changed: old_state=IDLE, new_state=CONNECTING, status=OK, seen_transient_failure=false, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036538.239754 8776151 client_channel_filter.cc:982] chand=0x107115c30: update: state=CONNECTING status=(OK) picker=0x600002e4c180
+I0000 00:00:1739036538.239757 8776151 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: CONNECTING
+I0000 00:00:1739036538.239877 8776159 tcp_client_posix.cc:180] CLIENT_CONNECT: ipv4:127.0.0.1:50051: on_writable: error=OK
+I0000 00:00:1739036538.239886 8776159 memory_quota.cc:558] Adding allocator 0x6000033407f8
+I0000 00:00:1739036538.239889 8776159 executor.cc:294] EXECUTOR (default-executor) try to schedule 0x154f13368 (short) to thread 0
+I0000 00:00:1739036538.239894 8776159 tcp_client_posix.cc:142] CLIENT_CONNECT: ipv4:127.0.0.1:50051: on_alarm: error=CANCELLED
+I0000 00:00:1739036538.239901 8776145 executor.cc:239] EXECUTOR (default-executor) [0]: execute
+I0000 00:00:1739036538.239903 8776145 executor.cc:108] EXECUTOR (default-executor) run 0x154f13368
+I0000 00:00:1739036538.239906 8776145 executor.cc:216] EXECUTOR (default-executor) [0]: step (sub_depth=1)
+I0000 00:00:1739036538.239912 8776148 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=1, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.239919 8776148 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker http_connect [0x15582aa00] at index 1
+I0000 00:00:1739036538.239924 8776148 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=2, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.239927 8776148 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker endpoint_info [0x6000008400c0] at index 2
+I0000 00:00:1739036538.239934 8776148 handshaker.cc:152] handshake_manager 0x154f12940: error=OK shutdown=false index=3, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv4:127.0.0.1:52372, grpc.internal.endpoint_peer_address=ipv4:127.0.0.1:50051, grpc.internal.event_engine=0x600000844080, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.239937 8776148 handshaker.cc:188] handshake_manager 0x154f12940: calling handshaker security [0x154f0e650] at index 3
+I0000 00:00:1739036538.239939 8776148 tcp_posix.cc:1810] WRITE 0x10708a280 (peer=ipv4:127.0.0.1:50051)
+I0000 00:00:1739036538.239950 8776148 tcp_posix.cc:1855] write: OK
+I0000 00:00:1739036538.239956 8776148 tcp_posix.cc:699] TCP:0x10708a280 notify_on_read
+I0000 00:00:1739036538.240119 8776159 tcp_posix.cc:1106] TCP:0x10708a280 got_read: OK
+I0000 00:00:1739036538.240123 8776159 tcp_posix.cc:895] TCP:0x10708a280 do_read
+I0000 00:00:1739036538.240126 8776159 tcp_posix.cc:831] TCP:0x10708a280 call_cb 0x60000044c270 true:0x60000044c270
+I0000 00:00:1739036538.240128 8776159 tcp_posix.cc:834] READ 0x10708a280 (peer=ipv4:127.0.0.1:50051) error=INTERNAL:Socket closed {fd:29, grpc_status:14}
+I0000 00:00:1739036538.240155 8776153 handshaker.cc:152] handshake_manager 0x154f12940: error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:18.240149+00:00'] [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34'] shutdown=false index=4, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv4:127.0.0.1:52372, grpc.internal.endpoint_peer_address=ipv4:127.0.0.1:50051, grpc.internal.event_engine=0x600000844080, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036538.240162 8776153 handshaker.cc:166] handshake_manager 0x154f12940: handshaking complete -- scheduling on_handshake_done with error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:18.240149+00:00'] [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34']
+I0000 00:00:1739036538.240169 8776153 memory_quota.cc:569] Removing allocator 0x6000033407f8
+I0000 00:00:1739036538.240189 8776153 subchannel.cc:803] subchannel 0x10708ae60 {address=ipv4:127.0.0.1:50051, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}}: connect failed (UNKNOWN:Handshake read failed {created_time:"2025-02-08T09:42:18.240149-08:00", children:[INTERNAL:Socket closed {fd:29, grpc_status:14}]}), backing off for 993 ms
+I0000 00:00:1739036538.240211 8776153 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002454280,0000000000000006}
+I0000 00:00:1739036538.240217 8776153 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60hopping into work_serializer
+I0000 00:00:1739036538.240220 8776151 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60 watcher=0x600000854e30 state=TRANSIENT_FAILURE status=UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed
+I0000 00:00:1739036538.240224 8776151 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459230 (subchannel 0x600002958c30): connectivity changed: new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed, watcher=0x600000854e30, subchannel_data_=0x600000459200, pick_first_->selected_=0x0
+I0000 00:00:1739036538.240226 8776151 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 1 of 2 (subchannel_state 0x600000459230): connectivity changed: old_state=CONNECTING, new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed, seen_transient_failure=false, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036538.240229 8776151 pick_first.cc:1084] Pick First 0x124ed3970 subchannel list 0x600003844120 failed to connect to all subchannels
+I0000 00:00:1739036538.240231 8776151 child_policy_handler.cc:99] [child_policy_handler 0x600002e58a80] requesting re-resolution
+I0000 00:00:1739036538.240232 8776151 client_channel_filter.cc:999] chand=0x107115c30: started name re-resolving
+I0000 00:00:1739036538.240234 8776151 polling_resolver.cc:230] [polling resolver 0x107085d90] in cooldown from last resolution (from 2 ms ago); will resolve again in 29998 ms
+I0000 00:00:1739036538.240239 8776151 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002440200,0000000000000007}
+I0000 00:00:1739036538.240242 8776151 client_channel_filter.cc:982] chand=0x107115c30: update: state=TRANSIENT_FAILURE status=(UNAVAILABLE: failed to connect to all addresses; last error: UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed) picker=0x600000a44060
+I0000 00:00:1739036538.240244 8776151 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: CONNECTING
+I0000 00:00:1739036538.240245 8776151 connectivity_state.cc:151] ConnectivityStateTracker client_channel[0x107115db0]: CONNECTING -> TRANSIENT_FAILURE (helper, UNAVAILABLE: failed to connect to all addresses; last error: UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed)
+I0000 00:00:1739036538.240248 8776151 connectivity_state.cc:159] ConnectivityStateTracker client_channel[0x107115db0]: notifying watcher 0x6000029400a0: CONNECTING -> TRANSIENT_FAILURE
+I0000 00:00:1739036538.240253 8776151 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103b080d0, error=OK, done=true, done_arg=0x600003358000, storage=0x600003358030)
+I0000 00:00:1739036538.240255 8776150 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x6000029400a0
+I0000 00:00:1739036538.240262 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103b080d0 OK
+I0000 00:00:1739036538.240274 8776159 channel.cc:189] grpc_channel_check_connectivity_state(channel=0x600003f503c0, try_to_connect=0)
+I0000 00:00:1739036538.240276 8776159 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: TRANSIENT_FAILURE
+I0000 00:00:1739036538.240350 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 440347904, clock_type: 1 }, cq=0x1071075a0, tag=0x103b08070)
+I0000 00:00:1739036538.240359 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 440358000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.240369 8776155 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002444400,0000000000000008}
+I0000 00:00:1739036538.240375 8776155 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x600002958cd0
+I0000 00:00:1739036538.441555 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036538.441599 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 641598000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.446721 8776156 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002444400,0000000000000008}
+E0000 00:00:1739036538.446764 8776156 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036538.446777 8776153 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x600002958cd0
+I0000 00:00:1739036538.446823 8776156 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103b08070, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:18.446772-08:00"}, done=true, done_arg=0x6000033407e0, storage=0x600003340810)
+I0000 00:00:1739036538.446831 8776156 completion_queue.cc:706] Operation failed: tag=0x103b08070, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:18.446772-08:00"}
+I0000 00:00:1739036538.446854 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103b08070 ERROR
+I0000 00:00:1739036538.446945 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 646939136, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fa0)
+I0000 00:00:1739036538.446969 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 646969000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.446982 8776155 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002444400,0000000000000009}
+I0000 00:00:1739036538.446999 8776155 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x60000294c190
+I0000 00:00:1739036538.649003 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036538.649122 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 849121000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.654083 8776157 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002444400,0000000000000009}
+E0000 00:00:1739036538.654119 8776157 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036538.654157 8776157 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fa0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:18.654126-08:00"}, done=true, done_arg=0x60000334c000, storage=0x60000334c030)
+I0000 00:00:1739036538.654143 8776148 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x60000294c190
+I0000 00:00:1739036538.654166 8776157 completion_queue.cc:706] Operation failed: tag=0x103ac7fa0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:18.654126-08:00"}
+I0000 00:00:1739036538.654234 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fa0 ERROR
+I0000 00:00:1739036538.654298 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 854292992, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036538.654343 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036538, tv_nsec: 854343000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.654357 8776150 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002440280,000000000000000a}
+I0000 00:00:1739036538.654373 8776150 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x600002944000
+I0000 00:00:1739036538.856424 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036538.856604 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 56603000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.861465 8776154 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002440280,000000000000000a}
+E0000 00:00:1739036538.861569 8776154 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036538.861589 8776152 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x600002944000
+I0000 00:00:1739036538.861624 8776154 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:18.861578-08:00"}, done=true, done_arg=0x60000335c000, storage=0x60000335c030)
+I0000 00:00:1739036538.861633 8776154 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:18.861578-08:00"}
+I0000 00:00:1739036538.861666 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036538.861750 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 61744128, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036538.861773 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 61773000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036538.861786 8776156 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002458000,000000000000000b}
+I0000 00:00:1739036538.861827 8776156 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x6000029400a0
+I0000 00:00:1739036539.063810 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036539.063845 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 263844000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.068879 8776151 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002458000,000000000000000b}
+E0000 00:00:1739036539.068925 8776151 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036539.068936 8776153 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x6000029400a0
+I0000 00:00:1739036539.068970 8776151 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.068928-08:00"}, done=true, done_arg=0x600003358000, storage=0x600003358030)
+I0000 00:00:1739036539.068975 8776151 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.068928-08:00"}
+I0000 00:00:1739036539.068989 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036539.069045 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 269042944, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036539.069056 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 269056000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.069078 8776152 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002454400,000000000000000c}
+I0000 00:00:1739036539.069084 8776152 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x60000294c190
+I0000 00:00:1739036539.238306 8776148 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002454280,0000000000000006}
+I0000 00:00:1739036539.238366 8776148 subchannel.cc:756] subchannel 0x10708ae60 {address=ipv4:127.0.0.1:50051, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}}: backoff delay elapsed, reporting IDLE
+I0000 00:00:1739036539.238426 8776148 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60hopping into work_serializer
+I0000 00:00:1739036539.238439 8776148 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60 watcher=0x600000854e30 state=IDLE status=OK
+I0000 00:00:1739036539.238445 8776148 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459230 (subchannel 0x600002958c30): connectivity changed: new_state=IDLE, status=OK, watcher=0x600000854e30, subchannel_data_=0x600000459200, pick_first_->selected_=0x0
+I0000 00:00:1739036539.238450 8776148 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 1 of 2 (subchannel_state 0x600000459230): connectivity changed: old_state=TRANSIENT_FAILURE, new_state=IDLE, status=OK, seen_transient_failure=true, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036539.238490 8776148 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker tcp_connect [0x154f12940] at index 0
+I0000 00:00:1739036539.238496 8776148 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker http_connect [0x155836000] at index 1
+I0000 00:00:1739036539.238500 8776148 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker endpoint_info [0x6000008400f0] at index 2
+I0000 00:00:1739036539.238510 8776150 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60hopping into work_serializer
+I0000 00:00:1739036539.238557 8776148 ssl_transport_security.cc:236]      HANDSHAKE START - TLS client start_connect  - !!!!!!
+I0000 00:00:1739036539.238634 8776148 ssl_transport_security.cc:236]                 LOOP - TLS client enter_early_data  - !!!!!!
+I0000 00:00:1739036539.238640 8776148 ssl_transport_security.cc:236]                 LOOP - TLS client read_server_hello  - !!!!!!
+I0000 00:00:1739036539.238648 8776148 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker security [0x154f13ad0] at index 3
+I0000 00:00:1739036539.238654 8776148 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c180,000000000000000d}
+I0000 00:00:1739036539.238657 8776148 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=0, args={endpoint=(nil), args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.internal.tcp_handshaker_bind_endpoint_to_pollset=1, grpc.internal.tcp_handshaker_resolved_address=ipv4:127.0.0.1:50051, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.238668 8776148 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker tcp_connect [0x154f12940] at index 0
+I0000 00:00:1739036539.238760 8776148 socket_utils_common_posix.cc:409] TCP_USER_TIMEOUT not supported for this platform
+I0000 00:00:1739036539.238922 8776148 tcp_client_posix.cc:380] CLIENT_CONNECT: ipv4:127.0.0.1:50051: asynchronously connecting fd 0x6000035481e0
+I0000 00:00:1739036539.238935 8776148 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60 watcher=0x600000854e30 state=CONNECTING status=OK
+I0000 00:00:1739036539.238939 8776148 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459230 (subchannel 0x600002958c30): connectivity changed: new_state=CONNECTING, status=OK, watcher=0x600000854e30, subchannel_data_=0x600000459200, pick_first_->selected_=0x0
+I0000 00:00:1739036539.238943 8776148 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 1 of 2 (subchannel_state 0x600000459230): connectivity changed: old_state=IDLE, new_state=CONNECTING, status=OK, seen_transient_failure=true, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036539.239521 8776159 tcp_client_posix.cc:180] CLIENT_CONNECT: ipv4:127.0.0.1:50051: on_writable: error=OK
+I0000 00:00:1739036539.239735 8776159 memory_quota.cc:558] Adding allocator 0x600003350018
+I0000 00:00:1739036539.239798 8776159 executor.cc:294] EXECUTOR (default-executor) try to schedule 0x154f12a68 (short) to thread 0
+I0000 00:00:1739036539.239822 8776159 tcp_client_posix.cc:142] CLIENT_CONNECT: ipv4:127.0.0.1:50051: on_alarm: error=CANCELLED
+I0000 00:00:1739036539.240440 8776145 executor.cc:239] EXECUTOR (default-executor) [0]: execute
+I0000 00:00:1739036539.240449 8776145 executor.cc:108] EXECUTOR (default-executor) run 0x154f12a68
+I0000 00:00:1739036539.240458 8776145 executor.cc:216] EXECUTOR (default-executor) [0]: step (sub_depth=1)
+I0000 00:00:1739036539.240467 8776152 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=1, args={endpoint=0x103c04080, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.240477 8776152 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker http_connect [0x155836000] at index 1
+I0000 00:00:1739036539.240484 8776152 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=2, args={endpoint=0x103c04080, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.240489 8776152 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker endpoint_info [0x6000008400f0] at index 2
+I0000 00:00:1739036539.240500 8776152 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=3, args={endpoint=0x103c04080, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv4:127.0.0.1:52375, grpc.internal.endpoint_peer_address=ipv4:127.0.0.1:50051, grpc.internal.event_engine=0x600000840140, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.240506 8776152 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker security [0x154f13ad0] at index 3
+I0000 00:00:1739036539.240512 8776152 tcp_posix.cc:1810] WRITE 0x103c04080 (peer=ipv4:127.0.0.1:50051)
+I0000 00:00:1739036539.240551 8776152 tcp_posix.cc:1855] write: OK
+I0000 00:00:1739036539.240564 8776152 tcp_posix.cc:699] TCP:0x103c04080 notify_on_read
+I0000 00:00:1739036539.241197 8776159 tcp_posix.cc:1106] TCP:0x103c04080 got_read: OK
+I0000 00:00:1739036539.241211 8776159 memory_quota.cc:771] RQ: pressure:4.44089e-16 report:0 controller:low min=0 max=2 ticks=1 last_control=0
+I0000 00:00:1739036539.241236 8776159 tcp_posix.cc:895] TCP:0x103c04080 do_read
+I0000 00:00:1739036539.241227 8776147 timer_manager.cc:196] wait ended: was_timed:true kicked:false
+I0000 00:00:1739036539.241248 8776159 tcp_posix.cc:831] TCP:0x103c04080 call_cb 0x600000440600 true:0x600000440600
+I0000 00:00:1739036539.241254 8776147 timer_manager.cc:182] sleep for a 1001 milliseconds
+I0000 00:00:1739036539.241254 8776159 tcp_posix.cc:834] READ 0x103c04080 (peer=ipv4:127.0.0.1:50051) error=INTERNAL:Socket closed {fd:29, grpc_status:14}
+I0000 00:00:1739036539.241353 8776156 handshaker.cc:152] handshake_manager 0x154f0e650: error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34'] [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:19.241318+00:00'] shutdown=false index=4, args={endpoint=0x103c04080, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv4:127.0.0.1:52375, grpc.internal.endpoint_peer_address=ipv4:127.0.0.1:50051, grpc.internal.event_engine=0x600000840140, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.241389 8776156 handshaker.cc:166] handshake_manager 0x154f0e650: handshaking complete -- scheduling on_handshake_done with error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34'] [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:19.241318+00:00']
+I0000 00:00:1739036539.241409 8776156 memory_quota.cc:569] Removing allocator 0x600003350018
+I0000 00:00:1739036539.241457 8776156 subchannel.cc:803] subchannel 0x10708ae60 {address=ipv4:127.0.0.1:50051, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e40, grpc.internal.security_connector=0x600002454380, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}}: connect failed (UNKNOWN:Handshake read failed {created_time:"2025-02-08T09:42:19.241318-08:00", children:[INTERNAL:Socket closed {fd:29, grpc_status:14}]}), backing off for 1825 ms
+I0000 00:00:1739036539.241542 8776156 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002440280,000000000000000e}
+I0000 00:00:1739036539.241547 8776156 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60hopping into work_serializer
+I0000 00:00:1739036539.241557 8776156 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958c30 subchannel 0x10708ae60 watcher=0x600000854e30 state=TRANSIENT_FAILURE status=UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed
+I0000 00:00:1739036539.241561 8776156 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459230 (subchannel 0x600002958c30): connectivity changed: new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed, watcher=0x600000854e30, subchannel_data_=0x600000459200, pick_first_->selected_=0x0
+I0000 00:00:1739036539.241567 8776156 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 1 of 2 (subchannel_state 0x600000459230): connectivity changed: old_state=CONNECTING, new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv4:127.0.0.1:50051: Socket closed, seen_transient_failure=true, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036539.271357 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036539.271398 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 471397000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.272141 8776157 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{000060000244c580,0000000000000004}
+I0000 00:00:1739036539.272141 8776153 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002454400,000000000000000c}
+I0000 00:00:1739036539.272181 8776157 subchannel.cc:756] subchannel 0x10708aac0 {address=ipv6:%5B::1%5D:50051, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}}: backoff delay elapsed, reporting IDLE
+I0000 00:00:1739036539.272226 8776157 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0hopping into work_serializer
+I0000 00:00:1739036539.272233 8776156 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x60000294c190
+E0000 00:00:1739036539.272210 8776153 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036539.272258 8776156 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0 watcher=0x600000854e60 state=IDLE status=OK
+I0000 00:00:1739036539.272267 8776156 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459050 (subchannel 0x600002958b90): connectivity changed: new_state=IDLE, status=OK, watcher=0x600000854e60, subchannel_data_=0x600000458f30, pick_first_->selected_=0x0
+I0000 00:00:1739036539.272275 8776156 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 0 of 2 (subchannel_state 0x600000459050): connectivity changed: old_state=TRANSIENT_FAILURE, new_state=IDLE, status=OK, seen_transient_failure=true, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036539.272290 8776152 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0hopping into work_serializer
+I0000 00:00:1739036539.272307 8776153 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.272261-08:00"}, done=true, done_arg=0x60000334c000, storage=0x60000334c030)
+I0000 00:00:1739036539.272315 8776153 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.272261-08:00"}
+I0000 00:00:1739036539.272314 8776156 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker tcp_connect [0x154f12940] at index 0
+I0000 00:00:1739036539.272324 8776156 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker http_connect [0x155836000] at index 1
+I0000 00:00:1739036539.272328 8776156 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker endpoint_info [0x6000008400f0] at index 2
+I0000 00:00:1739036539.272342 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036539.272364 8776156 ssl_transport_security.cc:236]      HANDSHAKE START - TLS client start_connect  - !!!!!!
+I0000 00:00:1739036539.272421 8776156 ssl_transport_security.cc:236]                 LOOP - TLS client enter_early_data  - !!!!!!
+I0000 00:00:1739036539.272425 8776156 ssl_transport_security.cc:236]                 LOOP - TLS client read_server_hello  - !!!!!!
+I0000 00:00:1739036539.272423 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 472418048, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036539.272431 8776156 handshaker.cc:81] handshake_manager 0x154f0e650: adding handshaker security [0x154f14530] at index 3
+I0000 00:00:1739036539.272439 8776156 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c580,000000000000000f}
+I0000 00:00:1739036539.272440 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 472440000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.272443 8776156 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=0, args={endpoint=(nil), args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.internal.tcp_handshaker_bind_endpoint_to_pollset=1, grpc.internal.tcp_handshaker_resolved_address=ipv6:%5B::1%5D:50051, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.272455 8776156 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker tcp_connect [0x154f12940] at index 0
+I0000 00:00:1739036539.272545 8776156 socket_utils_common_posix.cc:409] TCP_USER_TIMEOUT not supported for this platform
+I0000 00:00:1739036539.272705 8776156 tcp_client_posix.cc:380] CLIENT_CONNECT: ipv6:%5B::1%5D:50051: asynchronously connecting fd 0x6000035482d0
+I0000 00:00:1739036539.272717 8776156 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0 watcher=0x600000854e60 state=CONNECTING status=OK
+I0000 00:00:1739036539.272720 8776156 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459050 (subchannel 0x600002958b90): connectivity changed: new_state=CONNECTING, status=OK, watcher=0x600000854e60, subchannel_data_=0x600000458f30, pick_first_->selected_=0x0
+I0000 00:00:1739036539.272743 8776156 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 0 of 2 (subchannel_state 0x600000459050): connectivity changed: old_state=IDLE, new_state=CONNECTING, status=OK, seen_transient_failure=true, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036539.272763 8776156 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002444400,0000000000000010}
+I0000 00:00:1739036539.272769 8776156 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x60000295c370
+I0000 00:00:1739036539.272971 8776159 tcp_client_posix.cc:180] CLIENT_CONNECT: ipv6:%5B::1%5D:50051: on_writable: error=OK
+I0000 00:00:1739036539.272986 8776159 memory_quota.cc:558] Adding allocator 0x6000033407f8
+I0000 00:00:1739036539.273001 8776159 executor.cc:294] EXECUTOR (default-executor) try to schedule 0x154f12a68 (short) to thread 0
+I0000 00:00:1739036539.273010 8776159 tcp_client_posix.cc:142] CLIENT_CONNECT: ipv6:%5B::1%5D:50051: on_alarm: error=CANCELLED
+I0000 00:00:1739036539.273027 8776145 executor.cc:239] EXECUTOR (default-executor) [0]: execute
+I0000 00:00:1739036539.273034 8776145 executor.cc:108] EXECUTOR (default-executor) run 0x154f12a68
+I0000 00:00:1739036539.273052 8776145 executor.cc:216] EXECUTOR (default-executor) [0]: step (sub_depth=1)
+I0000 00:00:1739036539.273062 8776157 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=1, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.273075 8776157 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker http_connect [0x155836000] at index 1
+I0000 00:00:1739036539.273083 8776157 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=2, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.273087 8776157 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker endpoint_info [0x6000008400f0] at index 2
+I0000 00:00:1739036539.273097 8776157 handshaker.cc:152] handshake_manager 0x154f0e650: error=OK shutdown=false index=3, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv6:%5B::1%5D:52376, grpc.internal.endpoint_peer_address=ipv6:%5B::1%5D:50051, grpc.internal.event_engine=0x600000840140, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.273102 8776157 handshaker.cc:188] handshake_manager 0x154f0e650: calling handshaker security [0x154f14530] at index 3
+I0000 00:00:1739036539.273107 8776157 tcp_posix.cc:1810] WRITE 0x10708a280 (peer=ipv6:%5B::1%5D:50051)
+I0000 00:00:1739036539.273138 8776157 tcp_posix.cc:1855] write: OK
+I0000 00:00:1739036539.273149 8776157 tcp_posix.cc:699] TCP:0x10708a280 notify_on_read
+I0000 00:00:1739036539.273426 8776159 tcp_posix.cc:1106] TCP:0x10708a280 got_read: OK
+I0000 00:00:1739036539.273434 8776159 tcp_posix.cc:895] TCP:0x10708a280 do_read
+I0000 00:00:1739036539.273442 8776159 tcp_posix.cc:831] TCP:0x10708a280 call_cb 0x600000440420 true:0x600000440420
+I0000 00:00:1739036539.273444 8776159 tcp_posix.cc:834] READ 0x10708a280 (peer=ipv6:%5B::1%5D:50051) error=INTERNAL:Socket closed {fd:29, grpc_status:14}
+I0000 00:00:1739036539.273472 8776153 handshaker.cc:152] handshake_manager 0x154f0e650: error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:19.273457+00:00'] [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34'] shutdown=false index=4, args={endpoint=0x10708a280, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.endpoint_local_address=ipv6:%5B::1%5D:52376, grpc.internal.endpoint_peer_address=ipv6:%5B::1%5D:50051, grpc.internal.event_engine=0x600000840140, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}, read_buffer.Length()=0, exit_early=0}
+I0000 00:00:1739036539.273487 8776153 handshaker.cc:166] handshake_manager 0x154f0e650: handshaking complete -- scheduling on_handshake_done with error=UNKNOWN: Handshake read failed [type.googleapis.com/grpc.status.time.created_time='2025-02-08T17:42:19.273457+00:00'] [type.googleapis.com/grpc.status.children='v\x00\x00\x00\x08\r\x12\rSocket closed\x1a,\n&type.googleapis.com/grpc.status.int.fd\x12\x02\x32\x39\x1a\x35\n/type.googleapis.com/grpc.status.int.grpc_status\x12\x02\x31\x34']
+I0000 00:00:1739036539.273497 8776153 memory_quota.cc:569] Removing allocator 0x6000033407f8
+I0000 00:00:1739036539.273527 8776153 subchannel.cc:803] subchannel 0x10708aac0 {address=ipv6:%5B::1%5D:50051, args={grpc.client_channel_factory=0x600000868050, grpc.default_authority=localhost, grpc.http2_scheme=https, grpc.internal.channel_credentials=0x600002e54060, grpc.internal.client_channel_call_destination=0x105d65f68, grpc.internal.event_engine=0x600000854e70, grpc.internal.security_connector=0x600002454300, grpc.internal.subchannel_pool=0x600002168230, grpc.primary_user_agent=grpc-python/1.70.0, grpc.resource_quota=0x60000045c990, grpc.server_uri=dns:///localhost:50051, grpc.ssl_target_name_override=localhost}}: connect failed (UNKNOWN:Handshake read failed {created_time:"2025-02-08T09:42:19.273457-08:00", children:[INTERNAL:Socket closed {grpc_status:14, fd:29}]}), backing off for 1351 ms
+I0000 00:00:1739036539.273582 8776153 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{000060000244c580,0000000000000011}
+I0000 00:00:1739036539.273585 8776153 client_channel_filter.cc:658] chand=0x107115c30: connectivity change for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0hopping into work_serializer
+I0000 00:00:1739036539.273595 8776153 client_channel_filter.cc:681] chand=0x107115c30: processing connectivity change in work serializer for subchannel wrapper 0x600002958b90 subchannel 0x10708aac0 watcher=0x600000854e60 state=TRANSIENT_FAILURE status=UNAVAILABLE: ipv6:%5B::1%5D:50051: Socket closed
+I0000 00:00:1739036539.273598 8776153 pick_first.cc:745] [PF 0x124ed3970] subchannel state 0x600000459050 (subchannel 0x600002958b90): connectivity changed: new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv6:%5B::1%5D:50051: Socket closed, watcher=0x600000854e60, subchannel_data_=0x600000458f30, pick_first_->selected_=0x0
+I0000 00:00:1739036539.273601 8776153 pick_first.cc:802] [PF 0x124ed3970] subchannel list 0x600003844120 index 0 of 2 (subchannel_state 0x600000459050): connectivity changed: old_state=CONNECTING, new_state=TRANSIENT_FAILURE, status=UNAVAILABLE: ipv6:%5B::1%5D:50051: Socket closed, seen_transient_failure=true, p->selected_=0x0, p->subchannel_list_=0x600003844120, p->subchannel_list_->shutting_down_=false
+I0000 00:00:1739036539.273608 8776153 child_policy_handler.cc:99] [child_policy_handler 0x600002e58a80] requesting re-resolution
+I0000 00:00:1739036539.273611 8776153 client_channel_filter.cc:999] chand=0x107115c30: started name re-resolving
+I0000 00:00:1739036539.273620 8776153 client_channel_filter.cc:982] chand=0x107115c30: update: state=TRANSIENT_FAILURE status=(UNAVAILABLE: failed to connect to all addresses; last error: UNAVAILABLE: ipv6:%5B::1%5D:50051: Socket closed) picker=0x600000a0c480
+I0000 00:00:1739036539.273625 8776153 connectivity_state.cc:173] ConnectivityStateTracker client_channel[0x107115db0]: get current state: TRANSIENT_FAILURE
+I0000 00:00:1739036539.473768 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036539.473806 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 673806000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.477870 8776150 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002444400,0000000000000010}
+E0000 00:00:1739036539.478038 8776150 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036539.478157 8776150 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.478048-08:00"}, done=true, done_arg=0x6000033442a0, storage=0x6000033442d0)
+I0000 00:00:1739036539.478266 8776150 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.478048-08:00"}
+I0000 00:00:1739036539.478281 8776150 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x60000295c370
+I0000 00:00:1739036539.478517 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036539.478910 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 678905344, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036539.478934 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 678934000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.479078 8776157 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002450400,0000000000000012}
+I0000 00:00:1739036539.479089 8776157 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x600002950000
+I0000 00:00:1739036539.680282 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036539.680396 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 880394000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.686039 8776155 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002450400,0000000000000012}
+E0000 00:00:1739036539.686124 8776155 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036539.686138 8776154 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x600002950000
+I0000 00:00:1739036539.686196 8776155 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.686132-08:00"}, done=true, done_arg=0x600003350000, storage=0x600003350030)
+I0000 00:00:1739036539.686205 8776155 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.686132-08:00"}
+I0000 00:00:1739036539.686248 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036539.686370 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 886363136, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036539.686408 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036539, tv_nsec: 886408000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.686419 8776157 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002440300,0000000000000013}
+I0000 00:00:1739036539.686431 8776157 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x600002944000
+I0000 00:00:1739036539.889054 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036539.889154 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 89151000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.893219 8776156 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002440300,0000000000000013}
+E0000 00:00:1739036539.893291 8776156 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036539.893299 8776150 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x600002944000
+I0000 00:00:1739036539.893369 8776156 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.893301-08:00"}, done=true, done_arg=0x60000335c000, storage=0x60000335c030)
+I0000 00:00:1739036539.893379 8776156 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:19.893301-08:00"}
+I0000 00:00:1739036539.893416 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036539.893519 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 93510912, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036539.893547 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 93547000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036539.893570 8776157 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002458000,0000000000000014}
+I0000 00:00:1739036539.893587 8776157 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x600002940140
+I0000 00:00:1739036540.095961 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036540.096201 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 296198000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036540.102337 8776153 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002458000,0000000000000014}
+E0000 00:00:1739036540.102419 8776153 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036540.102435 8776150 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x600002940140
+I0000 00:00:1739036540.102484 8776153 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:20.10243-08:00"}, done=true, done_arg=0x600003358000, storage=0x600003358030)
+I0000 00:00:1739036540.102495 8776153 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:20.10243-08:00"}
+I0000 00:00:1739036540.102531 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036540.102657 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 302649088, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036540.102701 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 302701000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036540.102730 8776156 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002444400,0000000000000015}
+I0000 00:00:1739036540.102765 8776156 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x600002968050
+I0000 00:00:1739036540.246552 8776147 timer_manager.cc:196] wait ended: was_timed:true kicked:false
+I0000 00:00:1739036540.247057 8776147 timer_manager.cc:182] sleep for a 1000 milliseconds
+I0000 00:00:1739036540.304768 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: QUEUE_TIMEOUT
+I0000 00:00:1739036540.304870 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 504869000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036540.311194 8776148 posix_engine.cc:443] PosixEventEngine:0x6000033440e0 executing callback:{0000600002444400,0000000000000015}
+E0000 00:00:1739036540.311264 8776148 legacy_channel.cc:309] watch_completion_error: CANCELLED
+I0000 00:00:1739036540.311290 8776154 connectivity_state.cc:139] ConnectivityStateTracker client_channel[0x107115db0]: remove watcher 0x600002968050
+I0000 00:00:1739036540.311336 8776148 completion_queue.cc:701] cq_end_op_for_next(cq=0x1071075a0, tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:20.311273-08:00"}, done=true, done_arg=0x600003354000, storage=0x600003354030)
+I0000 00:00:1739036540.311347 8776148 completion_queue.cc:706] Operation failed: tag=0x103ac7fd0, error=UNKNOWN:Timed out waiting for connection state change {created_time:"2025-02-08T09:42:20.311273-08:00"}
+I0000 00:00:1739036540.311397 8776159 completion_queue.cc:1066] RETURN_EVENT[0x1071075a0]: OP_COMPLETE: tag:0x103ac7fd0 ERROR
+I0000 00:00:1739036540.311500 8776159 channel.cc:201] grpc_channel_watch_connectivity_state(channel=0x600003f503c0, last_observed_state=3, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 511493120, clock_type: 1 }, cq=0x1071075a0, tag=0x103ac7fd0)
+I0000 00:00:1739036540.311531 8776159 completion_queue.cc:957] grpc_completion_queue_next(cq=0x1071075a0, deadline=gpr_timespec { tv_sec: 1739036540, tv_nsec: 511531000, clock_type: 1 }, reserved=0x0)
+I0000 00:00:1739036540.311546 8776150 posix_engine.cc:518] PosixEventEngine:0x6000033440e0 scheduling callback:{0000600002468500,0000000000000016}
+I0000 00:00:1739036540.311579 8776150 connectivity_state.cc:117] ConnectivityStateTracker client_channel[0x107115db0]: add watcher 0x600002940140
