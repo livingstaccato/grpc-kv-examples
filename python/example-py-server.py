@@ -22,7 +22,7 @@ def slog(domain, action, status, msg):
     Returns a log message prefixed with structured emoji tags.
     Format: [Domain] → [Action] → [Status] message
     """
-    return f"[{domain}] → [{action}] → [{status}] {msg}"
+    return f"|{domain}|{action}|{status}|{msg}|"
 
 # Emoji mappings (as constants)
 # Domain (D)
