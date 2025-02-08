@@ -1,4 +1,8 @@
-# gRPC Client/Server Debugging
+---
+timestamp: 2025-02-08 10:31
+iteration: 01
+topic: gRPC Client/Server Debugging
+---
 
 Right now I am focusing on getting Python working properly with mTLS with certificates of varying types.
 
