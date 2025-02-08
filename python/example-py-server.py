@@ -123,8 +123,8 @@ async def serve():
             # root_certificates = None,
             root_certificates = client_cert.encode(), # if client_cert else None
 
-            # require_client_auth = False
-            require_client_auth = True
+            require_client_auth = False
+            # require_client_auth = True
             # require_client_auth=True if client_cert else False # Conditionally require client auth based on CA cert presence
         )
         logger.info("🔒 ✅ gRPC server credentials configured successfully for secure transport.")
