@@ -8,7 +8,6 @@ import time
 import os
 import asyncio
 from utils.certificate_helper import log_cert_info, load_certificates_from_env, load_pem_certificate
-from pyvider.rpcplugin.exceptions import RPCPluginError, CertificateError, TransportError, SecurityError
 
 # Configure logging
 logging.basicConfig(
@@ -59,7 +58,7 @@ class KVServicer(kv_pb2_grpc.KVServicer):
                     log_cert_info(client_cert, "Client mTLS") # Use helper to log detailed client cert info
                     common_name = client_cert.subject.common_name
                     logger.info(f"🔑 ✅ Client mTLS Common Name: {common_name} - Successfully Authenticated via mTLS")
-                except CertificateError as cert_err:
+                except Exception as cert_err:
                     logger.error(f"❌ 🔑 Client Certificate Processing Error: {cert_err}")
                     logger.debug("Raw Client Certificate Bytes (for deeper debug if needed - handle with caution in production):")
                     logger.debug(cert_bytes) # Only log raw bytes at debug level and in dev env
@@ -110,10 +109,10 @@ async def serve():
 
     except ValueError as ve:
         logger.error(f"❌ 🔐 Configuration Error: {ve}") # More specific error message
-        raise CertificateError(f"Failed to load certificates from environment: {ve}") from ve # Use custom CertificateError
+        raise Exception(f"Failed to load certificates from environment: {ve}") from ve # Use custom Exception
     except Exception as e:
         logger.error(f"❌ 🔐 Unexpected error during certificate loading: {e}")
-        raise SecurityError(f"Unexpected certificate loading error: {e}") from e # Use custom SecurityError
+        raise Exception(f"Unexpected certificate loading error: {e}") from e # Use custom Exception
 
     # Setup server credentials with mTLS
     try:
@@ -127,10 +126,10 @@ async def serve():
         logger.info("🔒 ✅ gRPC server credentials configured successfully for secure transport.")
     except grpc.RpcError as grpc_e:
         logger.error(f"❌ 🔒 gRPC Credential Setup Error (gRPC level): {grpc_e.code()}, details: {grpc_e.details()}")
-        raise TransportError(f"gRPC credential setup failed: {grpc_e}") from grpc_e # Use custom TransportError for gRPC related issues
+        raise Exception(f"gRPC credential setup failed: {grpc_e}") from grpc_e # Use custom Exception for gRPC related issues
     except Exception as e:
         logger.error(f"❌ 🔒 gRPC Credential Setup Error: {e}")
-        raise SecurityError(f"Unexpected error during gRPC credential setup: {e}") from e # Use custom SecurityError for general security setup issues
+        raise Exception(f"Unexpected error during gRPC credential setup: {e}") from e # Use custom Exception for general security setup issues
 
 
     server = grpc.aio.server(
@@ -150,7 +149,7 @@ async def serve():
         logger.info("🌐 ✅ Secure port [::]:50051 added successfully.")
     except Exception as e:
         logger.error(f"🌐 ❌ Failed to bind secure port [::]:50051: {e}")
-        raise TransportError(f"Port binding failed: {e}") from e # Use custom TransportError for network binding issues
+        raise Exception(f"Port binding failed: {e}") from e # Use custom Exception for network binding issues
 
     await server.start()
     logger.info("🚀 ✅ gRPC KV Server started and listening securely on [::]:50051")
