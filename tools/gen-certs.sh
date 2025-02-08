@@ -48,7 +48,6 @@ subjectKeyIdentifier = hash
 
 [alt_names]
 DNS.1 = $cn
-IP.1  = 127.0.0.1
 EOF
 
     key_file="$CERT_DIR/$name.key"
