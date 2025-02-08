@@ -7,8 +7,8 @@ from proto import kv_pb2, kv_pb2_grpc
 import time
 import os
 import asyncio
-from utils.certificate_helper import log_cert_info, load_certificates_from_env, load_pem_certificate
-from utils.exceptions import RPCPluginError, CertificateError, TransportError, SecurityError # Import custom exceptions
+from pyvider.rpcplugin.utils.certificate_helper import log_cert_info, load_certificates_from_env, load_pem_certificate
+from pyvider.rpcplugin.exceptions import RPCPluginError, CertificateError, TransportError, SecurityError
 
 # Configure logging
 logging.basicConfig(
