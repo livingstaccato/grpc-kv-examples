@@ -22,4 +22,4 @@ Nope.
 
 | Python  | ec384r1 | Python  | ec521r1 | Yes  | Yes  | No    |
 | Python  | ec384r1 | Python  | ec521r1 | Yes  | No   | Yes   |
-| Python  | ec384r1 | Python  | ec521r1 | No   | No   | No    |
+| Python  | ec384r1 | Python  | ec521r1 | No   | No   | Yes   |
