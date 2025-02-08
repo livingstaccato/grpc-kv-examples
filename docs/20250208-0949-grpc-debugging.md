@@ -28,6 +28,6 @@ Nope.
 | Python  | ec521r1 | Go      | ec521r1 | Yes  | No   | Yes   |
 | Python  | ec521r1 | Go      | ec521r1 | No   | No   | Yes   |
 
-| Python  | ec521r1 | C#      | ec521r1 | Yes  | Yes  | No    |
+| Python  | ec521r1 | C#      | ec521r1 | Yes  | Yes  | Yes   |
 | Python  | ec521r1 | C#      | ec521r1 | Yes  | No   | Yes   |
 | Python  | ec521r1 | C#      | ec521r1 | No   | No   | Yes   |
