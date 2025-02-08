@@ -124,7 +124,7 @@ class KVServicer(kv_pb2_grpc.KVServicer):
             # Log TLS version and cipher suite if available
             tls_version = auth_context.get(b'tls_version', [b'N/A'])[0].decode()
             cipher_suite = auth_context.get(b'cipher_suite', [b'N/A'])[0].decode()
-            logger.debug(slog(D_SERVER, "🔐 Security", S_SUCCESS, f"TLS Version: {tls_version}, Cipher Suite: {cipher_suite}"))
+            logger.debug(slog(D_SERVER, D_SECURITY, S_SUCCESS, f"TLS Version: {tls_version}, Cipher Suite: {cipher_suite}"))
         except Exception as e:
             logger.error(slog(D_SERVER, "❗ Exception", S_ERROR, f"Error logging request details for {method_name}: {e}"))
 
@@ -163,7 +163,7 @@ async def serve():
 
     # Setup server credentials with mTLS
     try:
-        logger.info(slog(D_SERVER, "🔐 Security", S_SUCCESS, "Configuring gRPC server credentials for mTLS"))
+        logger.info(slog(D_SERVER, D_SECURITY, S_SUCCESS, "Configuring gRPC server credentials for mTLS"))
         # If client_cert is provided, it is used for verifying the client; otherwise, client auth is disabled.
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())],
@@ -172,10 +172,10 @@ async def serve():
         )
         logger.info(slog(D_SERVER, D_SECURITY, S_SUCCESS, "gRPC server credentials configured successfully"))
     except grpc.RpcError as grpc_e:
-        logger.error(slog(D_SERVER, "🔐 Security", S_ERROR, f"gRPC Credential Setup Error: {grpc_e.code()}, details: {grpc_e.details()}"))
+        logger.error(slog(D_SERVER, D_SECURITY, S_ERROR, f"gRPC Credential Setup Error: {grpc_e.code()}, details: {grpc_e.details()}"))
         raise Exception(f"gRPC credential setup failed: {grpc_e}") from grpc_e
     except Exception as e:
-        logger.error(slog(D_SERVER, "🔐 Security", S_ERROR, f"gRPC Credential Setup Error: {e}"))
+        logger.error(slog(D_SERVER, D_SECURITY, S_ERROR, f"gRPC Credential Setup Error: {e}"))
         raise Exception(f"Unexpected error during gRPC credential setup: {e}") from e
 
     server = grpc.aio.server(
