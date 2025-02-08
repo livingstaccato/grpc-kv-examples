@@ -62,3 +62,11 @@
 2025/02/08 12:05:15.080622 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
 2025/02/08 12:05:15.080628 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
 2025/02/08 12:05:15.080631 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
+2025/02/08 12:05:15.249312 go-kv-server.go:280: 🔍 🤝 Client Hello from 127.0.0.1:61065
+2025/02/08 12:05:15.249329 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
+2025/02/08 12:05:15.249335 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
+2025/02/08 12:05:15.249338 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
+2025/02/08 12:05:17.688875 go-kv-server.go:280: 🔍 🤝 Client Hello from 127.0.0.1:61070
+2025/02/08 12:05:17.688909 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
+2025/02/08 12:05:17.688917 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
+2025/02/08 12:05:17.688922 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
