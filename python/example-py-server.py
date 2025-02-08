@@ -119,8 +119,8 @@ async def serve():
         logger.info("🔒 ⚙️ Configuring gRPC server credentials for mTLS...")
         server_credentials = grpc.ssl_server_credentials(
             [(server_key.encode(), server_cert.encode())], # Server certificate and key
-            root_certificates=client_cert.encode() if client_cert else None, # Client CA certificate for mTLS (optional)
-            require_client_auth=True # Uncomment to enforce mutual TLS client authentication is required
+            #root_certificates=client_cert.encode() if client_cert else None, # Client CA certificate for mTLS (optional)
+            #require_client_auth=True # Uncomment to enforce mutual TLS client authentication is required
             # require_client_auth=True if client_cert else False # Conditionally require client auth based on CA cert presence
         )
         logger.info("🔒 ✅ gRPC server credentials configured successfully for secure transport.")
