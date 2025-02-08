@@ -9,7 +9,6 @@ grpc.server_call_metric_recording
 grpc.minimal_stack
 grpc.max_concurrent_streams
 grpc.max_receive_message_length
-GRPC_ARG_MAX_MESSAGE_LENGTH GRPC_ARG_MAX_RECEIVE_MESSAGE_LENGTH
 grpc.max_send_message_length
 grpc.max_connection_idle_ms
 grpc.max_connection_age_ms
