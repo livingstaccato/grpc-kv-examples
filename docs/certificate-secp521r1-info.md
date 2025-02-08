@@ -30,6 +30,7 @@ DNS.1 = $cn
 
 ## Client
 
+```
 [I]➜ openssl x509 -in ../certs/ec-secp521r1-mtls-client.crt -text -noout
 Certificate:
     Data:
@@ -77,9 +78,11 @@ Certificate:
          85:0c:21:bd:27:1d:34:19:9d:36:4c:a1:05:56:29:f3:f0:1a:
          61:94:1a:ba:a7:a1:a8:3e:05:a2:3b:51:1b:66:44:10:58:46:
          55:28:1e:52:c2:62:cb:b4:76:b4:84:33:cf
+```
 
 ## Server
 
+```
 [I]➜ openssl x509 -in ../certs/ec-secp521r1-mtls-server.crt -text -noout
 Certificate:
     Data:
@@ -127,3 +130,4 @@ Certificate:
          4b:04:33:8c:48:e0:a8:a7:b0:d4:67:4b:96:43:d0:78:32:c9:
          41:06:ff:08:4f:17:b8:32:f5:85:8d:d2:e8:b2:73:65:fa:f8:
          4b:56:4c:59:c0:e0:e1:ed:ab:96:5a:45:2b
+```
