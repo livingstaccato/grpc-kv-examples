@@ -12,7 +12,7 @@ local PLUGIN_PORT="50051"
 # TLS algorithm configuration
 #PLUGIN_ALGO=${PLUGIN_ALGO:-
 PLUGIN_CLIENT_ALGO="ec-secp521r1"
-PLUGIN_SERVER_ALGO="ec-secp384r1"
+PLUGIN_SERVER_ALGO="ec-secp521r1"
 
 # Certificate paths
 PLUGIN_CLIENT_CERT_FILE="${BASE_PATH}/certs/${PLUGIN_CLIENT_ALGO}-mtls-client.crt"
