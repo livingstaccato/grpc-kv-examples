@@ -1,0 +1,64 @@
+
+🔐 TLS Configuration:
+   • Algorithm: 
+   • Client Algorithm: ec-secp521r1 (521 bits)
+   • Server Algorithm: ec-secp521r1 (521 bits)
+
+📊 Environment Status:
+   • Client Cert Size: 851 bytes
+   • Client  Key Size: 365 bytes
+   • Server Cert Size: 851 bytes
+   • Server  Key Size: 361 bytes
+
+🌐 Network Configuration:
+   • Host: localhost
+   • Port: 50051
+   • gRPC Endpoint: tcp:localhost:50051
+
+🚀 Environment setup complete!
+
+2025/02/08 12:05:10.967680 go-kv-server.go:337: 🚀 🔄 Starting gRPC server...
+2025/02/08 12:05:10.972814 go-kv-server.go:348: 🔒 🔄 Creating certificate pool
+2025/02/08 12:05:10.972839 go-kv-server.go:354: ✅ 🔒 Added client certificate to pool
+2025/02/08 12:05:10.973156 go-kv-server.go:33: 🔍 📜 Server Certificate Details:
+2025/02/08 12:05:10.973188 go-kv-server.go:34: 🔍 📋 Subject: CN=localhost,O=HashiCorp
+2025/02/08 12:05:10.973191 go-kv-server.go:35: 🔍 📋 Issuer: CN=localhost,O=HashiCorp
+2025/02/08 12:05:10.973192 go-kv-server.go:36: 🔍 ⏰ Valid From: 2025-02-05 23:19:15 +0000 UTC
+2025/02/08 12:05:10.973200 go-kv-server.go:37: 🔍 ⏰ Valid Until: 2026-02-05 23:19:15 +0000 UTC
+2025/02/08 12:05:10.973203 go-kv-server.go:38: 🔍 🔢 Serial Number: 12110372057149940253
+2025/02/08 12:05:10.973206 go-kv-server.go:39: 🔍 📊 Version: 3
+2025/02/08 12:05:10.973209 go-kv-server.go:51: 🔍 🔑 Key Usage: DigitalSignature, KeyEncipherment, KeyAgreement
+2025/02/08 12:05:10.973211 go-kv-server.go:71: 🔍 🔐 Extended Key Usage: ClientAuth, ServerAuth
+2025/02/08 12:05:10.973214 go-kv-server.go:76: 🔍 🌐 DNS Names: localhost
+2025/02/08 12:05:10.973216 go-kv-server.go:88: 🔍 📏 Basic Constraints - Is CA: true, Max Path Length: -1
+2025/02/08 12:05:10.973218 go-kv-server.go:230: 🔒 ⚙️ Configuring TLS settings...
+2025/02/08 12:05:10.973233 go-kv-server.go:314: 🔒 🛡️ TLS Configuration:
+2025/02/08 12:05:10.973246 go-kv-server.go:315: 🔑 📝 Cipher suites:
+2025/02/08 12:05:10.973248 go-kv-server.go:328:   • ECDHE-ECDSA-AES128-GCM-SHA256
+2025/02/08 12:05:10.973249 go-kv-server.go:328:   • ECDHE-ECDSA-AES256-GCM-SHA384
+2025/02/08 12:05:10.973251 go-kv-server.go:328:   • ECDHE-ECDSA-CHACHA20-POLY1305
+2025/02/08 12:05:10.973252 go-kv-server.go:330: 🔐 🔄 Client auth mode: RequireAndVerifyClientCert
+2025/02/08 12:05:10.973490 go-kv-server.go:331: 🔒 📊 Min TLS version: TLS 1.2
+2025/02/08 12:05:10.973494 go-kv-server.go:332: 🔒 📊 Max TLS version: TLS 1.3
+2025/02/08 12:05:10.974138 go-kv-server.go:391: ✅ 🌐 Server listening on :50051
+2025/02/08 12:05:10.974190 go-kv-server.go:437: 🚀 ✨ Starting gRPC server
+2025/02/08 12:05:12.695213 go-kv-server.go:280: 🔍 🤝 Client Hello from [::1]:61046
+2025/02/08 12:05:12.695421 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
+2025/02/08 12:05:12.695429 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
+2025/02/08 12:05:12.695432 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
+2025/02/08 12:05:12.697229 go-kv-server.go:280: 🔍 🤝 Client Hello from 127.0.0.1:61047
+2025/02/08 12:05:12.697237 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
+2025/02/08 12:05:12.697244 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
+2025/02/08 12:05:12.697246 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
+2025/02/08 12:05:13.732438 go-kv-server.go:280: 🔍 🤝 Client Hello from 127.0.0.1:61055
+2025/02/08 12:05:13.732482 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
+2025/02/08 12:05:13.732494 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
+2025/02/08 12:05:13.732500 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
+2025/02/08 12:05:13.781163 go-kv-server.go:280: 🔍 🤝 Client Hello from [::1]:61057
+2025/02/08 12:05:13.781181 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
+2025/02/08 12:05:13.781186 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
+2025/02/08 12:05:13.781189 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
+2025/02/08 12:05:15.080601 go-kv-server.go:280: 🔍 🤝 Client Hello from [::1]:61064
+2025/02/08 12:05:15.080622 go-kv-server.go:281: 🔍 📜 Supported versions: [772 771]
+2025/02/08 12:05:15.080628 go-kv-server.go:282: 🔍 🔑 Supported curves: [CurveP256]
+2025/02/08 12:05:15.080631 go-kv-server.go:283: 🔍 🔒 Cipher suites: [4865 4866 4867 49195 49196 49199 49200]
