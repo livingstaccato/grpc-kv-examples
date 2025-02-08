@@ -26,7 +26,7 @@ def slog(domain, action, status, msg):
 
 # Emoji mappings (as constants)
 # Domain (D)
-D_SERVER = "🛎️"      # Server
+D_SERVER = "🛎️ "      # Server
 D_CLIENT = "🙋"      # Client
 D_PLUGIN = "🔌"      # Plugin
 D_TCP    = "🌐"      # TCP
