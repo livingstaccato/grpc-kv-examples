@@ -109,6 +109,12 @@ declare -a test_combinations=(
     "nodejs:ruby:Node.js → Ruby"
     "nodejs:rust:Node.js → Rust"
     "nodejs:nodejs:Node.js → Node.js"
+    "csharp:go:C# → Go"
+    "csharp:python:C# → Python"
+    "csharp:ruby:C# → Ruby"
+    "csharp:rust:C# → Rust"
+    "csharp:nodejs:C# → Node.js"
+    "csharp:csharp:C# → C#"
 )
 
 # Filter test combinations based on what's available
@@ -128,6 +134,11 @@ for test in "${test_combinations[@]}"; do
 
     # Skip Node.js tests if Node.js is not available
     if [ "$HAS_NODEJS" = false ] && ( [ "$server" = "nodejs" ] || [ "$client" = "nodejs" ] ); then
+        continue
+    fi
+
+    # Skip C# server tests if C# is not available
+    if [ "$HAS_CSHARP" = false ] && [ "$server" = "csharp" ]; then
         continue
     fi
 
@@ -178,6 +189,10 @@ start_server() {
             cd "$BASE_DIR"
             node ./nodejs/node-kv-server.js > "$log_file" 2>&1 &
             ;;
+        csharp)
+            cd "$BASE_DIR/csharp"
+            dotnet run --project CSharpGrpcServer.csproj > "$log_file" 2>&1 &
+            ;;
     esac
     SERVER_PID=$!
     sleep 3  # Give server time to start
@@ -191,7 +206,7 @@ stop_server() {
         SERVER_PID=""
     fi
     # Kill any lingering server processes
-    pkill -f "go-kv-server|example-py-server|rb-kv-server|rust-kv-server|node-kv-server" 2>/dev/null || true
+    pkill -f "go-kv-server|example-py-server|rb-kv-server|rust-kv-server|node-kv-server|CSharpGrpcServer" 2>/dev/null || true
     sleep 1
 }
 
