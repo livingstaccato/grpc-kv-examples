@@ -263,8 +263,15 @@ for curve in "${CURVES[@]}"; do
     source ./env.sh > /dev/null 2>&1
 
     # Run all test combinations
+    prev_server=""
     for test in "${test_combinations[@]}"; do
         IFS=':' read -r server client desc <<< "$test"
+
+        # Add blank line when server language changes (visual grouping)
+        if [ -n "$prev_server" ] && [ "$prev_server" != "$server" ]; then
+            echo ""
+        fi
+        prev_server="$server"
 
         echo -n "  Testing ${desc}... "
 
@@ -312,8 +319,15 @@ get_result() {
 }
 
 # Print results for each test combination
+prev_server=""
 for test in "${test_combinations[@]}"; do
     IFS=':' read -r server client desc <<< "$test"
+
+    # Add blank line when server language changes (visual grouping)
+    if [ -n "$prev_server" ] && [ "$prev_server" != "$server" ]; then
+        echo ""
+    fi
+    prev_server="$server"
 
     printf "%-25s" "$desc"
 
