@@ -79,22 +79,50 @@ try
                     Log.Debug("🔐 Client Certificate:");
                     LogCertificateDetails(clientCert);
 
-                    // For this example, we'll do a simple thumbprint comparison
-                    // In production, you'd want proper chain validation
-                    bool isValid = clientCert.Thumbprint == clientCaCert.Thumbprint;
+                    // Build and validate the certificate chain
+                    using var certChain = new X509Chain();
 
-                    if (isValid)
+                    // Add our CA certificate to the extra store
+                    certChain.ChainPolicy.ExtraStore.Add(clientCaCert);
+
+                    // Configure chain policy for self-signed certificates
+                    certChain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
+                    certChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+                    Log.Debug("🔗 Building certificate chain...");
+                    bool chainValid = certChain.Build(clientCert);
+
+                    if (chainValid)
                     {
-                        Log.Information("✅ Client certificate validated successfully 🔒");
+                        Log.Debug("🔗 Certificate chain built successfully");
+
+                        // Verify the chain ends with our trusted CA
+                        var rootCert = certChain.ChainElements[certChain.ChainElements.Count - 1].Certificate;
+                        bool isValid = rootCert.Thumbprint == clientCaCert.Thumbprint;
+
+                        if (isValid)
+                        {
+                            Log.Information("✅ Client certificate validated successfully 🔒");
+                            Log.Debug("✅ Chain length: {ChainLength}", certChain.ChainElements.Count);
+                        }
+                        else
+                        {
+                            Log.Warning("⚠️  Certificate chain does not end with trusted CA");
+                            Log.Debug("Expected CA thumbprint: {Expected}", clientCaCert.Thumbprint);
+                            Log.Debug("Actual root thumbprint: {Actual}", rootCert.Thumbprint);
+                        }
+
+                        return isValid;
                     }
                     else
                     {
-                        Log.Warning("⚠️  Client certificate validation failed - thumbprint mismatch");
-                        Log.Debug("Expected thumbprint: {Expected}", clientCaCert.Thumbprint);
-                        Log.Debug("Received thumbprint: {Received}", clientCert.Thumbprint);
+                        Log.Warning("⚠️  Failed to build certificate chain");
+                        foreach (var status in certChain.ChainStatus)
+                        {
+                            Log.Warning("⚠️  Chain status: {Status} - {Information}", status.Status, status.StatusInformation);
+                        }
+                        return false;
                     }
-
-                    return isValid;
                 };
 
                 // TLS configuration
