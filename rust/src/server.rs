@@ -21,8 +21,10 @@ use proto::{Empty, GetRequest, GetResponse, PutRequest};
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Certificate CA mode: true for CA:TRUE (go-plugin compatible), false for CA:FALSE (strict validation)
-    /// Usage: --ca-mode true or --ca-mode false (default: true)
-    #[arg(long = "ca-mode", default_value = "true")]
+    ///
+    /// CA:TRUE mode uses certificates with basicConstraints=CA:TRUE (HashiCorp go-plugin compatible).
+    /// CA:FALSE mode uses certificates with basicConstraints=CA:FALSE (strict RFC compliance).
+    #[arg(long = "ca-mode", value_name = "BOOL", default_value = "false", action = clap::ArgAction::Set)]
     ca_mode: bool,
 }
 
