@@ -121,6 +121,9 @@ alias rb-server="(cd ${BASE_PATH}/ruby && ~/.data/rv/rubies/ruby-3.2.9/bin/bundl
 alias cs-build="(cd ${BASE_PATH}  && source env.sh && cd ./csharp && dotnet build)"
 alias cs-client="(cd ${BASE_PATH} && source env.sh && cd ./csharp && dotnet run)"
 
+alias node-client="(cd ${BASE_PATH} && source env.sh && node nodejs/node-kv-client.js)"
+alias node-server="(cd ${BASE_PATH} && source env.sh && node nodejs/node-kv-server.js)"
+
 alias rpcenv-refresh=" \
   unset PLUGIN_CLIENT_CERT \
     PLUGIN_CLIENT_KEY \
