@@ -44,7 +44,8 @@
       "Bash(xargs kill:*)",
       "Bash(timeout 10 ./go/bin/go-kv-client:*)",
       "Bash(uv run python:*)",
-      "Bash(timeout 15 dotnet run:*)"
+      "Bash(timeout 15 dotnet run:*)",
+      "Bash(./go/bin/go-kv-server)"
     ],
     "deny": [],
     "ask": []
