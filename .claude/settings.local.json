@@ -38,7 +38,13 @@
       "Bash(xargs kill)",
       "Bash(killall:*)",
       "Bash(tee:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(node:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(timeout 10 ./go/bin/go-kv-client:*)",
+      "Bash(uv run python:*)",
+      "Bash(timeout 15 dotnet run:*)"
     ],
     "deny": [],
     "ask": []
