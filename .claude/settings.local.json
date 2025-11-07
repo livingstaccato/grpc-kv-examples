@@ -46,7 +46,8 @@
       "Bash(uv run python:*)",
       "Bash(timeout 15 dotnet run:*)",
       "Bash(./go/bin/go-kv-server)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(netstat:*)"
     ],
     "deny": [],
     "ask": []
