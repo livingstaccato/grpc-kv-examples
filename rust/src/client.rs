@@ -1,7 +1,7 @@
 use log::{info, debug};
 use std::env;
 use std::fs;
-use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity};
+use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity, Endpoint};
 use clap::Parser;
 use rustls;
 
@@ -125,8 +125,13 @@ async fn create_channel_with_lenient_tls(
         .wrap_connector(http);
 
     // Build tonic channel with custom connector
-    info!("🚀 Building tonic channel with custom connector...");
-    let channel = Channel::builder(endpoint.parse()?)
+    info!("🚀 Building tonic endpoint...");
+
+    let tonic_endpoint = Endpoint::from_shared(endpoint.clone())?;
+    info!("📍 Endpoint created: {}", endpoint);
+
+    info!("🔌 Connecting with custom TLS connector...");
+    let channel = tonic_endpoint
         .connect_with_connector(https_connector)
         .await?;
 
