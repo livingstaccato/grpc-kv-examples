@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a multi-language gRPC key/value server/client implementation testing cross-language TLS compatibility. The primary goal is testing mTLS with different elliptic curves (secp256r1, secp384r1, secp521r1) across Go, Python, Ruby, and C# implementations.
+This is a multi-language gRPC key/value server/client implementation testing cross-language TLS compatibility. The primary goal is testing mTLS with different elliptic curves (secp256r1, secp384r1, secp521r1) across 6 language implementations.
 
 **Critical Context**: This project tests compatibility with HashiCorp's `go-plugin` which requires P-521 (secp521r1) curves. Currently only Go clients/servers work properly with secp521r1 certificates - other languages fail despite OpenSSL support.
 
@@ -14,7 +14,8 @@ This is a multi-language gRPC key/value server/client implementation testing cro
 - **Python** (`python/`): Server and client in `example-py-server.py` and `example-py-client.py`
 - **Ruby** (`ruby/`): Server and client in `rb-kv-server.rb` and `rb-kv-client.rb`
 - **Rust** (`rust/`): Server and client in `src/server.rs` and `src/client.rs` (⚠️ limited cross-language compatibility)
-- **C#** (`csharp/`): Client implementation (note: C# has compatibility issues)
+- **Node.js** (`nodejs/`): Server and client in `node-kv-server.js` and `node-kv-client.js`
+- **C#** (`csharp/`): Client and server - `Program.cs` (client), `ServerProgram.cs` (server)
 
 ## Environment Setup
 
@@ -149,15 +150,68 @@ Dependencies are defined in `rust/Cargo.toml`. Key crates:
 - `--ca-mode=false` (default): Uses `ca-false-{curve}-mtls-*.crt` files
 - `--ca-mode=true` (experimental): Uses standard `{curve}-mtls-*.crt` files (has tonic limitations)
 
-### C#
+### Node.js
+
+Node.js uses dynamic proto loading via `@grpc/proto-loader`, eliminating the need for code generation.
 
 ```bash
-# Build
+# Install dependencies (first time)
+cd nodejs
+npm install
+
+# Run server
+node-server
+
+# Run client
+node-client
+```
+
+Dependencies are defined in `nodejs/package.json`. Key packages:
+- `@grpc/grpc-js` for gRPC (v1.9.0)
+- `@grpc/proto-loader` for dynamic proto loading
+
+**Key Features:**
+- Dynamic proto loading (no code generation needed)
+- Full mTLS support
+- Accepts CA:TRUE certificates (cross-language compatible)
+- Simple setup - just `npm install` and run
+
+### C#
+
+C# has both client and server implementations.
+
+**Client:**
+```bash
+# Build client
 cs-build
 
 # Run client
 cs-client
 ```
+
+**Server:**
+```bash
+# Build server
+cd csharp
+dotnet build CSharpGrpcServer.csproj
+
+# Run server
+cs-server
+```
+
+Dependencies are defined in `.csproj` files. Key packages:
+- `Grpc.AspNetCore` (server) or `Grpc.Net.Client` (client) for gRPC
+- `Google.Protobuf` for Protocol Buffers
+- `Serilog` for structured logging (server)
+
+**Server Features:**
+- ASP.NET Core + Kestrel
+- HTTP/2 with TLS 1.2/1.3
+- mTLS with client certificate validation
+- Comprehensive debug/trace logging with certificate details
+- Production-ready implementation
+
+**Note:** The server has extensive logging for debugging TLS handshakes and certificate validation.
 
 ## Certificate Management
 
@@ -255,7 +309,15 @@ grpc_tools_ruby_protoc --ruby_out=ruby --grpc_out=ruby proto/kv.proto
 ├── rust/            # Rust implementation
 │   ├── src/         # Source files (client.rs, server.rs, lenient_verifier.rs)
 │   └── target/      # Compiled binaries (rust-kv-client, rust-kv-server)
+├── nodejs/          # Node.js implementation
+│   ├── node-kv-server.js # Server implementation
+│   ├── node-kv-client.js # Client implementation
+│   └── package.json # Dependencies (uses dynamic proto loading)
 ├── csharp/          # C# implementation
+│   ├── Program.cs   # Client entry point
+│   ├── ServerProgram.cs # Server entry point
+│   ├── KVServiceImpl.cs # Server service implementation
+│   └── *.csproj     # Project files (client and server)
 ├── certs/           # mTLS certificates for different curves
 │   ├── ec-*.crt     # CA:TRUE certificates (go-plugin compatible)
 │   └── ca-false-*.crt # CA:FALSE certificates (RFC-compliant, for Rust)
@@ -294,25 +356,30 @@ Use `test-curve-matrix.sh` to test all language combinations across all curves a
 ```
 
 This script:
-- Tests all server/client language combinations (Go, Python, Ruby, Rust, C#)
+- Tests all server/client language combinations (Go, Python, Ruby, Rust, Node.js, C#)
 - Tests all three elliptic curves (secp256r1, secp384r1, secp521r1)
 - Produces a color-coded matrix showing which combinations work
 - Provides summary statistics and key findings
+- **Total tests**: 108 (36 combinations × 3 curves)
 
 **Known Compatibility Issues:**
 - **Rust**: Limited cross-language compatibility due to CA:FALSE/CA:TRUE certificate mismatch
   - ✅ Rust ↔ Rust works (all curves)
   - ✅ Rust client → Ruby server works (all curves)
-  - ❌ Rust ↔ Go/Python/C# fails (certificate mismatch)
+  - ✅ Rust server (--ca-mode=true) ↔ Go/Python/Ruby/Node.js works
+  - ❌ Rust client ↔ Go/Python/C# fails (certificate mismatch)
   - See `RUST-INTEGRATION.md` for detailed analysis and solutions
 - **P-521 (secp521r1)**: Limited to specific language combinations
   - ✅ Go ↔ Go works
   - ✅ Go ↔ Ruby works
   - ✅ Ruby ↔ Ruby works
   - ✅ Rust ↔ Rust works
+  - ❓ Node.js and C# need testing with P-521
   - ❌ Python has known P-521 issues
   - See `P521-IMPROVEMENTS.md` for attempted fixes
-- **C#**: Client-only implementation (no server)
+- **C# Server**: Simplified certificate validation
+  - ✅ Works with Go client (verified)
+  - ⚠️ May have issues with some clients (uses thumbprint comparison instead of chain validation)
 
 ### Single-Curve Testing
 

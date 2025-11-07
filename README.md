@@ -18,8 +18,9 @@ This project implements a simple key/value gRPC service in multiple languages to
 | **Go** | ✅ | ✅ | Fully working | Best P-521 support |
 | **Python** | ✅ | ✅ | Working | P-521 issues |
 | **Ruby** | ✅ | ✅ | Working | Lenient cert validation |
-| **Rust** | ✅ | ✅ | Limited | See compatibility notes |
-| **C#** | ✅ | ❌ | Client only | No server implementation |
+| **Rust** | ✅ | ✅ | Partial | Server works with `--ca-mode=true` |
+| **Node.js** | ✅ | ✅ | Fully working | Dynamic proto loading |
+| **C#** | ✅ | ✅ | Working | Server with comprehensive logging |
 
 ## Quick Start
 
@@ -31,7 +32,9 @@ source env.sh
 go-server      # Go server
 py-server      # Python server
 rb-server      # Ruby server
-./rust/target/release/rust-kv-server  # Rust server
+./rust/target/release/rust-kv-server --ca-mode=true  # Rust server
+node-server    # Node.js server
+cs-server      # C# server
 
 # 3. Run a client (in another terminal)
 source env.sh
@@ -39,6 +42,8 @@ go-client      # Go client
 py-client      # Python client
 rb-client      # Ruby client
 ./rust/target/release/rust-kv-client  # Rust client
+node-client    # Node.js client
+cs-client      # C# client
 ```
 
 ## Building
@@ -63,9 +68,21 @@ cd ruby && bundle install  # Requires Ruby 3.0+
 cd rust && cargo build --release
 ```
 
+### Node.js
+```bash
+cd nodejs && npm install
+```
+
 ### C#
+
+**Client:**
 ```bash
 cd csharp && dotnet build
+```
+
+**Server:**
+```bash
+cd csharp && dotnet build CSharpGrpcServer.csproj
 ```
 
 ## Testing
