@@ -32,11 +32,11 @@ public class KVServiceImpl : KV.KVBase
 
         // Log auth context
         var authContext = context.AuthContext;
-        _logger.LogDebug("🔎 Auth context - Is authenticated: {IsAuthenticated}", authContext.IsAuthenticated);
         if (authContext.PeerIdentityPropertyName != null)
         {
-            _logger.LogDebug("🔎 Peer identity: {PeerIdentity}", authContext.PeerIdentityPropertyName);
+            _logger.LogDebug("🔎 Peer identity property: {PeerIdentity}", authContext.PeerIdentityPropertyName);
         }
+        _logger.LogDebug("🔎 Auth context properties: {PropertyCount}", authContext.Properties.Count());
 
         // Get value from store or return default
         byte[] value;
