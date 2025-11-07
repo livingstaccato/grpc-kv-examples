@@ -50,7 +50,7 @@ if ! command -v dotnet &> /dev/null; then
 else
     echo -e "${BLUE}🔨 Building C# project...${NC}"
     cd "$BASE_DIR/csharp"
-    dotnet build > /dev/null 2>&1
+    dotnet build CSharpGrpcServer.csproj > /dev/null 2>&1
     cd "$BASE_DIR"
     echo -e "${GREEN}✅ C# build complete${NC}"
     HAS_CSHARP=true
