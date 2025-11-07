@@ -13,6 +13,7 @@ This is a multi-language gRPC key/value server/client implementation testing cro
 - **Go** (`go/`): Server and client in `go-kv-server.go` and `go-kv-client.go`
 - **Python** (`python/`): Server and client in `example-py-server.py` and `example-py-client.py`
 - **Ruby** (`ruby/`): Server and client in `rb-kv-server.rb` and `rb-kv-client.rb`
+- **Rust** (`rust/`): Server and client in `src/server.rs` and `src/client.rs` (⚠️ limited cross-language compatibility)
 - **C#** (`csharp/`): Client implementation (note: C# has compatibility issues)
 
 ## Environment Setup
@@ -103,6 +104,50 @@ Required gems:
 ```bash
 rv ruby install 3.2
 ```
+
+### Rust
+
+Rust uses `cargo` for dependency management and building.
+
+```bash
+# Build (from rust/ directory)
+cd rust
+cargo build --release
+
+# Or from project root
+cargo build --release --manifest-path=rust/Cargo.toml
+
+# Run server (CA:FALSE mode - default)
+./rust/target/release/rust-kv-server
+
+# Run server (CA:TRUE mode - experimental)
+./rust/target/release/rust-kv-server --ca-mode=true
+
+# Run client (CA:FALSE mode - default)
+./rust/target/release/rust-kv-client
+
+# Run client (CA:TRUE mode - experimental)
+./rust/target/release/rust-kv-client --ca-mode=true
+```
+
+Dependencies are defined in `rust/Cargo.toml`. Key crates:
+- `tonic` for gRPC with TLS support
+- `prost` for Protocol Buffers
+- `rustls` with custom certificate verifiers
+- `tokio` for async runtime
+
+**Important Notes:**
+- Rust uses **CA:FALSE certificates** by default (RFC-compliant)
+- Other languages use **CA:TRUE certificates** (go-plugin compatible)
+- This creates **limited cross-language compatibility**:
+  - ✅ Rust ↔ Rust works (all curves)
+  - ✅ Rust client → Ruby server works (Ruby is lenient)
+  - ❌ Rust ↔ Go/Python/C# fails (certificate mismatch)
+- See `RUST-INTEGRATION.md` for detailed compatibility matrix and solutions
+
+**Certificate Modes:**
+- `--ca-mode=false` (default): Uses `ca-false-{curve}-mtls-*.crt` files
+- `--ca-mode=true` (experimental): Uses standard `{curve}-mtls-*.crt` files (has tonic limitations)
 
 ### C#
 
@@ -207,9 +252,16 @@ grpc_tools_ruby_protoc --ruby_out=ruby --grpc_out=ruby proto/kv.proto
 │   └── utils/       # Certificate and logging helpers
 ├── ruby/            # Ruby implementation
 │   └── proto/       # Generated Ruby proto files
+├── rust/            # Rust implementation
+│   ├── src/         # Source files (client.rs, server.rs, lenient_verifier.rs)
+│   └── target/      # Compiled binaries (rust-kv-client, rust-kv-server)
 ├── csharp/          # C# implementation
 ├── certs/           # mTLS certificates for different curves
+│   ├── ec-*.crt     # CA:TRUE certificates (go-plugin compatible)
+│   └── ca-false-*.crt # CA:FALSE certificates (RFC-compliant, for Rust)
 ├── docs/            # Debugging documentation
+├── RUST-INTEGRATION.md # Rust compatibility analysis
+├── P521-IMPROVEMENTS.md # P-521 curve improvements
 └── env.sh           # Environment setup script
 ```
 
@@ -242,15 +294,25 @@ Use `test-curve-matrix.sh` to test all language combinations across all curves a
 ```
 
 This script:
-- Tests all server/client language combinations (Go, Python, Ruby, C#)
+- Tests all server/client language combinations (Go, Python, Ruby, Rust, C#)
 - Tests all three elliptic curves (secp256r1, secp384r1, secp521r1)
 - Produces a color-coded matrix showing which combinations work
 - Provides summary statistics and key findings
 
 **Known Compatibility Issues:**
-- secp384r1: Works well for Go ↔ Python, Go ↔ Go, Python ↔ Python
-- secp521r1: Only works for Go ↔ Go (Python, Ruby, C# fail with P-521 servers)
-- C# client only (no server implementation)
+- **Rust**: Limited cross-language compatibility due to CA:FALSE/CA:TRUE certificate mismatch
+  - ✅ Rust ↔ Rust works (all curves)
+  - ✅ Rust client → Ruby server works (all curves)
+  - ❌ Rust ↔ Go/Python/C# fails (certificate mismatch)
+  - See `RUST-INTEGRATION.md` for detailed analysis and solutions
+- **P-521 (secp521r1)**: Limited to specific language combinations
+  - ✅ Go ↔ Go works
+  - ✅ Go ↔ Ruby works
+  - ✅ Ruby ↔ Ruby works
+  - ✅ Rust ↔ Rust works
+  - ❌ Python has known P-521 issues
+  - See `P521-IMPROVEMENTS.md` for attempted fixes
+- **C#**: Client-only implementation (no server)
 
 ### Single-Curve Testing
 
