@@ -145,7 +145,7 @@ start_server() {
             cd "$BASE_DIR"
             ;;
         rust)
-            "$BASE_DIR/rust/target/release/rust-kv-server" > "$log_file" 2>&1 &
+            "$BASE_DIR/rust/target/release/rust-kv-server" --ca-mode=true > "$log_file" 2>&1 &
             ;;
     esac
     SERVER_PID=$!
