@@ -104,24 +104,25 @@ async fn create_channel_with_lenient_tls(
 
     // Build rustls ClientConfig with custom verifier
     info!("🔧 Building rustls ClientConfig with dangerous configuration...");
-    let mut client_config = rustls::ClientConfig::builder()
+    let client_config = rustls::ClientConfig::builder()
         .dangerous()
         .with_custom_certificate_verifier(server_cert_verifier)
         .with_client_auth_cert(client_certs, client_key)?;
 
-    // Enable ALPN for HTTP/2 (required for gRPC)
-    client_config.alpn_protocols = vec![b"h2".to_vec()];
-
-    info!("✅ Rustls ClientConfig created");
+    info!("✅ Rustls ClientConfig created (ALPN will be set by hyper-rustls)");
 
     // Create HTTPS connector with custom rustls config
-    info!("🔌 Creating HTTPS connector with custom TLS...");
+    // Note: hyper-rustls will set ALPN protocols via enable_http2()
+    info!("🔌 Creating HTTP connector...");
+    let mut http = hyper_util::client::legacy::connect::HttpConnector::new();
+    http.enforce_http(false);
 
+    info!("🔒 Wrapping HTTP connector with custom TLS...");
     let https_connector = hyper_rustls::HttpsConnectorBuilder::new()
         .with_tls_config(client_config)
-        .https_or_http()
+        .https_only()
         .enable_http2()
-        .build();
+        .wrap_connector(http);
 
     // Build tonic channel with custom connector
     info!("🚀 Building tonic channel with custom connector...");
