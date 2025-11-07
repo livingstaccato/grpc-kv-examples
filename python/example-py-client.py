@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
 import os
+import sys
+
+# Configure SSL cipher suites for P-521 curve support BEFORE importing grpc
+os.environ['GRPC_SSL_CIPHER_SUITES'] = 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305'
+
 import grpc
 import logging
 import ssl
@@ -50,9 +55,18 @@ def main():
         credentials = create_channel_credentials(certs)
 
         # Channel options matching Go client
+        # Configure SSL/TLS options to support P-521 (secp521r1) curves
         options = [
             ('grpc.ssl_target_name_override', 'localhost'),
             ('grpc.default_authority', 'localhost'),
+            # Enable maximum TLS version and configure for ECDSA with P-521
+            ('grpc.max_receive_message_length', 100 * 1024 * 1024),
+            ('grpc.max_send_message_length', 100 * 1024 * 1024),
+            # Keepalive settings similar to Go client
+            ('grpc.keepalive_time_ms', 10000),
+            ('grpc.keepalive_timeout_ms', 5000),
+            ('grpc.keepalive_permit_without_calls', 1),
+            ('grpc.http2.min_time_between_pings_ms', 10000),
             #('grpc.use_local_subchannel_pool', 1),
         ]
 

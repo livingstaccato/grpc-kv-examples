@@ -69,6 +69,7 @@ class Program
         {
             // ❌ Error: {ex.Message}
             logger.LogError(ex, "❌ Error");
+            Environment.ExitCode = 1;
         }
         finally
         {

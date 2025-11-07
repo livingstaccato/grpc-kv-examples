@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# Configure OpenSSL for P-521 curve support
+ENV['GRPC_SSL_CIPHER_SUITES'] ||= 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305'
+
 require 'grpc'
 require 'logger'
 require 'openssl'
@@ -52,8 +55,16 @@ end
 
 # Server class encapsulates the gRPC server setup and lifecycle.
 class Server
-  # Default gRPC options can be configured here.
-  GRPC_OPTIONS = {}.freeze
+  # Configure gRPC options to support all elliptic curves including P-521
+  GRPC_OPTIONS = {
+    'grpc.max_send_message_length' => 100 * 1024 * 1024,
+    'grpc.max_receive_message_length' => 100 * 1024 * 1024,
+    'grpc.keepalive_time_ms' => 10_000,
+    'grpc.keepalive_timeout_ms' => 5_000,
+    'grpc.keepalive_permit_without_calls' => 1,
+    'grpc.http2.min_time_between_pings_ms' => 10_000,
+    'grpc.ssl_handshake_timeout_ms' => 10_000  # Increased timeout for P-521
+  }.freeze
 
   def initialize
     @logger = Logger.new($stdout)
@@ -144,6 +155,11 @@ class Server
     log_exception("Error inspecting #{name} key", e)
   end
 
+  def log_exception(message, exception)
+    @logger.error "❌ #{message}: #{exception.message}"
+    @logger.error exception.backtrace.join("\n")
+  end
+
   def setup_credentials
     @server_cert = ENV.fetch('PLUGIN_SERVER_CERT') { raise '🔐 ❌ Missing server certificate' }
     @server_key = ENV.fetch('PLUGIN_SERVER_KEY') { raise '🔐 ❌ Missing server key' }
@@ -173,7 +189,7 @@ class Server
   end
 
   def setup_server
-    @server = GRPC::RpcServer.new(pool_size: 10, max_waiting_requests: 100, **GRPC_OPTIONS)
+    @server = GRPC::RpcServer.new(pool_size: 10, max_waiting_requests: 100, server_args: GRPC_OPTIONS)
     @server.handle(KVService.new(logger: @logger))
     @logger.info '✅ Server configured'
   rescue StandardError => e

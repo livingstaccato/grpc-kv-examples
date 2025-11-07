@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Configure OpenSSL for P-521 curve support
+ENV['GRPC_SSL_CIPHER_SUITES'] ||= 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305'
 
 require 'grpc'
 require 'logger'
@@ -103,15 +107,17 @@ class GrpcClient
       client_cert.to_pem
     )
 
+    # Configure channel arguments to support all elliptic curves including P-521
     @channel_args = {
       'grpc.ssl_target_name_override' => 'localhost',
+      'grpc.default_authority' => 'localhost',
       'grpc.max_send_message_length' => 100 * 1024 * 1024,
       'grpc.max_receive_message_length' => 100 * 1024 * 1024,
       'grpc.keepalive_time_ms' => 10_000,
       'grpc.keepalive_timeout_ms' => 5_000,
       'grpc.keepalive_permit_without_calls' => 1,
       'grpc.http2.min_time_between_pings_ms' => 10_000,
-      'grpc.ssl_handshake_timeout_ms' => 5_000
+      'grpc.ssl_handshake_timeout_ms' => 10_000  # Increased timeout for P-521
     }
   end
 

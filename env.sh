@@ -5,14 +5,15 @@
 # Base configuration
 BASE_PATH=$(pwd)
 
-local PLUGIN_HOST="localhost"
-local PLUGIN_PORT="50051"
+PLUGIN_HOST="localhost"
+PLUGIN_PORT="50051"
 
 
 # TLS algorithm configuration
-#PLUGIN_ALGO=${PLUGIN_ALGO:-
-PLUGIN_CLIENT_ALGO="ec-secp384r1"
-PLUGIN_SERVER_ALGO="ec-secp384r1"
+# Options: ec-secp256r1, ec-secp384r1, ec-secp521r1
+# Default to secp384r1 for broad compatibility, use secp521r1 for go-plugin compatibility
+PLUGIN_CLIENT_ALGO="${PLUGIN_CLIENT_ALGO:-ec-secp384r1}"
+PLUGIN_SERVER_ALGO="${PLUGIN_SERVER_ALGO:-ec-secp384r1}"
 
 # Certificate paths
 PLUGIN_CLIENT_CERT_FILE="${BASE_PATH}/certs/${PLUGIN_CLIENT_ALGO}-mtls-client.crt"
@@ -114,8 +115,8 @@ alias go-server="(cd ${BASE_PATH} && source env.sh && ./go/bin/go-kv-server)"
 alias py-client="(cd ${BASE_PATH} && source env.sh && ./python/py-kv-client.py)"
 alias py-server="(cd ${BASE_PATH} && source env.sh && ./python/py-kv-server.py)"
 
-alias rb-client="(cd ${BASE_PATH} && source env.sh && ./ruby/rb-kv-client.rb)"
-alias rb-server="(cd ${BASE_PATH} && source env.sh && ./ruby/rb-kv-server.rb)"
+alias rb-client="(cd ${BASE_PATH}/ruby && ~/.data/rv/rubies/ruby-3.2.9/bin/bundle exec ~/.data/rv/rubies/ruby-3.2.9/bin/ruby ./rb-kv-client.rb)"
+alias rb-server="(cd ${BASE_PATH}/ruby && ~/.data/rv/rubies/ruby-3.2.9/bin/bundle exec ~/.data/rv/rubies/ruby-3.2.9/bin/ruby ./rb-kv-server.rb)"
 
 alias cs-build="(cd ${BASE_PATH}  && source env.sh && cd ./csharp && dotnet build)"
 alias cs-client="(cd ${BASE_PATH} && source env.sh && cd ./csharp && dotnet run)"
