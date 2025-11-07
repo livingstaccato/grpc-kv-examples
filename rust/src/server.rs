@@ -5,6 +5,9 @@ use std::sync::Arc;
 use tonic::{transport::{Server, Identity, ServerTlsConfig, Certificate}, Request, Response, Status};
 use rustls;
 use clap::Parser;
+use tokio::net::TcpListener;
+use tokio_stream::wrappers::TcpListenerStream;
+use tokio_stream::StreamExt;
 
 // Custom certificate verifier module
 mod lenient_verifier;
@@ -223,28 +226,53 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if args.ca_mode {
         // CA:TRUE mode - use custom rustls config with lenient verifier
         info!("⚠️  Using lenient mode (accepts CA:TRUE certificates)");
+        info!("🔒 Implementing custom TLS acceptor with lenient verifier...");
 
-        // For now, we'll note that custom rustls::ServerConfig integration with tonic Server
-        // requires using the incoming stream directly or using a custom acceptor.
-        // This is more complex than the client side.
-        // As a workaround, we'll use the standard config for now and document the limitation.
+        // Create custom rustls ServerConfig with lenient verifier
+        let tls_server_config = configure_tls_lenient()?;
 
-        info!("⚠️  NOTE: Server-side lenient mode not fully implemented yet");
-        info!("⚠️  Falling back to standard TLS config");
-        info!("⚠️  This may still reject CA:TRUE client certificates");
+        // Create TLS acceptor
+        let tls_acceptor = tokio_rustls::TlsAcceptor::from(tls_server_config);
 
-        let tls_config = configure_tls_standard(args.ca_mode)?;
+        // Bind TCP listener
+        info!("🌐 Binding TCP listener to {}...", addr);
+        let tcp_listener = TcpListener::bind(addr).await?;
+        let listener_stream = TcpListenerStream::new(tcp_listener);
 
-        info!("🌐 Binding server to {} with TLS...", addr);
+        // Create incoming stream with custom TLS
+        let incoming = listener_stream.then(move |tcp_stream| {
+            let acceptor = tls_acceptor.clone();
+            async move {
+                match tcp_stream {
+                    Ok(stream) => {
+                        info!("📥 Accepting new connection...");
+                        match acceptor.accept(stream).await {
+                            Ok(tls_stream) => {
+                                info!("✅ TLS handshake completed successfully");
+                                Ok(tls_stream)
+                            }
+                            Err(e) => {
+                                info!("❌ TLS handshake failed: {}", e);
+                                Err(std::io::Error::new(std::io::ErrorKind::Other, e))
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        info!("❌ TCP accept failed: {}", e);
+                        Err(e)
+                    }
+                }
+            }
+        });
 
-        let server = Server::builder()
-            .tls_config(tls_config)?
-            .add_service(KvServer::new(kv_service));
-
-        info!("✅ Server configured successfully");
+        info!("✅ Server configured with lenient TLS verifier");
         info!("🎧 Listening on {} - Ready to accept connections! 🚀", addr);
 
-        server.serve(addr).await?;
+        // Serve with custom incoming stream
+        Server::builder()
+            .add_service(KvServer::new(kv_service))
+            .serve_with_incoming(incoming)
+            .await?;
     } else {
         // CA:FALSE mode - use standard strict validation
         let tls_config = configure_tls_standard(args.ca_mode)?;
