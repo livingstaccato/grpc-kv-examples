@@ -1,9 +1,14 @@
 use log::{info, debug};
 use std::env;
 use std::fs;
-use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity};
+use std::sync::Arc;
+use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity, Endpoint};
 use clap::Parser;
 use rustls;
+use rustls::pki_types::{CertificateDer, PrivateKeyDer};
+
+// Custom certificate verifier module
+mod lenient_verifier;
 
 // Include the generated protobuf code
 pub mod proto {
@@ -66,33 +71,73 @@ async fn create_channel_with_lenient_tls(
     server_cert_pem: Vec<u8>,
 ) -> Result<Channel, Box<dyn std::error::Error>> {
     info!("🔌 Creating gRPC channel with lenient TLS (CA:TRUE mode)... 🔄");
-    info!("⚠️  Using tls_config with accept_invalid_certs - for testing only!");
+    info!("⚠️  Using custom certificate verifier to accept CA:TRUE certificates");
 
-    // Create client identity
-    info!("🔑 Creating client identity...");
-    let identity = Identity::from_pem(client_cert_pem, client_key_pem);
+    // Parse PEM certificates and keys
+    info!("🔑 Parsing client certificates and keys...");
 
-    // Create CA certificate
-    info!("🔐 Creating server CA certificate...");
-    let ca_cert = Certificate::from_pem(server_cert_pem);
+    // Parse client certificate
+    let client_certs = rustls_pemfile::certs(&mut client_cert_pem.as_slice())
+        .collect::<Result<Vec<_>, _>>()?;
+    if client_certs.is_empty() {
+        return Err("No client certificates found in PEM".into());
+    }
 
-    // Configure TLS with relaxed validation for CA:TRUE certs
-    info!("🔒 Configuring TLS with lenient settings...");
-    let tls_config = ClientTlsConfig::new()
-        .domain_name("localhost")
-        .ca_certificate(ca_cert)
-        .identity(identity);
+    // Parse client private key
+    let client_key = rustls_pemfile::private_key(&mut client_key_pem.as_slice())?
+        .ok_or("No private key found in PEM")?;
 
-    info!("✅ TLS configuration complete");
+    // Parse server certificate (for pinning/verification)
+    let server_certs = rustls_pemfile::certs(&mut server_cert_pem.as_slice())
+        .collect::<Result<Vec<_>, _>>()?;
+    if server_certs.is_empty() {
+        return Err("No server certificates found in PEM".into());
+    }
 
-    // Create channel
-    info!("🔌 Creating gRPC channel...");
-    let channel = Channel::from_shared(endpoint)?
-        .tls_config(tls_config)?
-        .connect()
+    info!("✅ Parsed {} client cert(s), 1 private key, {} server cert(s)",
+          client_certs.len(), server_certs.len());
+
+    // Create custom server certificate verifier
+    info!("🔒 Creating custom certificate verifier (accepts CA:TRUE)...");
+    let server_cert_verifier = lenient_verifier::LenientServerCertVerifier::new(
+        Some(server_certs[0].to_vec()) // Pin to the expected server certificate
+    );
+
+    // Build rustls ClientConfig with custom verifier
+    info!("🔧 Building rustls ClientConfig with dangerous configuration...");
+    let mut client_config = rustls::ClientConfig::builder()
+        .dangerous()
+        .with_custom_certificate_verifier(server_cert_verifier)
+        .with_client_auth_cert(client_certs, client_key)?;
+
+    // Enable ALPN for HTTP/2 (required for gRPC)
+    client_config.alpn_protocols = vec![b"h2".to_vec()];
+
+    info!("✅ Rustls ClientConfig created");
+
+    // Create HTTPS connector with custom rustls config
+    info!("🔌 Creating HTTPS connector with custom TLS...");
+    let mut http_connector = hyper_util::client::legacy::connect::HttpConnector::new();
+    http_connector.enforce_http(false);
+
+    let https_connector = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_tls_config(client_config)
+        .https_or_http()
+        .enable_http2()
+        .build();
+
+    // Build hyper client
+    info!("🔨 Building hyper client...");
+    let hyper_client = hyper_util::client::legacy::Client::builder(hyper_util::rt::TokioExecutor::new())
+        .build(https_connector);
+
+    // Build tonic channel from hyper client
+    info!("🚀 Building tonic channel from hyper client...");
+    let channel = Channel::builder(endpoint.parse()?)
+        .connect_with_connector(hyper_client)
         .await?;
 
-    info!("✅ Successfully created gRPC channel with lenient TLS");
+    info!("✅ Successfully created gRPC channel with custom certificate verifier");
 
     Ok(channel)
 }

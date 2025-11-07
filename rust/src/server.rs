@@ -1,9 +1,14 @@
 use log::{info, debug};
 use std::env;
 use std::fs;
+use std::sync::Arc;
 use tonic::{transport::{Server, Identity, ServerTlsConfig, Certificate}, Request, Response, Status};
 use rustls;
+use rustls::pki_types::{CertificateDer, PrivateKeyDer};
 use clap::Parser;
+
+// Custom certificate verifier module
+mod lenient_verifier;
 
 // Include the generated protobuf code
 pub mod proto {

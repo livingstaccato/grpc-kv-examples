@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(./build.sh:*)",
+      "Bash(chmod:*)",
+      "Bash(./test-cross-language.sh:*)",
+      "Bash(ruby:*)",
+      "Bash(gem list:*)",
+      "Bash(./test-go-python.sh:*)",
+      "Bash(./test-curve-matrix.sh:*)",
+      "Bash(command -v:*)",
+      "Bash(bundle install:*)",
+      "Bash(rv ruby install:*)",
+      "Bash(rv ruby list:*)",
+      "Bash(rv ruby use:*)",
+      "Bash(rv ruby:*)",
+      "Bash(~/.data/rv/rubies/ruby-3.2.9/bin/bundle install:*)",
+      "Bash(dotnet build:*)",
+      "Bash(/dev/null)",
+      "Bash(~/.data/rv/rubies/ruby-3.2.9/bin/ruby:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:rubydoc.info)",
+      "Bash(cargo build:*)",
+      "Bash(cargo clean:*)",
+      "Bash(source env.sh)",
+      "Bash(timeout 5 ./rust/target/release/rust-kv-client:*)",
+      "Bash(openssl ecparam:*)",
+      "Bash(openssl req:*)",
+      "Bash(./rust/target/release/rust-kv-client)",
+      "Bash(kill:*)",
+      "Bash(go/bin/go-kv-client)",
+      "Bash(./rust/target/release/rust-kv-client:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
