@@ -37,7 +37,8 @@
       "Bash(timeout 10 rust/target/release/rust-kv-client:*)",
       "Bash(xargs kill)",
       "Bash(killall:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(npm install)"
     ],
     "deny": [],
     "ask": []
