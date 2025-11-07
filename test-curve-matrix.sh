@@ -71,25 +71,44 @@ else
 fi
 echo ""
 
+# Check Node.js availability
+if command -v node &> /dev/null && [ -f "$BASE_DIR/nodejs/package.json" ]; then
+    echo -e "${GREEN}✅ Node.js available${NC}"
+    HAS_NODEJS=true
+else
+    echo -e "${YELLOW}⚠️  Node.js not available, skipping Node.js tests${NC}"
+    HAS_NODEJS=false
+fi
+echo ""
+
 # Test matrix: server:client:description
-# Note: C# and Rust client-only tests added at the end
+# Note: C# client-only and Node.js tests added at the end
 declare -a test_combinations=(
     "go:go:Go → Go"
     "go:python:Go → Python"
     "go:ruby:Go → Ruby"
     "go:rust:Go → Rust"
+    "go:nodejs:Go → Node.js"
     "python:go:Python → Go"
     "python:python:Python → Python"
     "python:ruby:Python → Ruby"
     "python:rust:Python → Rust"
+    "python:nodejs:Python → Node.js"
     "ruby:go:Ruby → Go"
     "ruby:python:Ruby → Python"
     "ruby:ruby:Ruby → Ruby"
     "ruby:rust:Ruby → Rust"
+    "ruby:nodejs:Ruby → Node.js"
     "rust:go:Rust → Go"
     "rust:python:Rust → Python"
     "rust:ruby:Rust → Ruby"
     "rust:rust:Rust → Rust"
+    "rust:nodejs:Rust → Node.js"
+    "nodejs:go:Node.js → Go"
+    "nodejs:python:Node.js → Python"
+    "nodejs:ruby:Node.js → Ruby"
+    "nodejs:rust:Node.js → Rust"
+    "nodejs:nodejs:Node.js → Node.js"
 )
 
 # Filter test combinations based on what's available
@@ -107,6 +126,11 @@ for test in "${test_combinations[@]}"; do
         continue
     fi
 
+    # Skip Node.js tests if Node.js is not available
+    if [ "$HAS_NODEJS" = false ] && ( [ "$server" = "nodejs" ] || [ "$client" = "nodejs" ] ); then
+        continue
+    fi
+
     filtered_combinations+=("$test")
 done
 
@@ -121,6 +145,9 @@ if [ "$HAS_CSHARP" = true ]; then
     fi
     if [ "$HAS_RUST" = true ]; then
         filtered_combinations+=("rust:csharp:Rust → C#")
+    fi
+    if [ "$HAS_NODEJS" = true ]; then
+        filtered_combinations+=("nodejs:csharp:Node.js → C#")
     fi
 fi
 
@@ -147,6 +174,10 @@ start_server() {
         rust)
             "$BASE_DIR/rust/target/release/rust-kv-server" --ca-mode=true > "$log_file" 2>&1 &
             ;;
+        nodejs)
+            cd "$BASE_DIR"
+            node ./nodejs/node-kv-server.js > "$log_file" 2>&1 &
+            ;;
     esac
     SERVER_PID=$!
     sleep 3  # Give server time to start
@@ -160,7 +191,7 @@ stop_server() {
         SERVER_PID=""
     fi
     # Kill any lingering server processes
-    pkill -f "go-kv-server|example-py-server|rb-kv-server|rust-kv-server" 2>/dev/null || true
+    pkill -f "go-kv-server|example-py-server|rb-kv-server|rust-kv-server|node-kv-server" 2>/dev/null || true
     sleep 1
 }
 
@@ -188,6 +219,10 @@ run_client() {
             ;;
         rust)
             timeout $TEST_TIMEOUT "$BASE_DIR/rust/target/release/rust-kv-client" --ca-mode=true > "$log_file" 2>&1
+            ;;
+        nodejs)
+            cd "$BASE_DIR"
+            timeout $TEST_TIMEOUT node ./nodejs/node-kv-client.js > "$log_file" 2>&1
             ;;
     esac
     return $?
