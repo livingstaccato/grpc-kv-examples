@@ -36,7 +36,8 @@
       "Bash(rust/target/release/rust-kv-client)",
       "Bash(timeout 10 rust/target/release/rust-kv-client:*)",
       "Bash(xargs kill)",
-      "Bash(killall:*)"
+      "Bash(killall:*)",
+      "Bash(tee:*)"
     ],
     "deny": [],
     "ask": []
