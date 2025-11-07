@@ -57,18 +57,39 @@ else
 fi
 echo ""
 
+# Check Rust availability
+if command -v cargo &> /dev/null && [ -f "$BASE_DIR/rust/Cargo.toml" ]; then
+    echo -e "${BLUE}🔨 Building Rust project...${NC}"
+    cd "$BASE_DIR/rust"
+    cargo build --release > /dev/null 2>&1
+    cd "$BASE_DIR"
+    echo -e "${GREEN}✅ Rust build complete${NC}"
+    HAS_RUST=true
+else
+    echo -e "${YELLOW}⚠️  Rust/Cargo not available, skipping Rust tests${NC}"
+    HAS_RUST=false
+fi
+echo ""
+
 # Test matrix: server:client:description
-# Note: C# only has client implementation
+# Note: C# and Rust client-only tests added at the end
 declare -a test_combinations=(
     "go:go:Go → Go"
     "go:python:Go → Python"
     "go:ruby:Go → Ruby"
+    "go:rust:Go → Rust"
     "python:go:Python → Go"
     "python:python:Python → Python"
     "python:ruby:Python → Ruby"
+    "python:rust:Python → Rust"
     "ruby:go:Ruby → Go"
     "ruby:python:Ruby → Python"
     "ruby:ruby:Ruby → Ruby"
+    "ruby:rust:Ruby → Rust"
+    "rust:go:Rust → Go"
+    "rust:python:Rust → Python"
+    "rust:ruby:Rust → Ruby"
+    "rust:rust:Rust → Rust"
 )
 
 # Filter test combinations based on what's available
@@ -78,6 +99,11 @@ for test in "${test_combinations[@]}"; do
 
     # Skip Ruby tests if Ruby is not available
     if [ "$HAS_RUBY" = false ] && ( [ "$server" = "ruby" ] || [ "$client" = "ruby" ] ); then
+        continue
+    fi
+
+    # Skip Rust tests if Rust is not available
+    if [ "$HAS_RUST" = false ] && ( [ "$server" = "rust" ] || [ "$client" = "rust" ] ); then
         continue
     fi
 
@@ -92,6 +118,9 @@ if [ "$HAS_CSHARP" = true ]; then
     )
     if [ "$HAS_RUBY" = true ]; then
         filtered_combinations+=("ruby:csharp:Ruby → C#")
+    fi
+    if [ "$HAS_RUST" = true ]; then
+        filtered_combinations+=("rust:csharp:Rust → C#")
     fi
 fi
 
@@ -115,6 +144,9 @@ start_server() {
             ~/.data/rv/rubies/ruby-3.2.9/bin/bundle exec ~/.data/rv/rubies/ruby-3.2.9/bin/ruby ./rb-kv-server.rb > "$log_file" 2>&1 &
             cd "$BASE_DIR"
             ;;
+        rust)
+            "$BASE_DIR/rust/target/release/rust-kv-server" > "$log_file" 2>&1 &
+            ;;
     esac
     SERVER_PID=$!
     sleep 3  # Give server time to start
@@ -128,7 +160,7 @@ stop_server() {
         SERVER_PID=""
     fi
     # Kill any lingering server processes
-    pkill -f "go-kv-server|example-py-server|rb-kv-server" 2>/dev/null || true
+    pkill -f "go-kv-server|example-py-server|rb-kv-server|rust-kv-server" 2>/dev/null || true
     sleep 1
 }
 
@@ -153,6 +185,9 @@ run_client() {
         csharp)
             cd "$BASE_DIR/csharp"
             timeout $TEST_TIMEOUT dotnet run > "$log_file" 2>&1
+            ;;
+        rust)
+            timeout $TEST_TIMEOUT "$BASE_DIR/rust/target/release/rust-kv-client" > "$log_file" 2>&1
             ;;
     esac
     return $?
