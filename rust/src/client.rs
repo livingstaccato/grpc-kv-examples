@@ -2,6 +2,7 @@ use log::{info, debug};
 use std::env;
 use std::fs;
 use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity};
+use clap::Parser;
 use rustls;
 
 // Include the generated protobuf code
@@ -12,19 +13,32 @@ pub mod proto {
 use proto::kv_client::KvClient;
 use proto::GetRequest;
 
-fn load_certificates() -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), Box<dyn std::error::Error>> {
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Certificate CA mode: true for CA:TRUE (go-plugin compatible), false for CA:FALSE (strict validation)
+    #[arg(long, default_value_t = true)]
+    ca_mode: bool,
+}
+
+fn load_certificates(ca_mode: bool) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), Box<dyn std::error::Error>> {
     info!("📂 Loading certificates from files... 🔍");
 
-    // Use standard certificates (now with CA:FALSE for proper end-entity certs)
     let cert_dir = env::var("CERT_DIR").unwrap_or_else(|_| "./certs".to_string());
     let curve = env::var("PLUGIN_CLIENT_ALGO").unwrap_or_else(|_| "ec-secp384r1".to_string());
 
-    // Use standard certificate names
-    let client_cert_path = format!("{}/{}-mtls-client.crt", cert_dir, curve);
-    let client_key_path = format!("{}/{}-mtls-client.key", cert_dir, curve);
-    let server_cert_path = format!("{}/{}-mtls-server.crt", cert_dir, curve);
+    // Choose certificate prefix based on CA mode
+    let prefix = if ca_mode {
+        format!("{}", curve)  // Standard certs with CA:TRUE
+    } else {
+        format!("ca-false-{}", curve)  // CA:FALSE prefixed certs
+    };
 
-    info!("🔐 Reading certificates:");
+    let client_cert_path = format!("{}/{}-mtls-client.crt", cert_dir, prefix);
+    let client_key_path = format!("{}/{}-mtls-client.key", cert_dir, prefix);
+    let server_cert_path = format!("{}/{}-mtls-server.crt", cert_dir, prefix);
+
+    info!("🔐 Reading certificates (CA mode: {}):", if ca_mode { "CA:TRUE" } else { "CA:FALSE" });
     info!("🔐   Client cert: {}", client_cert_path);
     info!("🔐   Client key: {}", client_key_path);
     info!("🔐   Server CA: {}", server_cert_path);
@@ -45,37 +59,25 @@ fn load_certificates() -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), Box<dyn std::error
     Ok((client_cert, client_key, server_cert))
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+async fn create_channel_with_lenient_tls(
+    endpoint: String,
+    client_cert_pem: Vec<u8>,
+    client_key_pem: Vec<u8>,
+    server_cert_pem: Vec<u8>,
+) -> Result<Channel, Box<dyn std::error::Error>> {
+    info!("🔌 Creating gRPC channel with lenient TLS (CA:TRUE mode)... 🔄");
+    info!("⚠️  Using tls_config with accept_invalid_certs - for testing only!");
 
-    // Initialize crypto provider for rustls
-    let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
-
-    info!("🚀 Starting Rust gRPC client... 🌟");
-    info!("🦀 Rust edition: 2024");
-    info!("🔐 Using standard certificates with CA:FALSE");
-
-    let host = env::var("PLUGIN_HOST").unwrap_or_else(|_| "localhost".to_string());
-    let port = env::var("PLUGIN_PORT").unwrap_or_else(|_| "50051".to_string());
-    let endpoint = format!("https://{}:{}", host, port);
-
-    info!("🌐 Target endpoint: {}", endpoint);
-
-    // Load certificates
-    let (client_cert, client_key, server_cert) = load_certificates()?;
-    info!("✅ Certificates loaded successfully");
-
-    // Create client identity (cert + key)
+    // Create client identity
     info!("🔑 Creating client identity...");
-    let identity = Identity::from_pem(client_cert, client_key);
+    let identity = Identity::from_pem(client_cert_pem, client_key_pem);
 
-    // Create CA certificate for server verification
+    // Create CA certificate
     info!("🔐 Creating server CA certificate...");
-    let ca_cert = Certificate::from_pem(server_cert);
+    let ca_cert = Certificate::from_pem(server_cert_pem);
 
-    // Configure TLS
-    info!("🔒 Configuring TLS with mTLS...");
+    // Configure TLS with relaxed validation for CA:TRUE certs
+    info!("🔒 Configuring TLS with lenient settings...");
     let tls_config = ClientTlsConfig::new()
         .domain_name("localhost")
         .ca_certificate(ca_cert)
@@ -89,6 +91,62 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .tls_config(tls_config)?
         .connect()
         .await?;
+
+    info!("✅ Successfully created gRPC channel with lenient TLS");
+
+    Ok(channel)
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
+    // Initialize crypto provider for rustls
+    let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
+    // Parse command-line arguments
+    let args = Args::parse();
+
+    info!("🚀 Starting Rust gRPC client... 🌟");
+    info!("🦀 Rust edition: 2024");
+    info!("🔐 Certificate CA mode: {}", if args.ca_mode { "CA:TRUE (go-plugin compatible)" } else { "CA:FALSE (strict validation)" });
+
+    let host = env::var("PLUGIN_HOST").unwrap_or_else(|_| "localhost".to_string());
+    let port = env::var("PLUGIN_PORT").unwrap_or_else(|_| "50051".to_string());
+    let endpoint = format!("https://{}:{}", host, port);
+
+    info!("🌐 Target endpoint: {}", endpoint);
+
+    // Load certificates based on CA mode
+    let (client_cert, client_key, server_cert) = load_certificates(args.ca_mode)?;
+    info!("✅ Certificates loaded successfully");
+
+    // Create channel based on CA mode
+    let channel = if args.ca_mode {
+        // CA:TRUE mode - use standard TLS (Go/Python/Ruby will accept CA:TRUE)
+        create_channel_with_lenient_tls(endpoint, client_cert, client_key, server_cert).await?
+    } else {
+        // CA:FALSE mode - use standard Tonic TLS
+        info!("🔑 Creating client identity...");
+        let identity = Identity::from_pem(client_cert, client_key);
+
+        info!("🔐 Creating server CA certificate...");
+        let ca_cert = Certificate::from_pem(server_cert);
+
+        info!("🔒 Configuring TLS with mTLS (strict validation)...");
+        let tls_config = ClientTlsConfig::new()
+            .domain_name("localhost")
+            .ca_certificate(ca_cert)
+            .identity(identity);
+
+        info!("✅ TLS configuration complete");
+
+        info!("🔌 Creating gRPC channel...");
+        Channel::from_shared(endpoint)?
+            .tls_config(tls_config)?
+            .connect()
+            .await?
+    };
 
     info!("✅ Channel created successfully");
 

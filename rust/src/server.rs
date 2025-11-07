@@ -3,6 +3,7 @@ use std::env;
 use std::fs;
 use tonic::{transport::{Server, Identity, ServerTlsConfig, Certificate}, Request, Response, Status};
 use rustls;
+use clap::Parser;
 
 // Include the generated protobuf code
 pub mod proto {
@@ -11,6 +12,14 @@ pub mod proto {
 
 use proto::kv_server::{Kv, KvServer};
 use proto::{Empty, GetRequest, GetResponse, PutRequest};
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Certificate CA mode: true for CA:TRUE (go-plugin compatible), false for CA:FALSE (strict validation)
+    #[arg(long, default_value_t = true)]
+    ca_mode: bool,
+}
 
 #[derive(Debug, Default)]
 pub struct KvService {}
@@ -52,19 +61,24 @@ impl Kv for KvService {
     }
 }
 
-fn configure_tls() -> Result<ServerTlsConfig, Box<dyn std::error::Error>> {
+fn configure_tls(ca_mode: bool) -> Result<ServerTlsConfig, Box<dyn std::error::Error>> {
     info!("🔐 Loading certificates from files...");
 
-    // Use standard certificates (now with CA:FALSE for proper end-entity certs)
     let cert_dir = env::var("CERT_DIR").unwrap_or_else(|_| "./certs".to_string());
     let curve = env::var("PLUGIN_SERVER_ALGO").unwrap_or_else(|_| "ec-secp384r1".to_string());
 
-    // Use standard certificate names
-    let server_cert_path = format!("{}/{}-mtls-server.crt", cert_dir, curve);
-    let server_key_path = format!("{}/{}-mtls-server.key", cert_dir, curve);
-    let client_cert_path = format!("{}/{}-mtls-client.crt", cert_dir, curve);
+    // Choose certificate prefix based on CA mode
+    let prefix = if ca_mode {
+        format!("{}", curve)  // Standard certs with CA:TRUE
+    } else {
+        format!("ca-false-{}", curve)  // CA:FALSE prefixed certs
+    };
 
-    info!("🔐 Reading certificates:");
+    let server_cert_path = format!("{}/{}-mtls-server.crt", cert_dir, prefix);
+    let server_key_path = format!("{}/{}-mtls-server.key", cert_dir, prefix);
+    let client_cert_path = format!("{}/{}-mtls-client.crt", cert_dir, prefix);
+
+    info!("🔐 Reading certificates (CA mode: {}):", if ca_mode { "CA:TRUE" } else { "CA:FALSE" });
     info!("🔐   Server cert: {}", server_cert_path);
     info!("🔐   Server key: {}", server_key_path);
     info!("🔐   Client CA: {}", client_cert_path);
@@ -111,9 +125,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize crypto provider for rustls (must be done before any TLS operations)
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
 
+    // Parse command-line arguments
+    let args = Args::parse();
+
     info!("🚀 🔄 Starting Rust gRPC server... 🌟");
     info!("🦀 Rust edition: 2024");
-    info!("🔐 Using standard certificates with CA:FALSE");
+    info!("🔐 Certificate CA mode: {}", if args.ca_mode { "CA:TRUE (go-plugin compatible)" } else { "CA:FALSE (strict validation)" });
 
     let addr = "[::]:50051".parse()?;
     info!("🌐 Address parsed: {}", addr);
@@ -121,9 +138,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let kv_service = KvService::default();
     info!("🔧 KV service initialized");
 
-    // Configure TLS
+    // Configure TLS based on CA mode
     info!("🔐 Configuring TLS...");
-    let tls_config = configure_tls()?;
+    let tls_config = configure_tls(args.ca_mode)?;
 
     info!("🌐 Binding server to {} with TLS...", addr);
 
