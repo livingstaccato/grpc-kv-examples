@@ -4,7 +4,6 @@ use std::fs;
 use std::sync::Arc;
 use tonic::{transport::{Server, Identity, ServerTlsConfig, Certificate}, Request, Response, Status};
 use rustls;
-use rustls::pki_types::{CertificateDer, PrivateKeyDer};
 use clap::Parser;
 
 // Custom certificate verifier module
@@ -22,7 +21,8 @@ use proto::{Empty, GetRequest, GetResponse, PutRequest};
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Certificate CA mode: true for CA:TRUE (go-plugin compatible), false for CA:FALSE (strict validation)
-    #[arg(long, default_value_t = true)]
+    /// Usage: --ca-mode true or --ca-mode false (default: true)
+    #[arg(long = "ca-mode", default_value = "true")]
     ca_mode: bool,
 }
 
@@ -66,8 +66,8 @@ impl Kv for KvService {
     }
 }
 
-fn configure_tls(ca_mode: bool) -> Result<ServerTlsConfig, Box<dyn std::error::Error>> {
-    info!("🔐 Loading certificates from files...");
+fn configure_tls_standard(ca_mode: bool) -> Result<ServerTlsConfig, Box<dyn std::error::Error>> {
+    info!("🔐 Loading certificates from files (standard mode)...");
 
     let cert_dir = env::var("CERT_DIR").unwrap_or_else(|_| "./certs".to_string());
     let curve = env::var("PLUGIN_SERVER_ALGO").unwrap_or_else(|_| "ec-secp384r1".to_string());
@@ -123,6 +123,78 @@ fn configure_tls(ca_mode: bool) -> Result<ServerTlsConfig, Box<dyn std::error::E
     Ok(tls_config)
 }
 
+fn configure_tls_lenient() -> Result<Arc<rustls::ServerConfig>, Box<dyn std::error::Error>> {
+    info!("🔐 Loading certificates from files (lenient mode - accepts CA:TRUE)...");
+
+    let cert_dir = env::var("CERT_DIR").unwrap_or_else(|_| "./certs".to_string());
+    let curve = env::var("PLUGIN_SERVER_ALGO").unwrap_or_else(|_| "ec-secp384r1".to_string());
+
+    // Use standard certs (CA:TRUE)
+    let server_cert_path = format!("{}/{}-mtls-server.crt", cert_dir, curve);
+    let server_key_path = format!("{}/{}-mtls-server.key", cert_dir, curve);
+    let client_cert_path = format!("{}/{}-mtls-client.crt", cert_dir, curve);
+
+    info!("🔐 Reading certificates (CA:TRUE mode):");
+    info!("🔐   Server cert: {}", server_cert_path);
+    info!("🔐   Server key: {}", server_key_path);
+    info!("🔐   Client CA: {}", client_cert_path);
+
+    let server_cert_pem = fs::read(&server_cert_path)
+        .map_err(|e| format!("Failed to read {}: {}", server_cert_path, e))?;
+    let server_key_pem = fs::read(&server_key_path)
+        .map_err(|e| format!("Failed to read {}: {}", server_key_path, e))?;
+    let client_cert_pem = fs::read(&client_cert_path)
+        .map_err(|e| format!("Failed to read {}: {}", client_cert_path, e))?;
+
+    info!("📦 Certificate sizes:");
+    info!("📦   Server Cert: {} bytes", server_cert_pem.len());
+    info!("📦   Server Key: {} bytes", server_key_pem.len());
+    info!("📦   Client CA Cert: {} bytes", client_cert_pem.len());
+
+    // Parse PEM certificates and keys
+    info!("🔑 Parsing server certificates and keys...");
+
+    // Parse server certificate
+    let server_certs = rustls_pemfile::certs(&mut server_cert_pem.as_slice())
+        .collect::<Result<Vec<_>, _>>()?;
+    if server_certs.is_empty() {
+        return Err("No server certificates found in PEM".into());
+    }
+
+    // Parse server private key
+    let server_key = rustls_pemfile::private_key(&mut server_key_pem.as_slice())?
+        .ok_or("No private key found in PEM")?;
+
+    // Parse client certificate (for pinning/verification)
+    let client_certs = rustls_pemfile::certs(&mut client_cert_pem.as_slice())
+        .collect::<Result<Vec<_>, _>>()?;
+    if client_certs.is_empty() {
+        return Err("No client certificates found in PEM".into());
+    }
+
+    info!("✅ Parsed {} server cert(s), 1 private key, {} client cert(s)",
+          server_certs.len(), client_certs.len());
+
+    // Create custom client certificate verifier
+    info!("🔒 Creating custom certificate verifier (accepts CA:TRUE)...");
+    let client_cert_verifier = lenient_verifier::LenientClientCertVerifier::new(
+        Some(client_certs[0].to_vec()) // Pin to the expected client certificate
+    );
+
+    // Build rustls ServerConfig with custom verifier
+    info!("🔧 Building rustls ServerConfig with dangerous configuration...");
+    let mut server_config = rustls::ServerConfig::builder()
+        .with_client_cert_verifier(client_cert_verifier)
+        .with_single_cert(server_certs, server_key)?;
+
+    // Enable ALPN for HTTP/2 (required for gRPC)
+    server_config.alpn_protocols = vec![b"h2".to_vec()];
+
+    info!("✅ Rustls ServerConfig created with lenient client cert verifier");
+
+    Ok(Arc::new(server_config))
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
@@ -145,19 +217,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Configure TLS based on CA mode
     info!("🔐 Configuring TLS...");
-    let tls_config = configure_tls(args.ca_mode)?;
 
-    info!("🌐 Binding server to {} with TLS...", addr);
+    if args.ca_mode {
+        // CA:TRUE mode - use custom rustls config with lenient verifier
+        info!("⚠️  Using lenient mode (accepts CA:TRUE certificates)");
 
-    // Create the server with TLS
-    let server = Server::builder()
-        .tls_config(tls_config)?
-        .add_service(KvServer::new(kv_service));
+        // For now, we'll note that custom rustls::ServerConfig integration with tonic Server
+        // requires using the incoming stream directly or using a custom acceptor.
+        // This is more complex than the client side.
+        // As a workaround, we'll use the standard config for now and document the limitation.
 
-    info!("✅ Server configured successfully");
-    info!("🎧 Listening on {} - Ready to accept connections! 🚀", addr);
+        info!("⚠️  NOTE: Server-side lenient mode not fully implemented yet");
+        info!("⚠️  Falling back to standard TLS config");
+        info!("⚠️  This may still reject CA:TRUE client certificates");
 
-    server.serve(addr).await?;
+        let tls_config = configure_tls_standard(args.ca_mode)?;
+
+        info!("🌐 Binding server to {} with TLS...", addr);
+
+        let server = Server::builder()
+            .tls_config(tls_config)?
+            .add_service(KvServer::new(kv_service));
+
+        info!("✅ Server configured successfully");
+        info!("🎧 Listening on {} - Ready to accept connections! 🚀", addr);
+
+        server.serve(addr).await?;
+    } else {
+        // CA:FALSE mode - use standard strict validation
+        let tls_config = configure_tls_standard(args.ca_mode)?;
+
+        info!("🌐 Binding server to {} with TLS...", addr);
+
+        let server = Server::builder()
+            .tls_config(tls_config)?
+            .add_service(KvServer::new(kv_service));
+
+        info!("✅ Server configured successfully");
+        info!("🎧 Listening on {} - Ready to accept connections! 🚀", addr);
+
+        server.serve(addr).await?;
+    }
 
     info!("⏹️  Server stopped gracefully");
 

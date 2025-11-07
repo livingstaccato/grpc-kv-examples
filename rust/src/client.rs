@@ -1,11 +1,9 @@
 use log::{info, debug};
 use std::env;
 use std::fs;
-use std::sync::Arc;
-use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity, Endpoint};
+use tonic::transport::{Certificate, Channel, ClientTlsConfig, Identity};
 use clap::Parser;
 use rustls;
-use rustls::pki_types::{CertificateDer, PrivateKeyDer};
 
 // Custom certificate verifier module
 mod lenient_verifier;
@@ -22,7 +20,8 @@ use proto::GetRequest;
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Certificate CA mode: true for CA:TRUE (go-plugin compatible), false for CA:FALSE (strict validation)
-    #[arg(long, default_value_t = true)]
+    /// Usage: --ca-mode true or --ca-mode false (default: true)
+    #[arg(long = "ca-mode", default_value = "true")]
     ca_mode: bool,
 }
 
@@ -117,8 +116,6 @@ async fn create_channel_with_lenient_tls(
 
     // Create HTTPS connector with custom rustls config
     info!("🔌 Creating HTTPS connector with custom TLS...");
-    let mut http_connector = hyper_util::client::legacy::connect::HttpConnector::new();
-    http_connector.enforce_http(false);
 
     let https_connector = hyper_rustls::HttpsConnectorBuilder::new()
         .with_tls_config(client_config)
@@ -126,15 +123,10 @@ async fn create_channel_with_lenient_tls(
         .enable_http2()
         .build();
 
-    // Build hyper client
-    info!("🔨 Building hyper client...");
-    let hyper_client = hyper_util::client::legacy::Client::builder(hyper_util::rt::TokioExecutor::new())
-        .build(https_connector);
-
-    // Build tonic channel from hyper client
-    info!("🚀 Building tonic channel from hyper client...");
+    // Build tonic channel with custom connector
+    info!("🚀 Building tonic channel with custom connector...");
     let channel = Channel::builder(endpoint.parse()?)
-        .connect_with_connector(hyper_client)
+        .connect_with_connector(https_connector)
         .await?;
 
     info!("✅ Successfully created gRPC channel with custom certificate verifier");

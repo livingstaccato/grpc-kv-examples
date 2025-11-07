@@ -31,7 +31,8 @@
       "Bash(./rust/target/release/rust-kv-client)",
       "Bash(kill:*)",
       "Bash(go/bin/go-kv-client)",
-      "Bash(./rust/target/release/rust-kv-client:*)"
+      "Bash(./rust/target/release/rust-kv-client:*)",
+      "Bash(rust/target/release/rust-kv-server:*)"
     ],
     "deny": [],
     "ask": []

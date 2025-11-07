@@ -15,6 +15,7 @@ use log::{info, warn};
 
 /// Lenient server certificate verifier that accepts CA:TRUE certificates
 /// Used by the client to verify server certificates
+#[derive(Debug)]
 pub struct LenientServerCertVerifier {
     /// The expected server certificate (for pinning)
     expected_cert: Option<Vec<u8>>,
@@ -119,6 +120,7 @@ impl ServerCertVerifier for LenientServerCertVerifier {
 
 /// Lenient client certificate verifier that accepts CA:TRUE certificates
 /// Used by the server to verify client certificates
+#[derive(Debug)]
 pub struct LenientClientCertVerifier {
     /// The expected client certificate (for pinning)
     expected_cert: Option<Vec<u8>>,
