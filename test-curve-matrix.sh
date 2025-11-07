@@ -187,7 +187,7 @@ run_client() {
             timeout $TEST_TIMEOUT dotnet run > "$log_file" 2>&1
             ;;
         rust)
-            timeout $TEST_TIMEOUT "$BASE_DIR/rust/target/release/rust-kv-client" > "$log_file" 2>&1
+            timeout $TEST_TIMEOUT "$BASE_DIR/rust/target/release/rust-kv-client" --ca-mode=true > "$log_file" 2>&1
             ;;
     esac
     return $?
