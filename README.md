@@ -21,6 +21,7 @@ This project implements a simple key/value gRPC service in multiple languages to
 | **Rust** | ✅ | ✅ | Partial | Server works with `--ca-mode=true` |
 | **Node.js** | ✅ | ✅ | Fully working | Dynamic proto loading |
 | **C#** | ✅ | ✅ | Working | Server with comprehensive logging |
+| **PHP** | ✅ | ✅ | Working | Requires Composer + dependencies |
 
 ## Quick Start
 
@@ -35,6 +36,7 @@ rb-server      # Ruby server
 ./rust/target/release/rust-kv-server --ca-mode=true  # Rust server
 node-server    # Node.js server
 cs-server      # C# server
+php-server     # PHP server
 
 # 3. Run a client (in another terminal)
 source env.sh
@@ -44,6 +46,7 @@ rb-client      # Ruby client
 ./rust/target/release/rust-kv-client  # Rust client
 node-client    # Node.js client
 cs-client      # C# client
+php-client     # PHP client
 ```
 
 ## Building
@@ -85,6 +88,26 @@ cd csharp && dotnet build
 cd csharp && dotnet build CSharpGrpcServer.csproj
 ```
 
+### PHP
+
+**Prerequisites:**
+```bash
+# Install Composer (macOS)
+brew install composer
+
+# Install gRPC extension
+pecl install grpc
+```
+
+**Setup:**
+```bash
+cd php
+composer install      # Install dependencies
+./generate-proto.sh  # Generate proto files
+```
+
+See `php/README.md` for detailed setup instructions.
+
 ## Testing
 
 ### Comprehensive Matrix Test
@@ -95,11 +118,13 @@ Test all language combinations across all curves:
 ./test-curve-matrix.sh
 ```
 
-**Results**: 60 tests (20 combinations × 3 curves)
-- Overall: 61% passing (37/60)
-- P-256: 70% passing
-- P-384: 70% passing
-- P-521: 45% passing
+**Results** (without PHP): 108 tests (36 combinations × 3 curves)
+- Overall: 56% passing (61/108)
+- P-256: 67% passing (24/36)
+- P-384: 64% passing (23/36)
+- P-521: 39% passing (14/36)
+
+**With PHP** (requires Composer + dependencies): 144 tests (48 combinations × 3 curves)
 
 ### Single Curve Test
 
@@ -168,7 +193,7 @@ Test specific curve:
 Two certificate types:
 
 ### CA:TRUE Certificates (Standard)
-- Used by: Go, Python, Ruby, C#
+- Used by: Go, Python, Ruby, Node.js, C#, PHP
 - Location: `certs/ec-{curve}-mtls-*.crt`
 - Compatible with: HashiCorp go-plugin
 - Constraint: `basicConstraints=CA:TRUE`
@@ -194,7 +219,9 @@ source env.sh
 ├── python/                # Python implementation
 ├── ruby/                  # Ruby implementation
 ├── rust/                  # Rust implementation
+├── nodejs/                # Node.js implementation
 ├── csharp/                # C# implementation
+├── php/                   # PHP implementation
 ├── proto/                 # Protocol Buffer definitions
 ├── certs/                 # TLS/mTLS certificates
 ├── env.sh                 # Environment setup script

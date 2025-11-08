@@ -214,6 +214,56 @@ Dependencies are defined in `.csproj` files. Key packages:
 
 **Note:** The server has extensive logging for debugging TLS handshakes and certificate validation.
 
+### PHP
+
+PHP uses Composer for dependency management and requires PHP 8.0+.
+
+```bash
+# Install dependencies (first time)
+cd php
+composer install
+
+# Generate proto files
+./generate-proto.sh
+
+# Run server
+php-server
+
+# Run client
+php-client
+```
+
+Dependencies are defined in `composer.json`. Key packages:
+- `grpc/grpc` for gRPC (v1.57+)
+- `google/protobuf` for Protocol Buffers
+- `grpc/grpc-tools` for proto code generation (dev dependency)
+
+**Key Features:**
+- Dynamic certificate handling (creates temp files from env vars)
+- Full mTLS support
+- Comprehensive emoji logging matching other languages
+- In-memory key-value store (Get/Put methods)
+- Certificate inspection and detailed logging
+- TLS 1.2/1.3 support
+
+**Proto Generation:**
+PHP requires `protoc` and `grpc_php_plugin` to generate client/server code from proto files:
+```bash
+cd php
+./generate-proto.sh
+```
+
+**Dependencies to Install:**
+```bash
+# macOS
+brew install composer protobuf grpc
+
+# Install PHP gRPC extension
+pecl install grpc
+```
+
+**Note:** PHP gRPC requires certificate file paths (not PEM strings), so the implementation creates temporary files in `/tmp/grpc-kv-php` from environment variables.
+
 ## Certificate Management
 
 Certificates are stored in `certs/` directory with naming pattern:
@@ -319,6 +369,12 @@ grpc_tools_ruby_protoc --ruby_out=ruby --grpc_out=ruby proto/kv.proto
 │   ├── ServerProgram.cs # Server entry point
 │   ├── KVServiceImpl.cs # Server service implementation
 │   └── *.csproj     # Project files (client and server)
+├── php/             # PHP implementation
+│   ├── php-kv-server.php # Server implementation
+│   ├── php-kv-client.php # Client implementation
+│   ├── composer.json # Dependencies
+│   ├── generate-proto.sh # Proto generation script
+│   └── README.md    # PHP-specific documentation
 ├── certs/           # mTLS certificates for different curves
 │   ├── ec-*.crt     # CA:TRUE certificates (go-plugin compatible)
 │   └── ca-false-*.crt # CA:FALSE certificates (RFC-compliant, for Rust)
@@ -357,11 +413,12 @@ Use `test-curve-matrix.sh` to test all language combinations across all curves a
 ```
 
 This script:
-- Tests all server/client language combinations (Go, Python, Ruby, Rust, Node.js, C#)
+- Tests all server/client language combinations (Go, Python, Ruby, Rust, Node.js, C#, PHP)
 - Tests all three elliptic curves (secp256r1, secp384r1, secp521r1)
 - Produces a color-coded matrix showing which combinations work
 - Provides summary statistics and key findings
-- **Total tests**: 108 (36 combinations × 3 curves)
+- **Total tests**: 144 (48 combinations × 3 curves) when PHP is installed
+- **Without PHP**: 108 tests (36 combinations × 3 curves)
 
 **Known Compatibility Issues:**
 - **Rust**: Limited cross-language compatibility due to CA:FALSE/CA:TRUE certificate mismatch
