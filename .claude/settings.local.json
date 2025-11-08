@@ -56,7 +56,8 @@
       "Bash(grpc_php_plugin:*)",
       "Bash(brew list:*)",
       "Bash(brew search:*)",
-      "Bash(pecl list:*)"
+      "Bash(pecl list:*)",
+      "Bash(bash:*)"
     ],
     "deny": [],
     "ask": []
