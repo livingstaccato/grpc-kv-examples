@@ -11,9 +11,10 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use Proto\KV\KVClient;
-use Proto\KV\GetRequest;
-use Proto\KV\PutRequest;
+use Proto\KVClient;
+use Proto\GetRequest;
+use Proto\PutRequest;
+use Proto\GetResponse;
 use Grpc\ChannelCredentials;
 
 /**
@@ -110,7 +111,7 @@ echo "🔌 Creating gRPC connection... 🔄\n";
 echo "🔌 Connecting to: {$address}\n";
 
 // Create the client
-$client = new \Proto\KV\KVClient($address, [
+$client = new \Proto\KVClient($address, [
     'credentials' => $channelCredentials,
     'grpc.ssl_target_name_override' => $host,
     'grpc.default_authority' => $host
@@ -120,7 +121,7 @@ echo "✅ Connection established successfully 🔗\n";
 
 // Test: Put a value
 echo "\n📝 Testing Put request...\n";
-$putRequest = new \Proto\KV\PutRequest();
+$putRequest = new \Proto\PutRequest();
 $putRequest->setKey('test');
 $putRequest->setValue('Hello from PHP!');
 
@@ -140,7 +141,7 @@ try {
 
 // Test: Get the value
 echo "\n🔍 Testing Get request...\n";
-$getRequest = new \Proto\KV\GetRequest();
+$getRequest = new \Proto\GetRequest();
 $getRequest->setKey('test');
 
 try {
