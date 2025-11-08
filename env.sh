@@ -125,6 +125,9 @@ alias cs-server="(cd ${BASE_PATH} && source env.sh && cd ./csharp && dotnet run 
 alias node-client="(cd ${BASE_PATH} && source env.sh && node nodejs/node-kv-client.js)"
 alias node-server="(cd ${BASE_PATH} && source env.sh && node nodejs/node-kv-server.js)"
 
+alias php-client="(cd ${BASE_PATH} && source env.sh && php php/php-kv-client.php)"
+alias php-server="(cd ${BASE_PATH} && source env.sh && php php/php-kv-server.php)"
+
 alias rpcenv-refresh=" \
   unset PLUGIN_CLIENT_CERT \
     PLUGIN_CLIENT_KEY \

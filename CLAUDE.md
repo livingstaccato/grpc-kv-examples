@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a multi-language gRPC key/value server/client implementation testing cross-language TLS compatibility. The primary goal is testing mTLS with different elliptic curves (secp256r1, secp384r1, secp521r1) across 6 language implementations.
+This is a multi-language gRPC key/value server/client implementation testing cross-language TLS compatibility. The primary goal is testing mTLS with different elliptic curves (secp256r1, secp384r1, secp521r1) across 7 language implementations.
 
 **Critical Context**: This project tests compatibility with HashiCorp's `go-plugin` which requires P-521 (secp521r1) curves. Currently only Go clients/servers work properly with secp521r1 certificates - other languages fail despite OpenSSL support.
 
@@ -16,6 +16,7 @@ This is a multi-language gRPC key/value server/client implementation testing cro
 - **Rust** (`rust/`): Server and client in `src/server.rs` and `src/client.rs` (⚠️ limited cross-language compatibility)
 - **Node.js** (`nodejs/`): Server and client in `node-kv-server.js` and `node-kv-client.js`
 - **C#** (`csharp/`): Client and server - `Program.cs` (client), `ServerProgram.cs` (server)
+- **PHP** (`php/`): Server and client in `php-kv-server.php` and `php-kv-client.php`
 
 ## Environment Setup
 

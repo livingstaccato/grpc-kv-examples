@@ -81,6 +81,16 @@ else
 fi
 echo ""
 
+# Check PHP availability
+if command -v php &> /dev/null && [ -f "$BASE_DIR/php/composer.json" ]; then
+    echo -e "${GREEN}✅ PHP available${NC}"
+    HAS_PHP=true
+else
+    echo -e "${YELLOW}⚠️  PHP not available, skipping PHP tests${NC}"
+    HAS_PHP=false
+fi
+echo ""
+
 # Test matrix: server:client:description
 # Note: C# client-only and Node.js tests added at the end
 declare -a test_combinations=(
@@ -115,6 +125,13 @@ declare -a test_combinations=(
     "csharp:rust:C# → Rust"
     "csharp:nodejs:C# → Node.js"
     "csharp:csharp:C# → C#"
+    "php:go:PHP → Go"
+    "php:python:PHP → Python"
+    "php:ruby:PHP → Ruby"
+    "php:rust:PHP → Rust"
+    "php:nodejs:PHP → Node.js"
+    "php:csharp:PHP → C#"
+    "php:php:PHP → PHP"
 )
 
 # Filter test combinations based on what's available
@@ -142,6 +159,11 @@ for test in "${test_combinations[@]}"; do
         continue
     fi
 
+    # Skip PHP tests if PHP is not available
+    if [ "$HAS_PHP" = false ] && ( [ "$server" = "php" ] || [ "$client" = "php" ] ); then
+        continue
+    fi
+
     filtered_combinations+=("$test")
 done
 
@@ -159,6 +181,26 @@ if [ "$HAS_CSHARP" = true ]; then
     fi
     if [ "$HAS_NODEJS" = true ]; then
         filtered_combinations+=("nodejs:csharp:Node.js → C#")
+    fi
+fi
+
+# Add PHP client tests if available
+if [ "$HAS_PHP" = true ]; then
+    filtered_combinations+=("go:php:Go → PHP")
+    if [ "$HAS_PYTHON" = true ]; then
+        filtered_combinations+=("python:php:Python → PHP")
+    fi
+    if [ "$HAS_RUBY" = true ]; then
+        filtered_combinations+=("ruby:php:Ruby → PHP")
+    fi
+    if [ "$HAS_RUST" = true ]; then
+        filtered_combinations+=("rust:php:Rust → PHP")
+    fi
+    if [ "$HAS_NODEJS" = true ]; then
+        filtered_combinations+=("nodejs:php:Node.js → PHP")
+    fi
+    if [ "$HAS_CSHARP" = true ]; then
+        filtered_combinations+=("csharp:php:C# → PHP")
     fi
 fi
 
@@ -193,6 +235,10 @@ start_server() {
             cd "$BASE_DIR/csharp"
             dotnet run --project CSharpGrpcServer.csproj > "$log_file" 2>&1 &
             ;;
+        php)
+            cd "$BASE_DIR"
+            php ./php/php-kv-server.php > "$log_file" 2>&1 &
+            ;;
     esac
     SERVER_PID=$!
     sleep 3  # Give server time to start
@@ -206,7 +252,7 @@ stop_server() {
         SERVER_PID=""
     fi
     # Kill any lingering server processes
-    pkill -f "go-kv-server|example-py-server|rb-kv-server|rust-kv-server|node-kv-server|CSharpGrpcServer" 2>/dev/null || true
+    pkill -f "go-kv-server|example-py-server|rb-kv-server|rust-kv-server|node-kv-server|CSharpGrpcServer|php-kv-server" 2>/dev/null || true
     sleep 1
 }
 
@@ -238,6 +284,10 @@ run_client() {
         nodejs)
             cd "$BASE_DIR"
             timeout $TEST_TIMEOUT node ./nodejs/node-kv-client.js > "$log_file" 2>&1
+            ;;
+        php)
+            cd "$BASE_DIR"
+            timeout $TEST_TIMEOUT php ./php/php-kv-client.php > "$log_file" 2>&1
             ;;
     esac
     return $?
