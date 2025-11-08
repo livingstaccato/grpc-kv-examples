@@ -11,6 +11,14 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Manually require generated proto files
+require_once __DIR__ . '/proto/Proto/KVClient.php';
+require_once __DIR__ . '/proto/Proto/GetRequest.php';
+require_once __DIR__ . '/proto/Proto/GetResponse.php';
+require_once __DIR__ . '/proto/Proto/PutRequest.php';
+require_once __DIR__ . '/proto/Proto/PBEmpty.php';
+require_once __DIR__ . '/proto/GPBMetadata/Kv.php';
+
 use Proto\KVClient;
 use Proto\GetRequest;
 use Proto\PutRequest;
