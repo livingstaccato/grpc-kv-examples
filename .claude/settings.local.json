@@ -50,7 +50,11 @@
       "Bash(netstat:*)",
       "Bash(./go/bin/go-kv-client)",
       "Bash(timeout 5 ./go/bin/go-kv-client:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(composer install:*)",
+      "Bash(protoc:*)",
+      "Bash(grpc_php_plugin:*)",
+      "Bash(brew list:*)"
     ],
     "deny": [],
     "ask": []

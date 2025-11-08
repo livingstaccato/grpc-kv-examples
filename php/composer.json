@@ -7,9 +7,6 @@
         "grpc/grpc": "^1.57",
         "google/protobuf": "^3.25"
     },
-    "require-dev": {
-        "grpc/grpc-tools": "^1.57"
-    },
     "autoload": {
         "psr-4": {
             "Proto\\": "proto/"
