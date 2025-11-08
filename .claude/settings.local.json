@@ -47,7 +47,8 @@
       "Bash(timeout 15 dotnet run:*)",
       "Bash(./go/bin/go-kv-server)",
       "Bash(pkill:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(./go/bin/go-kv-client)"
     ],
     "deny": [],
     "ask": []
