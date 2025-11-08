@@ -48,7 +48,8 @@
       "Bash(./go/bin/go-kv-server)",
       "Bash(pkill:*)",
       "Bash(netstat:*)",
-      "Bash(./go/bin/go-kv-client)"
+      "Bash(./go/bin/go-kv-client)",
+      "Bash(timeout 5 ./go/bin/go-kv-client:*)"
     ],
     "deny": [],
     "ask": []
