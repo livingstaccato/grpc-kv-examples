@@ -57,7 +57,8 @@
       "Bash(brew list:*)",
       "Bash(brew search:*)",
       "Bash(pecl list:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []
