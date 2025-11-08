@@ -54,7 +54,9 @@
       "Bash(composer install:*)",
       "Bash(protoc:*)",
       "Bash(grpc_php_plugin:*)",
-      "Bash(brew list:*)"
+      "Bash(brew list:*)",
+      "Bash(brew search:*)",
+      "Bash(pecl list:*)"
     ],
     "deny": [],
     "ask": []
