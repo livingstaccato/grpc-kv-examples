@@ -1,0 +1,18 @@
+{
+  "name": "grpc-kv-nodejs",
+  "version": "1.0.0",
+  "description": "Node.js gRPC KV Server and Client with mTLS",
+  "main": "kv-server.js",
+  "scripts": {
+    "proto": "grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./proto --grpc_out=grpc_js:./proto -I ../proto ../proto/kv.proto",
+    "server": "node kv-server.js",
+    "client": "node kv-client.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.0",
+    "@grpc/proto-loader": "^0.7.10"
+  },
+  "devDependencies": {
+    "grpc-tools": "^1.12.4"
+  }
+}
