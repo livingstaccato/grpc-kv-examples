@@ -1,0 +1,22 @@
+# Compatibility Test Results - Mon Dec  1 04:31:25 UTC 2025
+
+| Server | Server Algo | Client | Client Algo | Works |
+| ------ | ----------- | ------ | ----------- | ----- |
+| go | ec-secp384r1 | go | ec-secp384r1 | YES |
+| go | ec-secp384r1 | python | ec-secp384r1 | NO |
+| go | ec-secp384r1 | ruby | ec-secp384r1 | YES |
+| python | ec-secp384r1 | go | ec-secp384r1 | NO |
+| python | ec-secp384r1 | python | ec-secp384r1 | NO |
+| python | ec-secp384r1 | ruby | ec-secp384r1 | NO |
+| ruby | ec-secp384r1 | go | ec-secp384r1 | YES |
+| ruby | ec-secp384r1 | python | ec-secp384r1 | NO |
+| ruby | ec-secp384r1 | ruby | ec-secp384r1 | YES |
+| go | ec-secp521r1 | go | ec-secp521r1 | NO |
+| go | ec-secp521r1 | python | ec-secp521r1 | NO |
+| go | ec-secp521r1 | ruby | ec-secp521r1 | NO |
+| python | ec-secp521r1 | go | ec-secp521r1 | NO |
+| python | ec-secp521r1 | python | ec-secp521r1 | NO |
+| python | ec-secp521r1 | ruby | ec-secp521r1 | NO |
+| ruby | ec-secp521r1 | go | ec-secp521r1 | NO |
+| ruby | ec-secp521r1 | python | ec-secp521r1 | NO |
+| ruby | ec-secp521r1 | ruby | ec-secp521r1 | NO |

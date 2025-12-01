@@ -1,0 +1,22 @@
+# Podfile for Objective-C gRPC KV Client
+# Run: pod install
+
+platform :osx, '10.15'
+
+target 'KVClient' do
+  pod 'gRPC-ProtoRPC', '~> 1.62'
+  pod 'Protobuf', '~> 3.27'
+end
+
+target 'KVServer' do
+  pod 'gRPC-ProtoRPC', '~> 1.62'
+  pod 'Protobuf', '~> 3.27'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.15'
+    end
+  end
+end

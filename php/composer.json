@@ -1,15 +1,14 @@
 {
-    "name": "grpc-kv/php-examples",
-    "description": "PHP gRPC Key-Value store implementation with mTLS",
-    "type": "project",
+    "name": "grpc-kv/php-client",
+    "description": "PHP gRPC KV Client with mTLS support",
     "require": {
         "php": ">=8.0",
-        "grpc/grpc": "^1.57",
-        "google/protobuf": "^3.25"
+        "grpc/grpc": "^1.74",
+        "google/protobuf": "^4.33"
     },
     "autoload": {
         "psr-4": {
-            "Proto\\": "proto/"
+            "KV\\": "src/KV/"
         }
     }
 }
