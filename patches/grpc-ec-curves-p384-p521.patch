@@ -1,0 +1,85 @@
+From: Claude AI <patches@grpc-examples.local>
+Subject: [PATCH] tsi: Add support for P-384 and P-521 elliptic curves in TLS
+
+This patch enables gRPC's TLS implementation to advertise support for
+P-384 (secp384r1) and P-521 (secp521r1) elliptic curves in addition to
+P-256 (prime256v1).
+
+The root cause was that BoringSSL (used by gRPC) defines
+OPENSSL_VERSION_NUMBER as 0x1010107f (~OpenSSL 1.1.1g), which is less
+than 0x30000000 (OpenSSL 3.0). This caused gRPC to take the legacy
+code path that only sets a single ECDH curve using SSL_CTX_set_tmp_ecdh.
+
+However, BoringSSL actually supports SSL_CTX_set1_groups(), which can
+set multiple curves simultaneously. This patch:
+
+1. Adds OPENSSL_IS_BORINGSSL check to use SSL_CTX_set1_groups for
+   BoringSSL, enabling multiple curve support
+2. Extends kSslEcCurveNames to include P-384 and P-521 curves
+3. Updates the legacy OpenSSL path to also iterate through all three
+   curves for better compatibility
+
+Without this fix, gRPC clients/servers only advertise P-256 support
+in TLS handshakes, causing connection failures with servers/clients
+that require P-384 or P-521 curves.
+
+Tested: Verified that Python gRPC client now advertises
+[CurveP256, CurveP384, CurveP521] in TLS ClientHello.
+
+---
+ src/core/tsi/ssl_transport_security.cc | 33 ++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
+
+diff --git a/src/core/tsi/ssl_transport_security.cc b/src/core/tsi/ssl_transport_security.cc
+index 6526d3f..a389445 100644
+--- a/src/core/tsi/ssl_transport_security.cc
++++ b/src/core/tsi/ssl_transport_security.cc
+@@ -259,8 +259,8 @@ static int g_ssl_ex_verified_root_cert_index = -1;
+ #if !defined(OPENSSL_IS_BORINGSSL) && !defined(OPENSSL_NO_ENGINE)
+ static const char kSslEnginePrefix[] = "engine:";
+ #endif
+-#if OPENSSL_VERSION_NUMBER >= 0x30000000
+-static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1};
++#if (OPENSSL_VERSION_NUMBER >= 0x30000000) || defined(OPENSSL_IS_BORINGSSL)
++static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};
+ #endif
+
+ #if OPENSSL_VERSION_NUMBER < 0x10100000
+@@ -941,17 +941,28 @@ static tsi_result populate_ssl_context(
+     return TSI_INVALID_ARGUMENT;
+   }
+   {
+-#if OPENSSL_VERSION_NUMBER < 0x30000000L
+-    EC_KEY* ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+-    if (!SSL_CTX_set_tmp_ecdh(context, ecdh)) {
++#if (OPENSSL_VERSION_NUMBER < 0x30000000L) && !defined(OPENSSL_IS_BORINGSSL)
++    // Legacy OpenSSL (< 3.0) without BoringSSL
++    // Support multiple curves for better compatibility
++    static const int legacy_curves[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};
++    bool ecdh_set = false;
++    for (size_t i = 0; i < sizeof(legacy_curves)/sizeof(legacy_curves[0]); i++) {
++      EC_KEY* ecdh = EC_KEY_new_by_curve_name(legacy_curves[i]);
++      if (ecdh && SSL_CTX_set_tmp_ecdh(context, ecdh)) {
++        SSL_CTX_set_options(context, SSL_OP_SINGLE_ECDH_USE);
++        EC_KEY_free(ecdh);
++        ecdh_set = true;
++        break;
++      }
++      if (ecdh) EC_KEY_free(ecdh);
++    }
++    if (!ecdh_set) {
+       LOG(ERROR) << "Could not set ephemeral ECDH key.";
+-      EC_KEY_free(ecdh);
+       return TSI_INTERNAL_ERROR;
+     }
+-    SSL_CTX_set_options(context, SSL_OP_SINGLE_ECDH_USE);
+-    EC_KEY_free(ecdh);
+ #else
+-    if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, 1)) {
++    // OpenSSL 3.0+ or BoringSSL - use SSL_CTX_set1_groups for multiple curves
++    if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))) {
+       LOG(ERROR) << "Could not set ephemeral ECDH key.";
+       return TSI_INTERNAL_ERROR;
+     }
+--
+2.39.0
