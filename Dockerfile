@@ -112,7 +112,9 @@ RUN pip3 install --break-system-packages \
 ARG APPLY_GRPC_PATCH
 RUN if [ "$APPLY_GRPC_PATCH" = "true" ]; then \
         echo "Building PATCHED grpcio with P-384/P-521 support..." && \
-        apt-get update && apt-get install -y python3-dev cython3 && \
+        apt-get update && apt-get install -y python3-dev && \
+        # Pin Cython to 0.29.x for gRPC compatibility (Cython 3.x breaks older gRPC builds)
+        pip3 install --break-system-packages 'Cython<3.0' && \
         git clone --depth 1 --branch v1.62.0 --recurse-submodules --shallow-submodules \
             https://github.com/grpc/grpc.git /tmp/grpc && \
         cd /tmp/grpc && \
