@@ -3,11 +3,35 @@
 # This Dockerfile sets up an environment with all language runtimes and tools
 # needed to test gRPC TLS with P-256, P-384, and P-521 elliptic curves.
 #
+# ============================================================
+# TESTING MODES
+# ============================================================
+#
+# 1. UNPATCHED (default) - Demonstrates the BoringSSL P-256-only bug:
+#    docker build -t grpc-curve-test .
+#    docker run -it grpc-curve-test ./test-all-curves.sh
+#
+# 2. PATCHED - Tests with the EC curve fix applied:
+#    docker build --build-arg APPLY_GRPC_PATCH=true -t grpc-curve-test-patched .
+#    docker run -it grpc-curve-test-patched ./test-all-curves.sh
+#
+# ============================================================
+# EXPECTED RESULTS
+# ============================================================
+#
+# UNPATCHED MODE:
+#   - Python, Ruby, C++ will FAIL with P-384 and P-521 (BoringSSL bug)
+#   - Go, Node.js, Java, Rust, Dart, C# will PASS all curves
+#
+# PATCHED MODE:
+#   - ALL languages should PASS all curves
+#
+# ============================================================
 # Languages included:
 # - Go (server + client, uses crypto/tls - full curve support)
-# - Python (gRPC with BoringSSL - P-256 only bug)
-# - Ruby (gRPC with BoringSSL - P-256 only bug)
-# - C++ (gRPC with BoringSSL - P-256 only bug)
+# - Python (gRPC with BoringSSL - P-256 only bug, fixed with patch)
+# - Ruby (gRPC with BoringSSL - P-256 only bug, fixed with patch)
+# - C++ (gRPC with BoringSSL - P-256 only bug, fixed with patch)
 # - Node.js (gRPC with OpenSSL - full curve support)
 # - Java (gRPC with Netty/JDK TLS - full curve support)
 # - Kotlin (uses Java gRPC)
@@ -16,13 +40,16 @@
 # - Dart (native TLS - full curve support)
 # - C# (gRPC with SslStream - full curve support)
 #
-# Build: docker build -t grpc-curve-test .
-# Run:   docker run -it grpc-curve-test
 
 FROM ubuntu:24.04
 
 LABEL maintainer="grpc-kv-examples"
 LABEL description="gRPC cross-language EC curve compatibility testing environment"
+
+# Build argument to control patching
+# Set to "true" to build with the EC curve patch applied
+ARG APPLY_GRPC_PATCH=false
+ENV GRPC_PATCHED=${APPLY_GRPC_PATCH}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
@@ -74,11 +101,37 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python gRPC packages (stock version with P-256 only bug)
+# Install Python gRPC packages
+# In unpatched mode: stock grpcio with P-256 only bug
+# In patched mode: build grpcio from source with the fix
 RUN pip3 install --break-system-packages \
-    grpcio \
     grpcio-tools \
     protobuf
+
+# Conditionally install patched or stock grpcio
+ARG APPLY_GRPC_PATCH
+RUN if [ "$APPLY_GRPC_PATCH" = "true" ]; then \
+        echo "Building PATCHED grpcio with P-384/P-521 support..." && \
+        apt-get update && apt-get install -y python3-dev cython3 && \
+        git clone --depth 1 --branch v1.62.0 --recurse-submodules --shallow-submodules \
+            https://github.com/grpc/grpc.git /tmp/grpc && \
+        cd /tmp/grpc && \
+        # Apply the patch
+        sed -i 's/static const int kSslEcCurveNames\[\] = {NID_X9_62_prime256v1};/static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};/' \
+            src/core/tsi/ssl_transport_security.cc && \
+        sed -i 's/#if OPENSSL_VERSION_NUMBER >= 0x30000000/#if (OPENSSL_VERSION_NUMBER >= 0x30000000) || defined(OPENSSL_IS_BORINGSSL)/' \
+            src/core/tsi/ssl_transport_security.cc && \
+        sed -i 's/#if OPENSSL_VERSION_NUMBER < 0x30000000L/#if (OPENSSL_VERSION_NUMBER < 0x30000000L) \&\& !defined(OPENSSL_IS_BORINGSSL)/' \
+            src/core/tsi/ssl_transport_security.cc && \
+        # Build and install
+        pip3 install --break-system-packages . && \
+        rm -rf /tmp/grpc && \
+        echo "PATCHED grpcio installed"; \
+    else \
+        echo "Installing STOCK grpcio (P-256 only bug present)..." && \
+        pip3 install --break-system-packages grpcio && \
+        echo "STOCK grpcio installed"; \
+    fi
 
 # ============================================================
 # Ruby 3.x with bundler
