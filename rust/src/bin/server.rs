@@ -6,7 +6,6 @@ use grpc_kv_rust::proto::kv_server::{Kv, KvServer};
 use grpc_kv_rust::proto::{Empty, GetRequest, GetResponse, PutRequest};
 use grpc_kv_rust::{log, log_certificate_info};
 use std::env;
-use std::sync::Arc;
 use tonic::transport::{Certificate, Identity, Server, ServerTlsConfig};
 use tonic::{Request, Response, Status};
 

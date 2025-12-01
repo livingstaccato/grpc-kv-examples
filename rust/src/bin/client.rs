@@ -64,7 +64,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     let response = client.get(request).await?;
-    let value = String::from_utf8_lossy(&response.into_inner().value);
+    let inner = response.into_inner();
+    let value = String::from_utf8_lossy(&inner.value);
 
     println!("Response: {}", value);
     log("INFO", "Request completed successfully");
