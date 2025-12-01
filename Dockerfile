@@ -192,13 +192,13 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup update stable
 
 # ============================================================
-# Dart SDK
+# Dart SDK (direct download - apt package has libc6 issues on 24.04)
 # ============================================================
-RUN wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/dart.gpg && \
-    echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | tee /etc/apt/sources.list.d/dart_stable.list && \
-    apt-get update && apt-get install -y dart && \
-    rm -rf /var/lib/apt/lists/*
-ENV PATH="/usr/lib/dart/bin:${PATH}"
+ENV DART_VERSION=3.2.6
+RUN wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip && \
+    unzip -q dartsdk-linux-x64-release.zip -d /opt && \
+    rm dartsdk-linux-x64-release.zip
+ENV PATH="/opt/dart-sdk/bin:${PATH}"
 
 # ============================================================
 # .NET SDK 8.0
