@@ -4,71 +4,88 @@
 
 ## Test Environment
 
-| Language | Version | gRPC Library |
-|----------|---------|--------------|
-| **Go** | 1.24.7 | google.golang.org/grpc v1.69.2 |
-| **Node.js** | v22.21.1 | @grpc/grpc-js ^1.10.0 |
-| **Ruby** | 3.3.6 | grpc 1.76.0 |
-| **Python** | 3.11.14 | grpcio 1.76.0 |
-| **Java** | OpenJDK 21.0.8 | grpc-netty-shaded 1.60.0 |
-| **Swift** | 5.10.1 | grpc-swift 1.21.0 |
-| **C#** | .NET 9.0 | Grpc.Net.Client 2.67.0 |
+| Language | Version | gRPC Library | TLS Backend |
+|----------|---------|--------------|-------------|
+| **Go** | 1.24.7 | google.golang.org/grpc v1.69.2 | Go crypto/tls |
+| **Node.js** | v22.21.1 | @grpc/grpc-js ^1.10.0 | BoringSSL |
+| **Ruby** | 3.3.6 | grpc 1.76.0 | BoringSSL |
+| **Python** | 3.11.14 | grpcio 1.76.0 | BoringSSL |
+| **Java** | OpenJDK 21.0.8 | grpc-netty-shaded 1.60.0 | Netty/OpenSSL |
+| **Kotlin** | 1.9.22 | grpc-kotlin 1.4.1 | Netty/OpenSSL |
+| **Swift** | 5.10.1 | grpc-swift 1.21.0 | SwiftNIO SSL |
+| **Rust** | 1.75+ | tonic 0.11 | rustls |
+| **C++** | C++17 | grpc 1.60+ | BoringSSL |
+| **C#** | .NET 9.0 | Grpc.Net.Client 2.67.0 | .NET SslStream |
 
 ---
 
 ## Algorithm: ec-secp256r1 (P-256)
 
-| Server ↓ \ Client → | Go | Node.js | Ruby | Python | Java | Swift | C# |
-|---------------------|:--:|:-------:|:----:|:------:|:----:|:-----:|:--:|
-| **Go**              | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Node.js**         | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Ruby**            | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Python**          | ⚠️ | ⚠️      | ⚠️   | ⚠️     | ⚠️   | ⚠️    | ✅ |
-| **Java**            | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Swift**           | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **C#**              | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
+| Server ↓ \ Client → | Go | Node | Ruby | Python | Java | Kotlin | Swift | Rust | C++ | C# |
+|---------------------|:--:|:----:|:----:|:------:|:----:|:------:|:-----:|:----:|:---:|:--:|
+| **Go**              | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Node.js**         | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Ruby**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Python**          | ⚠️ | ⚠️   | ⚠️   | ⚠️     | ⚠️   | ⚠️     | ⚠️    | ⚠️   | ⚠️  | ✅ |
+| **Java**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Kotlin**          | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Swift**           | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Rust**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **C++**             | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **C#**              | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
 
 ---
 
-## Algorithm: ec-secp384r1 (P-384) - RECOMMENDED
+## Algorithm: ec-secp384r1 (P-384) - RECOMMENDED ⭐
 
-| Server ↓ \ Client → | Go | Node.js | Ruby | Python | Java | Swift | C# |
-|---------------------|:--:|:-------:|:----:|:------:|:----:|:-----:|:--:|
-| **Go**              | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Node.js**         | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Ruby**            | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Python**          | ⚠️ | ⚠️      | ⚠️   | ⚠️     | ⚠️   | ⚠️    | ✅ |
-| **Java**            | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Swift**           | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **C#**              | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
+| Server ↓ \ Client → | Go | Node | Ruby | Python | Java | Kotlin | Swift | Rust | C++ | C# |
+|---------------------|:--:|:----:|:----:|:------:|:----:|:------:|:-----:|:----:|:---:|:--:|
+| **Go**              | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Node.js**         | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Ruby**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Python**          | ⚠️ | ⚠️   | ⚠️   | ⚠️     | ⚠️   | ⚠️     | ⚠️    | ⚠️   | ⚠️  | ✅ |
+| **Java**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Kotlin**          | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Swift**           | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Rust**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **C++**             | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **C#**              | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
 
 ---
 
-## Algorithm: ec-secp521r1 (P-521) - PROBLEMATIC
+## Algorithm: ec-secp521r1 (P-521) - PROBLEMATIC ⚠️
 
-| Server ↓ \ Client → | Go | Node.js | Ruby | Python | Java | Swift | C# |
-|---------------------|:--:|:-------:|:----:|:------:|:----:|:-----:|:--:|
-| **Go**              | ✅ | ❌      | ❌   | ❌     | ✅   | ❌    | ✅ |
-| **Node.js**         | ❌ | ❌      | ❌   | ❌     | ❌   | ❌    | ✅ |
-| **Ruby**            | ❌ | ❌      | ❌   | ❌     | ❌   | ❌    | ✅ |
-| **Python**          | ❌ | ❌      | ❌   | ❌     | ❌   | ❌    | ✅ |
-| **Java**            | ✅ | ❌      | ❌   | ❌     | ✅   | ❌    | ✅ |
-| **Swift**           | ❌ | ❌      | ❌   | ❌     | ❌   | ❌    | ✅ |
-| **C#**              | ✅ | ❌      | ❌   | ❌     | ✅   | ❌    | ✅ |
+| Server ↓ \ Client → | Go | Node | Ruby | Python | Java | Kotlin | Swift | Rust | C++ | C# |
+|---------------------|:--:|:----:|:----:|:------:|:----:|:------:|:-----:|:----:|:---:|:--:|
+| **Go**              | ✅ | ❌   | ❌   | ❌     | ✅   | ✅     | ❌    | ✅?  | ❌  | ✅ |
+| **Node.js**         | ❌ | ❌   | ❌   | ❌     | ❌   | ❌     | ❌    | ❌   | ❌  | ✅ |
+| **Ruby**            | ❌ | ❌   | ❌   | ❌     | ❌   | ❌     | ❌    | ❌   | ❌  | ✅ |
+| **Python**          | ❌ | ❌   | ❌   | ❌     | ❌   | ❌     | ❌    | ❌   | ❌  | ✅ |
+| **Java**            | ✅ | ❌   | ❌   | ❌     | ✅   | ✅     | ❌    | ✅?  | ❌  | ✅ |
+| **Kotlin**          | ✅ | ❌   | ❌   | ❌     | ✅   | ✅     | ❌    | ✅?  | ❌  | ✅ |
+| **Swift**           | ❌ | ❌   | ❌   | ❌     | ❌   | ❌     | ❌    | ❌   | ❌  | ✅ |
+| **Rust**            | ✅?| ❌   | ❌   | ❌     | ✅?  | ✅?    | ❌    | ✅?  | ❌  | ✅ |
+| **C++**             | ❌ | ❌   | ❌   | ❌     | ❌   | ❌     | ❌    | ❌   | ❌  | ✅ |
+| **C#**              | ✅ | ❌   | ❌   | ❌     | ✅   | ✅     | ❌    | ✅?  | ❌  | ✅ |
+
+**Note:** ✅? indicates Rust may work with P-521 due to using rustls instead of BoringSSL - needs testing.
 
 ---
 
 ## Algorithm: rsa-2048
 
-| Server ↓ \ Client → | Go | Node.js | Ruby | Python | Java | Swift | C# |
-|---------------------|:--:|:-------:|:----:|:------:|:----:|:-----:|:--:|
-| **Go**              | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Node.js**         | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Ruby**            | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Python**          | ✅ | ✅      | ❌   | ⚠️     | ✅   | ✅    | ✅ |
-| **Java**            | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **Swift**           | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
-| **C#**              | ✅ | ✅      | ✅   | ⚠️     | ✅   | ✅    | ✅ |
+| Server ↓ \ Client → | Go | Node | Ruby | Python | Java | Kotlin | Swift | Rust | C++ | C# |
+|---------------------|:--:|:----:|:----:|:------:|:----:|:------:|:-----:|:----:|:---:|:--:|
+| **Go**              | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Node.js**         | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Ruby**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Python**          | ✅ | ✅   | ❌   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Java**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Kotlin**          | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Swift**           | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **Rust**            | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **C++**             | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
+| **C#**              | ✅ | ✅   | ✅   | ⚠️     | ✅   | ✅     | ✅    | ✅   | ✅  | ✅ |
 
 ---
 
@@ -78,14 +95,26 @@
 |--------|---------|
 | ✅ | Verified working |
 | ❌ | Known failure |
-| ⚠️ | Environment-dependent (works in some environments, fails in others) |
+| ⚠️ | Environment-dependent |
+| ✅? | Expected to work (needs verification) |
 | - | Not tested |
 
 ---
 
-## TLS 1.3 Cipher Suite Negotiation
+## TLS Backend Comparison
 
-Different server implementations negotiate different TLS 1.3 cipher suites:
+| TLS Backend | Languages | P-521 Support | Notes |
+|-------------|-----------|:-------------:|-------|
+| **Go crypto/tls** | Go | ✅ | Native Go, full curve support |
+| **BoringSSL** | Node.js, Ruby, Python, C++ | ❌ | Google's OpenSSL fork, limited P-521 |
+| **Netty/OpenSSL** | Java, Kotlin | ✅ | JVM with native SSL |
+| **rustls** | Rust | ✅? | Pure Rust, uses ring crypto |
+| **SwiftNIO SSL** | Swift | ❌ | Uses BoringSSL internally |
+| **.NET SslStream** | C# | ✅ | .NET native, full support |
+
+---
+
+## TLS 1.3 Cipher Suite Negotiation
 
 | Server | Default TLS 1.3 Cipher |
 |--------|------------------------|
@@ -93,7 +122,9 @@ Different server implementations negotiate different TLS 1.3 cipher suites:
 | Python | TLS_AES_256_GCM_SHA384 |
 | Ruby | TLS_CHACHA20_POLY1305_SHA256 |
 | Node.js | TLS_AES_256_GCM_SHA384 |
-| Java | TLS_AES_256_GCM_SHA384 |
+| Java/Kotlin | TLS_AES_256_GCM_SHA384 |
+| Rust | TLS_AES_256_GCM_SHA384 |
+| C++ | TLS_AES_128_GCM_SHA256 |
 
 ---
 
@@ -107,38 +138,36 @@ Different server implementations negotiate different TLS 1.3 cipher suites:
 ### Known Issues
 
 #### 1. secp521r1 (P-521) Widespread Incompatibility
-- **Affected:** Python, Ruby, Node.js (via grpc-js), Swift
-- **Cause:** Many gRPC implementations use BoringSSL which has limited P-521 support
+- **Affected:** Node.js, Ruby, Python, Swift, C++ (BoringSSL-based)
+- **Cause:** BoringSSL has limited/no P-521 support
 - **Solution:** Avoid P-521; use P-384 instead
+- **Exception:** Rust (rustls) and Go may work with P-521
 
 #### 2. Python Cryptography Library Conflicts
 - **Symptom:** `pyo3_runtime.PanicException: Python API call failed`
-- **Cause:** System cryptography package conflicts with pip-installed version
-- **Solution:** Use virtual environment or match system package version
+- **Cause:** System cryptography package conflicts
+- **Solution:** Use virtual environment
 
 #### 3. Go Client TLS 1.3 MinVersion
-- **Symptom:** C# clients fail to connect to Go server
-- **Cause:** Setting `MinVersion: tls.VersionTLS13` in Go
+- **Symptom:** C# clients fail to connect
 - **Solution:** Use `MinVersion: tls.VersionTLS12`
-
-#### 4. Certificate Verification Failures
-- **Symptom:** `CERTIFICATE_VERIFY_FAILED: unable to get local issuer certificate`
-- **Cause:** Self-signed certificates without proper trust chain
-- **Solution:** Ensure client trusts server's CA certificate
 
 ---
 
 ## Implementation Status
 
-| Language | Server | Client | Status |
-|----------|:------:|:------:|--------|
-| Go | ✅ | ✅ | Production ready |
-| Node.js | ✅ | ✅ | Production ready |
-| Ruby | ✅ | ✅ | Production ready |
-| Python | ✅ | ✅ | Environment-dependent |
-| Java | ✅ | ✅ | Requires network for build |
-| Swift | ✅ | ✅ | Requires network for build |
-| C# | ✅ | ✅ | Production ready |
+| Language | Server | Client | Build System | Status |
+|----------|:------:|:------:|--------------|--------|
+| Go | ✅ | ✅ | go build | Production ready |
+| Node.js | ✅ | ✅ | npm | Production ready |
+| Ruby | ✅ | ✅ | bundler | Production ready |
+| Python | ✅ | ✅ | pip | Environment-dependent |
+| Java | ✅ | ✅ | Gradle | Requires network |
+| Kotlin | ✅ | ✅ | Gradle | Requires network |
+| Swift | ✅ | ✅ | Swift PM | Requires network |
+| Rust | ✅ | ✅ | Cargo | Requires network |
+| C++ | ✅ | ✅ | CMake | Requires gRPC installed |
+| C# | ✅ | ✅ | dotnet | Production ready |
 
 ---
 
@@ -146,67 +175,75 @@ Different server implementations negotiate different TLS 1.3 cipher suites:
 
 ### Go
 ```bash
-source env.sh
-./go/bin/go-kv-server  # Terminal 1
-./go/bin/go-kv-client  # Terminal 2
+source env.sh && ./go/bin/go-kv-server  # Server
+source env.sh && ./go/bin/go-kv-client  # Client
 ```
 
 ### Node.js
 ```bash
-source env.sh
-node nodejs/kv-server.js  # Terminal 1
-node nodejs/kv-client.js  # Terminal 2
+cd nodejs && npm install
+source env.sh && node kv-server.js  # Server
+source env.sh && node kv-client.js  # Client
 ```
 
 ### Ruby
 ```bash
-source env.sh
-ruby ruby/rb-kv-server.rb  # Terminal 1
-ruby ruby/rb-kv-client.rb  # Terminal 2
+source env.sh && ruby ruby/rb-kv-server.rb  # Server
+source env.sh && ruby ruby/rb-kv-client.rb  # Client
 ```
 
-### Java (requires gradle build first)
+### Java
 ```bash
 cd java && gradle build
-source env.sh
-gradle runServer  # Terminal 1
-gradle runClient  # Terminal 2
+source env.sh && gradle runServer  # Server
+source env.sh && gradle runClient  # Client
 ```
 
-### Swift (requires swift build first)
+### Kotlin
+```bash
+cd kotlin && gradle build
+source env.sh && gradle runServer  # Server
+source env.sh && gradle runClient  # Client
+```
+
+### Rust
+```bash
+cd rust && cargo build --release
+source env.sh && ./target/release/kv-server  # Server
+source env.sh && ./target/release/kv-client  # Client
+```
+
+### C++
+```bash
+cd cpp && mkdir build && cd build && cmake .. && make
+source env.sh && ./kv-server  # Server
+source env.sh && ./kv-client  # Client
+```
+
+### Swift
 ```bash
 cd swift && swift build
-source env.sh
-.build/debug/kv-server  # Terminal 1
-.build/debug/kv-client  # Terminal 2
+source env.sh && .build/debug/kv-server  # Server
+source env.sh && .build/debug/kv-client  # Client
 ```
 
 ---
 
-## Cross-Language Testing
+## Project Structure
 
-Start any server, then connect with any client:
-
-```bash
-# Example: Go server with Node.js client
-source env.sh
-./go/bin/go-kv-server &
-node nodejs/kv-client.js
-
-# Example: Node.js server with Ruby client
-node nodejs/kv-server.js &
-ruby ruby/rb-kv-client.rb
 ```
-
----
-
-## Certificate Generation
-
-Generate new certificates for any algorithm:
-
-```bash
-./tools/gen-certs.sh ec-secp384r1  # Recommended
-./tools/gen-certs.sh ec-secp256r1
-./tools/gen-certs.sh rsa-2048
-# Avoid: ./tools/gen-certs.sh ec-secp521r1
+grpc-kv-examples/
+├── proto/kv.proto          # Shared protobuf definition
+├── certs/                  # TLS certificates
+├── go/                     # Go implementation
+├── nodejs/                 # Node.js implementation
+├── ruby/                   # Ruby implementation
+├── python/                 # Python implementation
+├── java/                   # Java implementation
+├── kotlin/                 # Kotlin implementation
+├── swift/                  # Swift implementation
+├── rust/                   # Rust implementation
+├── cpp/                    # C++ implementation
+├── csharp/                 # C# implementation
+└── env.sh                  # Environment setup
 ```

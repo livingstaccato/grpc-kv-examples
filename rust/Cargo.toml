@@ -1,0 +1,23 @@
+[package]
+name = "grpc-kv-rust"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "kv-server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "kv-client"
+path = "src/bin/client.rs"
+
+[dependencies]
+tonic = { version = "0.11", features = ["tls"] }
+prost = "0.12"
+tokio = { version = "1", features = ["full"] }
+tokio-rustls = "0.25"
+rustls-pemfile = "2"
+chrono = "0.4"
+
+[build-dependencies]
+tonic-build = "0.11"
