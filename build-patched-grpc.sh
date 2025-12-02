@@ -68,7 +68,7 @@ check_prereqs() {
 
     if $BUILD_PYTHON; then
         command -v python3 >/dev/null || error "python3 not found"
-        command -v pip3 >/dev/null || error "pip3 not found"
+        command -v uv >/dev/null || error "uv not found (install with: curl -LsSf https://astral.sh/uv/install.sh | sh)"
     fi
 
     if $BUILD_RUBY; then
@@ -166,10 +166,7 @@ build_python() {
 
     # Pin Cython to <3.0 for compatibility with gRPC v1.62.0
     log "Installing Cython <3.0 for compatibility..."
-    pip3 install --break-system-packages 'Cython<3.0' || {
-        log "Trying without --break-system-packages..."
-        pip3 install 'Cython<3.0'
-    }
+    uv pip install --system 'Cython<3.0'
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
@@ -181,7 +178,7 @@ build_python() {
     log "Building grpcio from source (this takes 20-30 minutes)..."
     log "Build log: $BUILD_DIR/python-build.log"
 
-    if pip3 install --break-system-packages --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"; then
+    if uv pip install --system --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"; then
         success "Python grpcio built and installed successfully!"
     else
         error "Python grpcio build FAILED. Check $BUILD_DIR/python-build.log"
@@ -268,7 +265,7 @@ main() {
     echo "Artifacts location: $BUILD_DIR/"
     echo ""
     echo "To test with patched gRPC:"
-    echo "  Python: pip install $BUILD_DIR/wheels/grpcio*.whl"
+    echo "  Python: uv pip install --system $BUILD_DIR/wheels/grpcio*.whl"
     echo "  C++:    export CMAKE_PREFIX_PATH=$BUILD_DIR/install"
     echo "  Ruby:   gem install $BUILD_DIR/grpc/src/ruby/pkg/*.gem"
     echo ""
