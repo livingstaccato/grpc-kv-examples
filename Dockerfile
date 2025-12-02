@@ -95,22 +95,23 @@ ENV GOPATH="/root/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
 # ============================================================
-# Python 3.11+ with uv
+# Python via uv (manages Python + packages)
 # ============================================================
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-venv \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install uv for Python package management
+# Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
 
-# Install Python gRPC packages using uv
+# Install Python via uv and create a venv
+ENV UV_PYTHON_INSTALL_DIR="/opt/python"
+ENV VIRTUAL_ENV="/opt/venv"
+RUN uv python install 3.12 && \
+    uv venv "$VIRTUAL_ENV" --python 3.12
+ENV PATH="$VIRTUAL_ENV/bin:${PATH}"
+
+# Install Python gRPC packages
 # In unpatched mode: stock grpcio with P-256 only bug
 # In patched mode: build grpcio from source with the fix
-RUN uv pip install --system \
+RUN uv pip install \
     grpcio \
     grpcio-tools \
     protobuf
