@@ -1,0 +1,24 @@
+# Build artifacts
+build/
+
+# Git
+.git/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Language-specific build artifacts
+go/bin/
+rust/target/
+nodejs/node_modules/
+dart/.dart_tool/
+csharp/bin/
+csharp/obj/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
