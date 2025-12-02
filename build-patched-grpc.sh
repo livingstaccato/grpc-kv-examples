@@ -169,9 +169,9 @@ build_python() {
     export VIRTUAL_ENV="$BUILD_DIR/venv"
     export PATH="$BUILD_DIR/venv/bin:$PATH"
 
-    # Pin Cython to <3.0 for compatibility with gRPC v1.62.0
-    log "Installing Cython <3.0 for compatibility..."
-    uv pip install 'Cython<3.0'
+    # Install build dependencies for gRPC v1.62.0
+    log "Installing build dependencies..."
+    uv pip install 'Cython<3.0' setuptools wheel
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false

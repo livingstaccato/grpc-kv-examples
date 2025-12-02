@@ -95,31 +95,30 @@ ENV GOPATH="/root/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
 # ============================================================
-# Python 3.11+ with pip
+# Python 3.11+ with uv
 # ============================================================
 RUN apt-get update && apt-get install -y \
     python3 \
-    python3-pip \
     python3-venv \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python gRPC packages
+# Install uv for Python package management
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Install Python gRPC packages using uv
 # In unpatched mode: stock grpcio with P-256 only bug
 # In patched mode: build grpcio from source with the fix
-RUN pip3 install --break-system-packages \
+RUN uv pip install --system \
+    grpcio \
     grpcio-tools \
     protobuf
 
-# Conditionally install patched or stock grpcio
-# NOTE: Building patched grpcio from source takes 30+ minutes.
-# For patched mode, we install stock first, then the user runs ./build-patched-grpc.sh --python --install
+# NOTE: For patched mode, run ./build-patched-grpc.sh --python inside container
 ARG APPLY_GRPC_PATCH
-RUN echo "Installing STOCK grpcio..." && \
-    pip3 install --break-system-packages grpcio && \
-    echo "STOCK grpcio installed" && \
-    if [ "$APPLY_GRPC_PATCH" = "true" ]; then \
-        echo "NOTE: Run ./build-patched-grpc.sh --python --install inside container to apply patch"; \
+RUN if [ "$APPLY_GRPC_PATCH" = "true" ]; then \
+        echo "NOTE: Run ./build-patched-grpc.sh --python inside container to apply patch"; \
     fi
 
 # ============================================================
