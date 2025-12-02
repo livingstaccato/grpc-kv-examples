@@ -166,8 +166,10 @@ build_python() {
 
     # Pin Cython to <3.0 for compatibility with gRPC v1.62.0
     log "Installing Cython <3.0 for compatibility..."
-    pip3 install --break-system-packages 'Cython<3.0' 2>/dev/null || \
+    pip3 install --break-system-packages 'Cython<3.0' || {
+        log "Trying without --break-system-packages..."
         pip3 install 'Cython<3.0'
+    }
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
@@ -175,16 +177,19 @@ build_python() {
     export GRPC_PYTHON_BUILD_SYSTEM_CARES=false
     export GRPC_BUILD_WITH_BORING_SSL_ASM=false
 
-    # Build and install directly (faster than wheel)
-    log "Building grpcio from source..."
-    pip3 install --break-system-packages --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log" || \
-        pip3 install --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"
+    # Build and install directly
+    log "Building grpcio from source (this takes 20-30 minutes)..."
+    log "Build log: $BUILD_DIR/python-build.log"
 
-    success "Python grpcio built and installed"
-
-    if $DO_INSTALL; then
-        log "grpcio already installed during build"
+    if pip3 install --break-system-packages --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"; then
+        success "Python grpcio built and installed successfully!"
+    else
+        error "Python grpcio build FAILED. Check $BUILD_DIR/python-build.log"
     fi
+
+    # Verify installation
+    log "Verifying grpcio installation..."
+    python3 -c "import grpc; print(f'grpcio version: {grpc.__version__}')" || error "grpcio import failed"
 }
 
 # Build C++ gRPC
