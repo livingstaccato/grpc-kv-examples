@@ -12,8 +12,11 @@
 #    docker run -it grpc-curve-test ./test-all-curves.sh
 #
 # 2. PATCHED - Tests with the EC curve fix applied:
-#    docker build --build-arg APPLY_GRPC_PATCH=true -t grpc-curve-test-patched .
-#    docker run -it grpc-curve-test-patched ./test-all-curves.sh
+#    docker build -t grpc-curve-test .
+#    docker run -it grpc-curve-test
+#    # Inside container, build patched grpcio (takes ~30 min):
+#    ./build-patched-grpc.sh --python --install
+#    ./test-all-curves.sh
 #
 # ============================================================
 # EXPECTED RESULTS
@@ -109,30 +112,14 @@ RUN pip3 install --break-system-packages \
     protobuf
 
 # Conditionally install patched or stock grpcio
+# NOTE: Building patched grpcio from source takes 30+ minutes.
+# For patched mode, we install stock first, then the user runs ./build-patched-grpc.sh --python --install
 ARG APPLY_GRPC_PATCH
-RUN if [ "$APPLY_GRPC_PATCH" = "true" ]; then \
-        echo "Building PATCHED grpcio with P-384/P-521 support..." && \
-        apt-get update && apt-get install -y python3-dev && \
-        # Pin Cython to 0.29.x for gRPC compatibility (Cython 3.x breaks older gRPC builds)
-        pip3 install --break-system-packages 'Cython<3.0' && \
-        git clone --depth 1 --branch v1.62.0 --recurse-submodules --shallow-submodules \
-            https://github.com/grpc/grpc.git /tmp/grpc && \
-        cd /tmp/grpc && \
-        # Apply the patch
-        sed -i 's/static const int kSslEcCurveNames\[\] = {NID_X9_62_prime256v1};/static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};/' \
-            src/core/tsi/ssl_transport_security.cc && \
-        sed -i 's/#if OPENSSL_VERSION_NUMBER >= 0x30000000/#if (OPENSSL_VERSION_NUMBER >= 0x30000000) || defined(OPENSSL_IS_BORINGSSL)/' \
-            src/core/tsi/ssl_transport_security.cc && \
-        sed -i 's/#if OPENSSL_VERSION_NUMBER < 0x30000000L/#if (OPENSSL_VERSION_NUMBER < 0x30000000L) \&\& !defined(OPENSSL_IS_BORINGSSL)/' \
-            src/core/tsi/ssl_transport_security.cc && \
-        # Build and install
-        pip3 install --break-system-packages . && \
-        rm -rf /tmp/grpc && \
-        echo "PATCHED grpcio installed"; \
-    else \
-        echo "Installing STOCK grpcio (P-256 only bug present)..." && \
-        pip3 install --break-system-packages grpcio && \
-        echo "STOCK grpcio installed"; \
+RUN echo "Installing STOCK grpcio..." && \
+    pip3 install --break-system-packages grpcio && \
+    echo "STOCK grpcio installed" && \
+    if [ "$APPLY_GRPC_PATCH" = "true" ]; then \
+        echo "NOTE: Run ./build-patched-grpc.sh --python --install inside container to apply patch"; \
     fi
 
 # ============================================================

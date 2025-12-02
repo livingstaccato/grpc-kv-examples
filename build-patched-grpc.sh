@@ -136,8 +136,14 @@ apply_patch() {
 # Build Python grpcio
 build_python() {
     log "Building Python grpcio with patch..."
+    log "NOTE: This will take 20-30 minutes..."
 
     cd "$BUILD_DIR/grpc"
+
+    # Pin Cython to <3.0 for compatibility with gRPC v1.62.0
+    log "Installing Cython <3.0 for compatibility..."
+    pip3 install --break-system-packages 'Cython<3.0' 2>/dev/null || \
+        pip3 install 'Cython<3.0'
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
@@ -145,18 +151,15 @@ build_python() {
     export GRPC_PYTHON_BUILD_SYSTEM_CARES=false
     export GRPC_BUILD_WITH_BORING_SSL_ASM=false
 
-    # Build the wheel
-    pip3 wheel . --no-deps -w "$BUILD_DIR/wheels/" \
-        --config-settings="--build-option=--enable-epoll" \
-        2>&1 | tee "$BUILD_DIR/python-build.log"
+    # Build and install directly (faster than wheel)
+    log "Building grpcio from source..."
+    pip3 install --break-system-packages --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log" || \
+        pip3 install --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"
 
-    success "Python wheel built: $BUILD_DIR/wheels/"
-    ls -la "$BUILD_DIR/wheels/"*.whl
+    success "Python grpcio built and installed"
 
     if $DO_INSTALL; then
-        log "Installing patched grpcio..."
-        pip3 install --force-reinstall "$BUILD_DIR/wheels/"grpcio*.whl
-        success "Patched grpcio installed"
+        log "grpcio already installed during build"
     fi
 }
 
