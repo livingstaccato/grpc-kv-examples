@@ -226,7 +226,7 @@ build_ruby() {
     # Build the gem
     cd src/ruby
     bundle install
-    rake native_gem
+    rake native
 
     success "Ruby gem built"
     ls -la pkg/*.gem
