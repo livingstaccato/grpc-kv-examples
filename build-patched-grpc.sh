@@ -104,33 +104,57 @@ clone_grpc() {
     success "gRPC source ready"
 }
 
-# Apply patch
+# Apply patch using sed (more reliable than git apply across versions)
 apply_patch() {
     log "Applying EC curves patch..."
 
     cd "$BUILD_DIR/grpc"
 
-    # Check if patch already applied
-    if git diff --quiet src/core/tsi/ssl_transport_security.cc 2>/dev/null; then
-        # Try to apply
-        if git apply --check "$PATCH_FILE" 2>/dev/null; then
-            git apply "$PATCH_FILE"
-            success "Patch applied successfully"
-        else
-            log "Patch may already be applied or conflicts exist"
-            # Force apply
-            patch -p1 < "$PATCH_FILE" || true
-        fi
-    else
-        log "Source already modified, skipping patch"
+    local SSL_FILE="src/core/tsi/ssl_transport_security.cc"
+
+    if [ ! -f "$SSL_FILE" ]; then
+        error "Source file not found: $SSL_FILE"
     fi
 
-    # Verify patch
-    if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
+    # Check if already patched
+    if grep -q "NID_secp384r1" "$SSL_FILE"; then
+        log "Patch already applied, skipping..."
         success "Patch verified - P-384/P-521 support enabled"
-    else
-        error "Patch verification failed"
+        return 0
     fi
+
+    log "Patching $SSL_FILE..."
+
+    # Patch 1: Update kSslEcCurveNames to include P-384 and P-521
+    # Change: static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1};
+    # To:     static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};
+    sed -i 's/static const int kSslEcCurveNames\[\] = {NID_X9_62_prime256v1};/static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};/' "$SSL_FILE"
+
+    # Patch 2: Update #if condition to include BoringSSL
+    # Change: #if OPENSSL_VERSION_NUMBER >= 0x30000000
+    # To:     #if (OPENSSL_VERSION_NUMBER >= 0x30000000) || defined(OPENSSL_IS_BORINGSSL)
+    sed -i 's/#if OPENSSL_VERSION_NUMBER >= 0x30000000$/#if (OPENSSL_VERSION_NUMBER >= 0x30000000) || defined(OPENSSL_IS_BORINGSSL)/' "$SSL_FILE"
+
+    # Patch 3: Update the else condition
+    # Change: #if OPENSSL_VERSION_NUMBER < 0x30000000L
+    # To:     #if (OPENSSL_VERSION_NUMBER < 0x30000000L) && !defined(OPENSSL_IS_BORINGSSL)
+    sed -i 's/#if OPENSSL_VERSION_NUMBER < 0x30000000L$/#if (OPENSSL_VERSION_NUMBER < 0x30000000L) \&\& !defined(OPENSSL_IS_BORINGSSL)/' "$SSL_FILE"
+
+    # Patch 4: Update SSL_CTX_set1_groups call to use array size
+    # Change: if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, 1)) {
+    # To:     if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))) {
+    sed -i 's/SSL_CTX_set1_groups(context, kSslEcCurveNames, 1)/SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)\/sizeof(kSslEcCurveNames[0]))/' "$SSL_FILE"
+
+    # Verify patch
+    if grep -q "NID_secp384r1" "$SSL_FILE"; then
+        success "Patch applied successfully - P-384/P-521 support enabled"
+    else
+        error "Patch verification failed - NID_secp384r1 not found"
+    fi
+
+    # Show what was changed
+    log "Verifying patch contents..."
+    grep -n "kSslEcCurveNames\|OPENSSL_IS_BORINGSSL\|0x30000000" "$SSL_FILE" | head -10
 }
 
 # Build Python grpcio
