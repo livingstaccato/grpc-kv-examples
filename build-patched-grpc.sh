@@ -67,7 +67,6 @@ check_prereqs() {
     command -v cmake >/dev/null || error "cmake not found"
 
     if $BUILD_PYTHON; then
-        command -v python3 >/dev/null || error "python3 not found"
         command -v uv >/dev/null || error "uv not found (install with: curl -LsSf https://astral.sh/uv/install.sh | sh)"
     fi
 
@@ -164,9 +163,15 @@ build_python() {
 
     cd "$BUILD_DIR/grpc"
 
+    # Create virtual environment for the build
+    log "Creating virtual environment..."
+    uv venv "$BUILD_DIR/venv"
+    export VIRTUAL_ENV="$BUILD_DIR/venv"
+    export PATH="$BUILD_DIR/venv/bin:$PATH"
+
     # Pin Cython to <3.0 for compatibility with gRPC v1.62.0
     log "Installing Cython <3.0 for compatibility..."
-    uv pip install --system 'Cython<3.0'
+    uv pip install 'Cython<3.0'
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
@@ -178,7 +183,7 @@ build_python() {
     log "Building grpcio from source (this takes 20-30 minutes)..."
     log "Build log: $BUILD_DIR/python-build.log"
 
-    if uv pip install --system --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"; then
+    if uv pip install --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"; then
         success "Python grpcio built and installed successfully!"
     else
         error "Python grpcio build FAILED. Check $BUILD_DIR/python-build.log"
@@ -186,7 +191,10 @@ build_python() {
 
     # Verify installation
     log "Verifying grpcio installation..."
-    python3 -c "import grpc; print(f'grpcio version: {grpc.__version__}')" || error "grpcio import failed"
+    python -c "import grpc; print(f'grpcio version: {grpc.__version__}')" || error "grpcio import failed"
+
+    success "Virtual environment with patched grpcio: $BUILD_DIR/venv"
+    log "Activate with: source $BUILD_DIR/venv/bin/activate"
 }
 
 # Build C++ gRPC
@@ -265,7 +273,7 @@ main() {
     echo "Artifacts location: $BUILD_DIR/"
     echo ""
     echo "To test with patched gRPC:"
-    echo "  Python: uv pip install --system $BUILD_DIR/wheels/grpcio*.whl"
+    echo "  Python: source $BUILD_DIR/venv/bin/activate"
     echo "  C++:    export CMAKE_PREFIX_PATH=$BUILD_DIR/install"
     echo "  Ruby:   gem install $BUILD_DIR/grpc/src/ruby/pkg/*.gem"
     echo ""
