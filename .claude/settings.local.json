@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(uv --version:*)"
+      "Bash(uv --version:*)",
+      "Bash(./utils/capture-grpc-versions.sh:*)"
     ],
     "deny": [],
     "ask": []

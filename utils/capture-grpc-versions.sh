@@ -31,7 +31,7 @@ fi
 # Ruby version
 if command -v ruby &> /dev/null; then
     RUBY_VERSION=$(ruby -e "require 'grpc'; puts GRPC::VERSION" 2>/dev/null || echo "not-installed")
-    RUBY_GEM_PATH=$(ruby -e "require 'grpc'; puts $LOAD_PATH.grep(/grpc/).first" 2>/dev/null || echo "not-found")
+    RUBY_GEM_PATH=$(ruby -e "require 'grpc'; puts \$LOAD_PATH.grep(/grpc/).first" 2>/dev/null || echo "not-found")
     RUBY_PATCHED="false"
     if [[ "$RUBY_GEM_PATH" == *"build/patched-grpc"* ]]; then
         RUBY_PATCHED="true"
