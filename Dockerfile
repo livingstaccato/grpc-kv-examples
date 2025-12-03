@@ -3,11 +3,38 @@
 # This Dockerfile sets up an environment with all language runtimes and tools
 # needed to test gRPC TLS with P-256, P-384, and P-521 elliptic curves.
 #
+# ============================================================
+# TESTING MODES
+# ============================================================
+#
+# 1. UNPATCHED (default) - Demonstrates the BoringSSL P-256-only bug:
+#    docker build -t grpc-curve-test .
+#    docker run -it grpc-curve-test ./test-all-curves.sh
+#
+# 2. PATCHED - Tests with the EC curve fix applied:
+#    docker build -t grpc-curve-test .
+#    docker run -it grpc-curve-test
+#    # Inside container, build patched grpcio (takes ~30 min):
+#    ./build-patched-grpc.sh --python --install
+#    ./test-all-curves.sh
+#
+# ============================================================
+# EXPECTED RESULTS
+# ============================================================
+#
+# UNPATCHED MODE:
+#   - Python, Ruby, C++ will FAIL with P-384 and P-521 (BoringSSL bug)
+#   - Go, Node.js, Java, Rust, Dart, C# will PASS all curves
+#
+# PATCHED MODE:
+#   - ALL languages should PASS all curves
+#
+# ============================================================
 # Languages included:
 # - Go (server + client, uses crypto/tls - full curve support)
-# - Python (gRPC with BoringSSL - P-256 only bug)
-# - Ruby (gRPC with BoringSSL - P-256 only bug)
-# - C++ (gRPC with BoringSSL - P-256 only bug)
+# - Python (gRPC with BoringSSL - P-256 only bug, fixed with patch)
+# - Ruby (gRPC with BoringSSL - P-256 only bug, fixed with patch)
+# - C++ (gRPC with BoringSSL - P-256 only bug, fixed with patch)
 # - Node.js (gRPC with OpenSSL - full curve support)
 # - Java (gRPC with Netty/JDK TLS - full curve support)
 # - Kotlin (uses Java gRPC)
@@ -16,13 +43,16 @@
 # - Dart (native TLS - full curve support)
 # - C# (gRPC with SslStream - full curve support)
 #
-# Build: docker build -t grpc-curve-test .
-# Run:   docker run -it grpc-curve-test
 
 FROM ubuntu:24.04
 
 LABEL maintainer="grpc-kv-examples"
 LABEL description="gRPC cross-language EC curve compatibility testing environment"
+
+# Build argument to control patching
+# Set to "true" to build with the EC curve patch applied
+ARG APPLY_GRPC_PATCH=false
+ENV GRPC_PATCHED=${APPLY_GRPC_PATCH}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
@@ -56,7 +86,7 @@ RUN apt-get update && apt-get install -y \
 # ============================================================
 # Go (1.21+)
 # ============================================================
-ENV GO_VERSION=1.22.0
+ENV GO_VERSION=1.23.4
 RUN wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
     rm go${GO_VERSION}.linux-amd64.tar.gz
@@ -65,20 +95,33 @@ ENV GOPATH="/root/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
 # ============================================================
-# Python 3.11+ with pip
+# Python via uv (manages Python + packages)
 # ============================================================
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:${PATH}"
 
-# Install Python gRPC packages (stock version with P-256 only bug)
-RUN pip3 install --break-system-packages \
+# Install Python via uv and create a venv
+ENV UV_PYTHON_INSTALL_DIR="/opt/python"
+ENV VIRTUAL_ENV="/opt/venv"
+RUN uv python install 3.12 && \
+    uv venv "$VIRTUAL_ENV" --python 3.12
+ENV PATH="$VIRTUAL_ENV/bin:${PATH}"
+
+# Install Python gRPC packages
+# In unpatched mode: stock grpcio with P-256 only bug
+# In patched mode: build grpcio from source with the fix
+RUN uv pip install \
     grpcio \
     grpcio-tools \
-    protobuf
+    protobuf \
+    cryptography
+
+# NOTE: For patched mode, run ./build-patched-grpc.sh --python inside container
+ARG APPLY_GRPC_PATCH
+RUN if [ "$APPLY_GRPC_PATCH" = "true" ]; then \
+        echo "NOTE: Run ./build-patched-grpc.sh --python inside container to apply patch"; \
+    fi
 
 # ============================================================
 # Ruby 3.x with bundler
@@ -139,22 +182,20 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup update stable
 
 # ============================================================
-# Dart SDK
+# Dart SDK (direct download - apt package has libc6 issues on 24.04)
 # ============================================================
-RUN wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/dart.gpg && \
-    echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | tee /etc/apt/sources.list.d/dart_stable.list && \
-    apt-get update && apt-get install -y dart && \
-    rm -rf /var/lib/apt/lists/*
-ENV PATH="/usr/lib/dart/bin:${PATH}"
+ENV DART_VERSION=3.6.1
+RUN wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip && \
+    unzip -q dartsdk-linux-x64-release.zip -d /opt && \
+    rm dartsdk-linux-x64-release.zip
+ENV PATH="/opt/dart-sdk/bin:${PATH}"
 
 # ============================================================
-# .NET SDK 8.0
+# .NET SDK 9.0 (via official install script)
 # ============================================================
-RUN wget https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb && \
-    apt-get update && apt-get install -y dotnet-sdk-8.0 && \
-    rm -rf /var/lib/apt/lists/*
+ENV DOTNET_ROOT="/opt/dotnet"
+RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 9.0 --install-dir "$DOTNET_ROOT"
+ENV PATH="${DOTNET_ROOT}:${PATH}"
 
 # ============================================================
 # Working directory setup

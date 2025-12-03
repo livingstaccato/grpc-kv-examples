@@ -6,20 +6,20 @@
 
 | Language | Version | gRPC Library | TLS Backend |
 |----------|---------|--------------|-------------|
-| **Go** | 1.24.7 | google.golang.org/grpc v1.69.2 | Go crypto/tls |
-| **Node.js** | v22.21.1 | @grpc/grpc-js ^1.10.0 | BoringSSL |
+| **Go** | 1.23+ | google.golang.org/grpc v1.73.0 | Go crypto/tls |
+| **Node.js** | v20+ | @grpc/grpc-js ^1.14.0 | OpenSSL |
 | **Ruby** | 3.3.6 | grpc 1.76.0 | BoringSSL |
 | **Python** | 3.11.14 | grpcio 1.76.0 | BoringSSL |
-| **Java** | OpenJDK 21.0.8 | grpc-netty-shaded 1.60.0 | Netty/OpenSSL |
-| **Kotlin** | 1.9.22 | grpc-kotlin 1.4.1 | Netty/OpenSSL |
-| **Swift** | 5.10.1 | grpc-swift 1.21.0 | SwiftNIO SSL |
-| **Rust** | 1.75+ | tonic 0.11 | rustls |
+| **Java** | OpenJDK 21+ | grpc-netty-shaded 1.77.0 | Netty/JDK TLS |
+| **Kotlin** | 1.9+ | grpc-kotlin 1.4.1 | Netty/JDK TLS |
+| **Swift** | 5.10+ | grpc-swift 2.0.0 | SwiftNIO SSL |
+| **Rust** | 1.75+ | tonic 0.14 | rustls |
 | **C++** | C++17 | grpc 1.60+ | BoringSSL |
-| **C#** | .NET 9.0 | Grpc.Net.Client 2.67.0 | .NET SslStream |
+| **C#** | .NET 9.0 | Grpc.Net.Client 2.71.0 | .NET SslStream |
 | **PHP** | 8.4 | grpc/grpc 1.74 | BoringSSL |
-| **Dart** | 3.10.2 | grpc 4.1.0 | Dart Native TLS |
+| **Dart** | 3.0+ | grpc 4.0.0 | Dart Native TLS |
 | **Objective-C** | Clang 18 | gRPC-ProtoRPC 1.62 | BoringSSL |
-| **Scala** | 3.3.1 | grpc-netty 1.62.2 | Netty/OpenSSL |
+| **Scala** | 3.3+ | grpc-netty 1.77.0 | Netty/JDK TLS |
 
 ---
 
