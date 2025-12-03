@@ -1,10 +1,10 @@
 import Foundation
-import GRPC
-import NIO
-import NIOSSL
-import Logging
+import GRPCCore
+import GRPCNIOTransportHTTP2
+import GRPCProtobuf
+import SwiftProtobuf
 
-/// Swift gRPC KV Client with mTLS
+/// Swift gRPC KV Client with mTLS (grpc-swift 2.x)
 ///
 /// Connects to a KV server using mutual TLS authentication.
 
@@ -24,8 +24,8 @@ func loadCertificate(_ envVar: String) -> String? {
 
 @main
 struct KVClient {
-    static func main() throws {
-        log("INFO", "Starting gRPC KV Client (Swift)")
+    static func main() async throws {
+        log("INFO", "Starting gRPC KV Client (Swift 2.x)")
 
         // Load certificates from environment
         guard let clientCertPEM = loadCertificate("PLUGIN_CLIENT_CERT") else {
@@ -48,62 +48,51 @@ struct KVClient {
         log("INFO", "Client key length: \(clientKeyPEM.count) bytes")
         log("INFO", "Server cert length: \(serverCertPEM.count) bytes")
 
-        // Create event loop group
-        let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        defer {
-            try? group.syncShutdownGracefully()
-        }
-
-        // Configure TLS
-        let clientCert = try NIOSSLCertificate(bytes: Array(clientCertPEM.utf8), format: .pem)
-        let clientKey = try NIOSSLPrivateKey(bytes: Array(clientKeyPEM.utf8), format: .pem)
-        let serverCA = try NIOSSLCertificate(bytes: Array(serverCertPEM.utf8), format: .pem)
-
-        var tlsConfig = TLSConfiguration.makeClientConfiguration()
-        tlsConfig.certificateChain = [.certificate(clientCert)]
-        tlsConfig.privateKey = .privateKey(clientKey)
-        tlsConfig.trustRoots = .certificates([serverCA])
-        tlsConfig.certificateVerification = .fullVerification
-        tlsConfig.minimumTLSVersion = .tlsv12
-
-        log("INFO", "mTLS credentials configured")
-
-        // Connect to server
+        // Get connection details from environment
         let host = ProcessInfo.processInfo.environment["PLUGIN_HOST"] ?? "localhost"
         let port = Int(ProcessInfo.processInfo.environment["PLUGIN_PORT"] ?? "50051") ?? 50051
 
+        log("INFO", "mTLS credentials configured")
         log("INFO", "Connecting to server at \(host):\(port)...")
 
-        let channel = try GRPCChannelPool.with(
-            target: .host(host, port: port),
-            transportSecurity: .tls(GRPCTLSConfiguration.makeClientConfigurationBackedByNIOSSL(configuration: tlsConfig)),
-            eventLoopGroup: group
-        ) {
-            $0.maximumReceiveMessageLength = 100 * 1024 * 1024
+        // Configure mTLS transport security
+        let transportSecurity: HTTP2ClientTransport.Posix.TransportSecurity = .tls(
+            certificateChain: [.bytes(Array(clientCertPEM.utf8), format: .pem)],
+            privateKey: .bytes(Array(clientKeyPEM.utf8), format: .pem)
+        ) { config in
+            config.trustRoots = .bytes(Array(serverCertPEM.utf8), format: .pem)
+            config.certificateVerification = .fullVerification
         }
 
-        defer {
-            try? channel.close().wait()
-        }
+        // Connect and send request using withGRPCClient
+        try await withGRPCClient(
+            transport: .http2NIOPosix(
+                target: .dns(host: host, port: port),
+                transportSecurity: transportSecurity
+            )
+        ) { grpcClient in
+            log("INFO", "Connected successfully")
 
-        log("INFO", "Connected successfully")
+            // Create the KV service client
+            let client = Proto_KV.Client(wrapping: grpcClient)
 
-        // Create client
-        let client = KVNIOClient(channel: channel)
+            // Send Get request
+            log("INFO", "Sending Get request...")
+            var request = Proto_GetRequest()
+            request.key = "test"
 
-        // Send Get request
-        log("INFO", "Sending Get request...")
-        var request = GetRequest()
-        request.key = "test"
-
-        do {
-            let response = try client.get(request).response.wait()
-            let value = String(data: response.value, encoding: .utf8) ?? ""
-            print("Response: \(value)")
-            log("INFO", "Request completed successfully")
-        } catch {
-            log("ERROR", "Get request failed: \(error)")
-            exit(1)
+            do {
+                let response = try await client.get(request)
+                let value = String(data: response.value, encoding: .utf8) ?? ""
+                print("Response: \(value)")
+                log("INFO", "Request completed successfully")
+            } catch let error as RPCError {
+                log("ERROR", "Get request failed: \(error.code) - \(error.message)")
+                exit(1)
+            } catch {
+                log("ERROR", "Get request failed: \(error)")
+                exit(1)
+            }
         }
     }
 }

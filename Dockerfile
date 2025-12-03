@@ -86,7 +86,7 @@ RUN apt-get update && apt-get install -y \
 # ============================================================
 # Go (1.21+)
 # ============================================================
-ENV GO_VERSION=1.22.0
+ENV GO_VERSION=1.23.4
 RUN wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
     rm go${GO_VERSION}.linux-amd64.tar.gz
@@ -114,7 +114,8 @@ ENV PATH="$VIRTUAL_ENV/bin:${PATH}"
 RUN uv pip install \
     grpcio \
     grpcio-tools \
-    protobuf
+    protobuf \
+    cryptography
 
 # NOTE: For patched mode, run ./build-patched-grpc.sh --python inside container
 ARG APPLY_GRPC_PATCH
@@ -183,20 +184,18 @@ RUN rustup update stable
 # ============================================================
 # Dart SDK (direct download - apt package has libc6 issues on 24.04)
 # ============================================================
-ENV DART_VERSION=3.2.6
+ENV DART_VERSION=3.6.1
 RUN wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip && \
     unzip -q dartsdk-linux-x64-release.zip -d /opt && \
     rm dartsdk-linux-x64-release.zip
 ENV PATH="/opt/dart-sdk/bin:${PATH}"
 
 # ============================================================
-# .NET SDK 8.0
+# .NET SDK 9.0 (via official install script)
 # ============================================================
-RUN wget https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb && \
-    apt-get update && apt-get install -y dotnet-sdk-8.0 && \
-    rm -rf /var/lib/apt/lists/*
+ENV DOTNET_ROOT="/opt/dotnet"
+RUN curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 9.0 --install-dir "$DOTNET_ROOT"
+ENV PATH="${DOTNET_ROOT}:${PATH}"
 
 # ============================================================
 # Working directory setup

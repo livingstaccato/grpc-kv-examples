@@ -2,7 +2,32 @@
   "permissions": {
     "allow": [
       "Bash(uv --version:*)",
-      "Bash(./utils/capture-grpc-versions.sh:*)"
+      "Bash(./utils/capture-grpc-versions.sh:*)",
+      "WebSearch",
+      "WebFetch(domain:www.swift.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:swiftpackageindex.com)",
+      "WebFetch(domain:swiftinit.org)",
+      "Bash(go get:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(npm install:*)",
+      "Bash(cargo update:*)",
+      "Bash(protoc:*)",
+      "Bash(swift:*)",
+      "Bash(chmod:*)",
+      "Bash(./generate-protos.sh)",
+      "Bash(docker:*)",
+      "WebFetch(domain:lib.rs)",
+      "WebFetch(domain:docs.rs)",
+      "Bash(grep -E '^\\[(PASS|FAIL|EXPECTED FAIL)\\]' echo \"\" echo \"Testing P-384 (BoringSSL-based implementations will fail without patch):\" docker run --rm grpc-curve-test ./test-all-curves.sh --curve p384)",
+      "Bash(grep -E '^\\[(PASS|FAIL|EXPECTED FAIL)\\]' echo \"\" echo \"Testing P-521 (BoringSSL-based implementations will fail without patch):\" docker run --rm grpc-curve-test ./test-all-curves.sh --curve p521)",
+      "Bash(for dir in /home/tim/code/gh/livingstaccato/grpc-kv-examples/{python,ruby,go,java,kotlin,swift,rust,cpp,csharp,php,dart,objc,scala,nodejs})",
+      "Bash(do)",
+      "Bash(if [ -f \"$dir/README.md\" ])",
+      "Bash(then)",
+      "Bash(else)",
+      "Bash(fi)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
