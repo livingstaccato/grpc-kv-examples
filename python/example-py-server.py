@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 
-import os
-import sys
-
-# Configure SSL cipher suites for P-521 curve support BEFORE importing grpc
-os.environ['GRPC_SSL_CIPHER_SUITES'] = 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305'
-
 import grpc
 import logging
 from concurrent import futures
 from proto import kv_pb2, kv_pb2_grpc
+import os
 import asyncio
 from utils.certificate_helper import log_cert_info, load_pem_certificate
 
@@ -183,18 +178,11 @@ async def serve():
         logger.error(slog(D_SERVER, D_SECURITY, S_ERROR, f"gRPC Credential Setup Error: {e}"))
         raise Exception(f"Unexpected error during gRPC credential setup: {e}") from e
 
-    # Configure server options to support all elliptic curves including P-521
     server = grpc.aio.server(
         futures.ThreadPoolExecutor(max_workers=10),
         options=[
             ('grpc.ssl_target_name_override', 'localhost'),
             ('grpc.default_authority', 'localhost'),
-            ('grpc.max_receive_message_length', 100 * 1024 * 1024),
-            ('grpc.max_send_message_length', 100 * 1024 * 1024),
-            ('grpc.keepalive_time_ms', 10000),
-            ('grpc.keepalive_timeout_ms', 5000),
-            ('grpc.keepalive_permit_without_calls', 1),
-            ('grpc.http2.min_time_between_pings_ms', 10000),
         ]
     )
     kv_pb2_grpc.add_KVServicer_to_server(KVServicer(), server)

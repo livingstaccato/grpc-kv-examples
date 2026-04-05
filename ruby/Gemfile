@@ -1,6 +1,0 @@
-source 'https://rubygems.org'
-
-ruby '>= 3.0.0'
-
-gem 'grpc', '~> 1.71'
-gem 'grpc-tools', '~> 1.71'

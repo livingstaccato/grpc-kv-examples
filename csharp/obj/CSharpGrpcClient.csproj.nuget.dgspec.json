@@ -1,26 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "/Users/tim/code/grpc-kv-examples/csharp/CSharpGrpcClient.csproj": {}
+    "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/CSharpGrpcClient.csproj": {}
   },
   "projects": {
-    "/Users/tim/code/grpc-kv-examples/csharp/CSharpGrpcClient.csproj": {
+    "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/CSharpGrpcClient.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/tim/code/grpc-kv-examples/csharp/CSharpGrpcClient.csproj",
+        "projectUniqueName": "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/CSharpGrpcClient.csproj",
         "projectName": "CSharpGrpcClient",
-        "projectPath": "/Users/tim/code/grpc-kv-examples/csharp/CSharpGrpcClient.csproj",
-        "packagesPath": "/Users/tim/.nuget/packages/",
-        "outputPath": "/Users/tim/code/grpc-kv-examples/csharp/obj/",
+        "projectPath": "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/CSharpGrpcClient.csproj",
+        "packagesPath": "/Users/tim.perkins/.nuget/packages/",
+        "outputPath": "/Users/tim.perkins/code/py/grpc-kv-examples/csharp/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/tim/.nuget/NuGet/NuGet.Config"
+          "/Users/tim.perkins/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "/opt/homebrew/Cellar/dotnet/9.0.8/libexec/library-packs": {},
+          "/opt/homebrew/Cellar/dotnet/9.0.101/libexec/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -104,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.8/libexec/sdk/9.0.109/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.101/libexec/sdk/9.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
