@@ -24,7 +24,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATCH_FILE="$SCRIPT_DIR/patches/grpc-ec-curves-p384-p521.patch"
 BUILD_DIR="$SCRIPT_DIR/build/patched-grpc"
-GRPC_VERSION="v1.76.0"  # Use a stable version
+GRPC_VERSION="v1.80.0"  # Use a stable version
 
 BUILD_PYTHON=false
 BUILD_CPP=false
@@ -169,7 +169,7 @@ build_python() {
     export VIRTUAL_ENV="$BUILD_DIR/venv"
     export PATH="$BUILD_DIR/venv/bin:$PATH"
 
-    # Install build dependencies for gRPC v1.62.0
+    # Install build dependencies for gRPC v1.80.0
     log "Installing build dependencies..."
     uv pip install 'Cython<3.0' setuptools wheel
 
@@ -237,8 +237,10 @@ build_ruby() {
     ls -la pkg/*.gem
 
     if $DO_INSTALL; then
-        gem install pkg/*.gem
-        success "Patched Ruby gRPC gem installed"
+        local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"
+        mkdir -p "$RUBY_GEMS_DIR"
+        GEM_HOME="$RUBY_GEMS_DIR" gem install pkg/*.gem
+        success "Patched Ruby gRPC gem installed to $RUBY_GEMS_DIR"
     fi
 }
 

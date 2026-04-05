@@ -10,7 +10,7 @@ repositories {
     mavenCentral()
 }
 
-val grpcVersion = "1.77.0"
+val grpcVersion = "1.80.0"
 val grpcKotlinVersion = "1.4.1"
 val protobufVersion = "4.29.0"
 val coroutinesVersion = "1.7.3"

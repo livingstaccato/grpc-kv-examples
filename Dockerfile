@@ -205,6 +205,9 @@ WORKDIR /workspace
 # Copy the project files
 COPY . /workspace/
 
+# Make scripts executable
+RUN chmod +x /workspace/*.sh /workspace/utils/*.sh /workspace/tools/*.sh
+
 # Install language-specific dependencies
 # Go dependencies
 RUN cd /workspace/go && go mod download || true

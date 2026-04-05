@@ -3,7 +3,7 @@
     "description": "PHP gRPC KV Client with mTLS support",
     "require": {
         "php": ">=8.0",
-        "grpc/grpc": "^1.76",
+        "grpc/grpc": "^1.80.0",
         "google/protobuf": "^4.33"
     },
     "autoload": {

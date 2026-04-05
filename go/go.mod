@@ -3,7 +3,7 @@ module github.com/livingstaccato/grpc-kv-examples
 go 1.23.5
 
 require (
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.80.0
 	google.golang.org/protobuf v1.36.6
 )
 

@@ -2,7 +2,7 @@ beautifulsoup4==4.12.3
 cffi==1.17.1
 cryptography==44.0.0
 google==3.0.0
-grpcio==1.76.0
+grpcio==1.80.0
 markdown-it-py==3.0.0
 mdurl==0.1.2
 protobuf==6.33.0

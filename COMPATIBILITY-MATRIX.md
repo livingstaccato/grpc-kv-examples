@@ -7,19 +7,19 @@
 | Language | Version | gRPC Library | TLS Backend |
 |----------|---------|--------------|-------------|
 | **Go** | 1.23+ | google.golang.org/grpc v1.73.0 | Go crypto/tls |
-| **Node.js** | v20+ | @grpc/grpc-js ^1.14.0 | OpenSSL |
-| **Ruby** | 3.3.6 | grpc 1.76.0 | BoringSSL |
-| **Python** | 3.11.14 | grpcio 1.76.0 | BoringSSL |
-| **Java** | OpenJDK 21+ | grpc-netty-shaded 1.77.0 | Netty/JDK TLS |
+| **Node.js** | v20+ | @grpc/grpc-js ^1.14.3 | OpenSSL |
+| **Ruby** | 3.3.6 | grpc 1.80.0 | BoringSSL |
+| **Python** | 3.11.14 | grpcio 1.80.0 | BoringSSL |
+| **Java** | OpenJDK 21+ | grpc-netty-shaded 1.80.0 | Netty/JDK TLS |
 | **Kotlin** | 1.9+ | grpc-kotlin 1.4.1 | Netty/JDK TLS |
 | **Swift** | 5.10+ | grpc-swift 2.0.0 | SwiftNIO SSL |
-| **Rust** | 1.75+ | tonic 0.14 | rustls |
-| **C++** | C++17 | grpc 1.60+ | BoringSSL |
-| **C#** | .NET 9.0 | Grpc.Net.Client 2.71.0 | .NET SslStream |
-| **PHP** | 8.4 | grpc/grpc 1.74 | BoringSSL |
-| **Dart** | 3.0+ | grpc 4.0.0 | Dart Native TLS |
-| **Objective-C** | Clang 18 | gRPC-ProtoRPC 1.62 | BoringSSL |
-| **Scala** | 3.3+ | grpc-netty 1.77.0 | Netty/JDK TLS |
+| **Rust** | 1.75+ | tonic 0.14.5 | rustls |
+| **C++** | C++17 | grpc 1.80.0 | BoringSSL |
+| **C#** | .NET 9.0 | Grpc.Net.Client 2.76.0 | .NET SslStream |
+| **PHP** | 8.4 | grpc/grpc 1.80.0 | BoringSSL |
+| **Dart** | 3.0+ | grpc 5.1.0 | Dart Native TLS |
+| **Objective-C** | Clang 18 | gRPC-ProtoRPC 1.80.0 | BoringSSL |
+| **Scala** | 3.3+ | grpc-netty 1.80.0 | Netty/JDK TLS |
 
 ---
 

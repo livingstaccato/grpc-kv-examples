@@ -75,7 +75,7 @@ LANGUAGES[java]="Java:java:gradle build:gradle run --args=client:Netty/JDK:no"
 LANGUAGES[rust]="Rust:rust:cargo build --release:./target/release/kv-client:rustls:no"
 LANGUAGES[dart]="Dart:dart:dart pub get:dart run bin/client.dart:Native TLS:no"
 LANGUAGES[csharp]="C#:csharp:dotnet build:dotnet run:SslStream:no"
-LANGUAGES[cpp]="C++:cpp:cmake -B build && cmake --build build:./build/kv-client:gRPC/BoringSSL:yes"
+LANGUAGES[cpp]="C++:cpp:rm -rf build && cmake -B build -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH:-} && cmake --build build:./build/kv-client:gRPC/BoringSSL:yes"
 
 # Results tracking
 declare -A RESULTS

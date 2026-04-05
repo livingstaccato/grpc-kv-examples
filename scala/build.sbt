@@ -9,7 +9,7 @@ Compile / PB.targets := Seq(
 
 // gRPC and Protocol Buffers dependencies
 libraryDependencies ++= Seq(
-  "io.grpc" % "grpc-netty" % "1.77.0",
+  "io.grpc" % "grpc-netty" % "1.80.0",
   "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
   "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"
 )

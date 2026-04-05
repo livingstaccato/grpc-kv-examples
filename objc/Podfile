@@ -4,12 +4,12 @@
 platform :osx, '10.15'
 
 target 'KVClient' do
-  pod 'gRPC-ProtoRPC', '~> 1.76'
+  pod 'gRPC-ProtoRPC', '~> 1.80.0'
   pod 'Protobuf', '~> 4.29'
 end
 
 target 'KVServer' do
-  pod 'gRPC-ProtoRPC', '~> 1.76'
+  pod 'gRPC-ProtoRPC', '~> 1.80.0'
   pod 'Protobuf', '~> 4.29'
 end
 
