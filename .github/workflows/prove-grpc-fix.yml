@@ -87,12 +87,19 @@ jobs:
   # Job 4: Build Patched Ruby gRPC
   build-ruby:
     name: Build Patched Ruby
-    needs: build-env
+    needs: [build-env, build-cpp]
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Restore C++ (needed for Ruby build)
+        uses: actions/cache/restore@v5
+        with:
+          path: build/patched-grpc/install
+          key: patched-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
+          fail-on-cache-miss: true
 
       - name: Cache Patched Ruby
         id: cache-ruby
@@ -106,7 +113,14 @@ jobs:
         run: |
           docker build -t grpc-curve-test:latest .
           docker run --name builder -d -t grpc-curve-test:latest
+          
+          # Inject C++ artifacts
+          docker exec builder mkdir -p /workspace/build/patched-grpc
+          docker cp build/patched-grpc/install builder:/workspace/build/patched-grpc/
+          
+          # Build Ruby gem against C++ artifacts
           docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --ruby --install"
+          
           mkdir -p build/patched-grpc
           docker cp builder:/workspace/build/patched-grpc/ruby-gems build/patched-grpc/
           docker rm -f builder

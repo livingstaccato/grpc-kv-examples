@@ -205,22 +205,29 @@ build_cpp() {
 
 # Build Ruby gRPC
 build_ruby() {
-    log "Building Ruby gRPC gem with patch..."
+    log "Building Ruby gRPC gem against patched C++ gRPC..."
 
     cd "$BUILD_DIR/grpc"
 
-    # Build the gem
+    # Check if C++ build exists
+    if [ ! -d "$BUILD_DIR/install" ]; then
+        error "C++ gRPC build not found at $BUILD_DIR/install. Build C++ first."
+    fi
+
+    # Build the gem against system (our patched) libraries
     cd src/ruby
-    export GRPC_CONFIG=opt
-    export GRPC_RUBY_BUILD_PROCS=1
-    log "Installing rake-compiler..."
-    gem install rake-compiler
+    export GRPC_RUBY_USE_SYSTEM_LIBRARIES=1
+    export CMAKE_PREFIX_PATH="$BUILD_DIR/install"
+    export LD_LIBRARY_PATH="$BUILD_DIR/install/lib:$LD_LIBRARY_PATH"
+    
     log "Running bundle install..."
     bundle install
-    log "Running rake compile (serial build, verbose)..."
-    free -m || true
-    if bundle exec rake compile -- --verbose V=1 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
-        success "Ruby extension compiled successfully"
+    
+    log "Running rake compile using patched system libraries..."
+    if bundle exec rake compile -- \
+        --with-grpc-include="$BUILD_DIR/install/include" \
+        --with-grpc-lib="$BUILD_DIR/install/lib" 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
+        success "Ruby extension compiled successfully against patched libraries"
     else
         error "Ruby extension compilation FAILED. Check $BUILD_DIR/ruby-build.log"
     fi
