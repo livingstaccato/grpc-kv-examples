@@ -6,14 +6,14 @@
 # the Python grpcio package with the fix.
 #
 # Usage:
-#   ./build-patched-grpc.sh [--python] [--cpp] [--ruby] [--install]
+#   ./build-patched-grpc.sh [--python] [--cpp] [--ruby] [--all] [--install]
 #
 # Options:
-#   --python   Build patched Python grpcio wheel
-#   --cpp      Build patched C++ gRPC library
-#   --ruby     Build patched Ruby gRPC gem
-#   --install  Install after building (default: just build)
-#   --all      Build all languages
+#   --python    Build Python grpcio
+#   --cpp       Build C++ gRPC
+#   --ruby      Build Ruby gRPC gem
+#   --all       Build all of the above
+#   --install   Install to build/patched-grpc/install
 #
 # Output:
 #   ./build/patched-grpc/   - Built artifacts
@@ -32,69 +32,53 @@ BUILD_CPP=false
 BUILD_RUBY=false
 DO_INSTALL=false
 
-# Colors
+# ANSI colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
 
-log() { echo -e "${BLUE}[BUILD]${NC} $1"; }
-error() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
-success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
-
-# Parse arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --python) BUILD_PYTHON=true; shift ;;
-        --cpp) BUILD_CPP=true; shift ;;
-        --ruby) BUILD_RUBY=true; shift ;;
-        --install) DO_INSTALL=true; shift ;;
-        --all) BUILD_PYTHON=true; BUILD_CPP=true; BUILD_RUBY=true; shift ;;
-        *) echo "Unknown option: $1"; exit 1 ;;
-    esac
-done
-
-# Default to Python if nothing specified
-if ! $BUILD_PYTHON && ! $BUILD_CPP && ! $BUILD_RUBY; then
-    BUILD_PYTHON=true
-fi
-
-# Check prerequisites
-check_prereqs() {
-    log "Checking prerequisites..."
-
-    command -v git >/dev/null || error "git not found"
-    command -v cmake >/dev/null || error "cmake not found"
-
-    if $BUILD_PYTHON; then
-        command -v uv >/dev/null || error "uv not found (install with: curl -LsSf https://astral.sh/uv/install.sh | sh)"
-    fi
-
-    if $BUILD_RUBY; then
-        command -v ruby >/dev/null || error "ruby not found"
-        command -v gem >/dev/null || error "gem not found"
-    fi
-
-    [ -f "$PATCH_FILE" ] || error "Patch file not found: $PATCH_FILE"
-
-    success "Prerequisites OK"
+log() {
+    echo -e "${CYAN}[BUILD]${NC} $1"
 }
 
-# Clone gRPC source
-clone_grpc() {
-    log "Cloning gRPC $GRPC_VERSION..."
+success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
 
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
+}
+
+warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+check_prereqs() {
+    log "Checking prerequisites..."
+    for cmd in git cmake make g++; do
+        if ! command -v $cmd &> /dev/null; then
+            error "$cmd is required but not installed."
+        fi
+    done
+    
+    if ! command -v uv &> /dev/null; then
+        warn "uv not found, trying to install..."
+        curl -LsSf https://astral.sh/uv/install.sh | sh || true
+        export PATH="$HOME/.cargo/bin:$PATH"
+    fi
+}
+
+clone_grpc() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
     if [ -d "grpc" ]; then
-        log "gRPC source already exists, updating..."
-        cd grpc
-        git fetch origin
-        git checkout $GRPC_VERSION
-        git submodule update --init --recursive
+        log "gRPC source already exists, skipping clone"
     else
+        log "Cloning gRPC $GRPC_VERSION..."
         git clone --depth 1 --branch $GRPC_VERSION \
             --recurse-submodules --shallow-submodules \
             https://github.com/grpc/grpc.git
@@ -106,67 +90,43 @@ clone_grpc() {
     success "gRPC source ready"
 }
 
-# Apply patch using sed (more reliable than git apply across versions)
 apply_patch() {
     log "Applying EC curves patch..."
-
     cd "$BUILD_DIR/grpc"
 
-    local SSL_FILE="src/core/tsi/ssl_transport_security.cc"
-
-    if [ ! -f "$SSL_FILE" ]; then
-        error "Source file not found: $SSL_FILE"
+    if [ ! -f "$PATCH_FILE" ]; then
+        error "Patch file not found: $PATCH_FILE"
     fi
 
     # Check if already patched
-    if grep -q "NID_secp384r1" "$SSL_FILE"; then
-        log "Patch already applied, skipping..."
-        success "Patch verified - P-384/P-521 support enabled"
-        return 0
+    if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
+        log "Patch already applied, skipping"
+        return
     fi
 
-    log "Patching $SSL_FILE..."
+    log "Patching src/core/tsi/ssl_transport_security.cc..."
+    
+    # Simple search and replace for the curve list
+    sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' \
+        src/core/tsi/ssl_transport_security.cc
 
-    # Patch 1: Update kSslEcCurveNames to include P-384 and P-521
-    # Change: static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1};
-    # To:     static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};
-    sed -i 's/static const int kSslEcCurveNames\[\] = {NID_X9_62_prime256v1};/static const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};/' "$SSL_FILE"
-
-    # Patch 2: Update #if condition to include BoringSSL
-    # Change: #if OPENSSL_VERSION_NUMBER >= 0x30000000
-    # To:     #if (OPENSSL_VERSION_NUMBER >= 0x30000000) || defined(OPENSSL_IS_BORINGSSL)
-    sed -i 's/#if OPENSSL_VERSION_NUMBER >= 0x30000000$/#if (OPENSSL_VERSION_NUMBER >= 0x30000000) || defined(OPENSSL_IS_BORINGSSL)/' "$SSL_FILE"
-
-    # Patch 3: Update the else condition
-    # Change: #if OPENSSL_VERSION_NUMBER < 0x30000000L
-    # To:     #if (OPENSSL_VERSION_NUMBER < 0x30000000L) && !defined(OPENSSL_IS_BORINGSSL)
-    sed -i 's/#if OPENSSL_VERSION_NUMBER < 0x30000000L$/#if (OPENSSL_VERSION_NUMBER < 0x30000000L) \&\& !defined(OPENSSL_IS_BORINGSSL)/' "$SSL_FILE"
-
-    # Patch 4: Update SSL_CTX_set1_groups call to use array size
-    # Change: if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, 1)) {
-    # To:     if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))) {
-    sed -i 's/SSL_CTX_set1_groups(context, kSslEcCurveNames, 1)/SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)\/sizeof(kSslEcCurveNames[0]))/' "$SSL_FILE"
-
-    # Verify patch
-    if grep -q "NID_secp384r1" "$SSL_FILE"; then
+    # Check if it worked
+    if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
         success "Patch applied successfully - P-384/P-521 support enabled"
     else
-        error "Patch verification failed - NID_secp384r1 not found"
+        error "Failed to apply patch"
     fi
 
-    # Show what was changed
     log "Verifying patch contents..."
-    grep -n "kSslEcCurveNames\|OPENSSL_IS_BORINGSSL\|0x30000000" "$SSL_FILE" | head -10
+    grep -nE "OPENSSL_IS_BORINGSSL|NID_secp384r1|kSslEcCurveNames" src/core/tsi/ssl_transport_security.cc || true
 }
 
-# Build Python grpcio
 build_python() {
     log "Building Python grpcio with patch..."
     log "NOTE: This will take 20-30 minutes..."
 
     cd "$BUILD_DIR/grpc"
 
-    # Create virtual environment for the build
     log "Creating virtual environment..."
     uv venv "$BUILD_DIR/venv"
     export VIRTUAL_ENV="$BUILD_DIR/venv"
@@ -191,6 +151,7 @@ build_python() {
     export GRPC_PYTHON_BUILD_WITH_CYTHON=1
     # Force language level 3 for Cython
     export GRPC_PYTHON_CYTHON_OPTIONS="--language-level=3"
+
     # Build and install directly
     log "Building grpcio from source (this takes 20-30 minutes)..."
     log "Build log: $BUILD_DIR/python-build.log"
@@ -201,7 +162,6 @@ build_python() {
         error "Python grpcio build FAILED. Check $BUILD_DIR/python-build.log"
     fi
 
-    # Verify installation
     log "Verifying grpcio installation..."
     python -c "import grpc; print(f'grpcio version: {grpc.__version__}')" || error "grpcio import failed"
 
@@ -209,7 +169,6 @@ build_python() {
     log "Activate with: source $BUILD_DIR/venv/bin/activate"
 }
 
-# Build C++ gRPC
 build_cpp() {
     log "Building C++ gRPC with patch..."
 
@@ -317,9 +276,35 @@ main() {
     echo ""
 }
 
-main
-/*.gem"
-    echo ""
-}
+# Parse arguments
+if [ $# -eq 0 ]; then
+    error "No options specified. Use --python, --cpp, --ruby, or --all."
+fi
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --python)
+            BUILD_PYTHON=true
+            ;;
+        --cpp)
+            BUILD_CPP=true
+            ;;
+        --ruby)
+            BUILD_RUBY=true
+            ;;
+        --all)
+            BUILD_PYTHON=true
+            BUILD_CPP=true
+            BUILD_RUBY=true
+            ;;
+        --install)
+            DO_INSTALL=true
+            ;;
+        *)
+            error "Unknown option: $1"
+            ;;
+    esac
+    shift
+done
 
 main
