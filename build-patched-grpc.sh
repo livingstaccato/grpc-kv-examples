@@ -216,19 +216,23 @@ build_cpp() {
     mkdir -p cmake/build
     cd cmake/build
 
+    log "Running cmake configuration..."
     cmake ../.. \
         -DgRPC_INSTALL=ON \
         -DgRPC_BUILD_TESTS=OFF \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX="$BUILD_DIR/install"
 
-    make -j$(nproc)
+    log "Running make (this takes 30-40 minutes)..."
+    if make -j$(nproc) 2>&1 | tee "$BUILD_DIR/cpp-build.log"; then
+        success "C++ gRPC built successfully"
+    else
+        error "C++ gRPC build FAILED. Check $BUILD_DIR/cpp-build.log"
+    fi
 
     if $DO_INSTALL; then
         make install
         success "C++ gRPC installed to $BUILD_DIR/install"
-    else
-        success "C++ gRPC built in $BUILD_DIR/grpc/cmake/build"
     fi
 }
 
@@ -240,11 +244,16 @@ build_ruby() {
 
     # Build the gem
     cd src/ruby
+    log "Running bundle install..."
     bundle install
-    rake native
+    log "Running rake native (this may take 10-15 minutes)..."
+    if bundle exec rake native 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
+        success "Ruby gem built successfully"
+    else
+        error "Ruby gem build FAILED. Check $BUILD_DIR/ruby-build.log"
+    fi
 
-    success "Ruby gem built"
-    ls -la pkg/*.gem
+    ls -la pkg/*.gem || error "No gems found in pkg/"
 
     if $DO_INSTALL; then
         local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"

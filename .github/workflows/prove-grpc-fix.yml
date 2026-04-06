@@ -35,6 +35,7 @@ jobs:
     name: Build Patched gRPC
     needs: build-env
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -56,7 +57,7 @@ jobs:
           docker run --name builder -d -t grpc-curve-test:latest
           
           # Build all patched languages
-          docker exec builder ./build-patched-grpc.sh --all --install
+          docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --all --install"
           
           # Copy results out for caching
           mkdir -p build
@@ -70,6 +71,7 @@ jobs:
     name: Run Proof & Report
     needs: build-patched
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
