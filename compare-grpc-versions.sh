@@ -27,6 +27,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Directories
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RESULTS_DIR="results"
 BASELINE_DIR="$RESULTS_DIR/baseline"
 PATCHED_DIR="$RESULTS_DIR/patched"
