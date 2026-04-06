@@ -169,12 +169,12 @@ jobs:
             docker cp build/patched-grpc/ruby-gems proof-container:/workspace/build/patched-grpc/
           fi
           
-          # Run tests for each language that we have artifacts for
-          docker exec proof-container ./compare-grpc-versions.sh --language python --skip-build
-          docker exec proof-container ./compare-grpc-versions.sh --language cpp --skip-build
+          # Run tests for all languages that we have artifacts for
+          LANGS="python,cpp"
           if [ -d "build/patched-grpc/ruby-gems" ]; then
-            docker exec proof-container ./compare-grpc-versions.sh --language ruby --skip-build
+            LANGS="python,ruby,cpp"
           fi
+          docker exec proof-container ./compare-grpc-versions.sh --language $LANGS --skip-build
           
           # Extract results
           docker cp proof-container:/workspace/reports .

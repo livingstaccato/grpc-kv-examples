@@ -107,15 +107,25 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate language
-case "$LANGUAGE" in
-    python|ruby|cpp|all)
-        ;;
-    *)
-        echo -e "${RED}Error: Invalid language '$LANGUAGE'${NC}"
-        echo "Must be one of: python, ruby, cpp, all"
-        exit 1
-        ;;
-esac
+if [[ "$LANGUAGE" == "all" ]]; then
+    TEST_LANGUAGES=("python" "ruby" "cpp")
+elif [[ "$LANGUAGE" == *","* ]]; then
+    IFS=',' read -ra TEST_LANGUAGES <<< "$LANGUAGE"
+else
+    TEST_LANGUAGES=("$LANGUAGE")
+fi
+
+for lang in "${TEST_LANGUAGES[@]}"; do
+    case "$lang" in
+        python|ruby|cpp)
+            ;;
+        *)
+            echo -e "${RED}Error: Invalid language '$lang'${NC}"
+            echo "Must be one of: python, ruby, cpp, all"
+            exit 1
+            ;;
+    esac
+done
 
 # Set default output file if not specified
 if [[ -z "$OUTPUT_FILE" ]]; then
@@ -128,7 +138,7 @@ echo -e "${CYAN}║        gRPC Elliptic Curve Patch Comparison Tool          �
 echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${BLUE}Configuration:${NC}"
-echo "  Language(s): $LANGUAGE"
+echo "  Language(s): ${TEST_LANGUAGES[*]}"
 echo "  Quick mode: $QUICK_MODE"
 echo "  Output: $OUTPUT_FILE"
 echo ""
@@ -144,13 +154,6 @@ echo ""
 if [[ -n "${VIRTUAL_ENV:-}" ]]; then
     echo -e "${YELLOW}Deactivating virtual environment...${NC}"
     deactivate || true
-fi
-
-# Determine which languages to test
-if [[ "$LANGUAGE" == "all" ]]; then
-    TEST_LANGUAGES=("python" "ruby" "cpp")
-else
-    TEST_LANGUAGES=("$LANGUAGE")
 fi
 
 # Run baseline tests for each language
