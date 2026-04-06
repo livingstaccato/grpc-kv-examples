@@ -27,7 +27,7 @@ SERVER_PORT=50051
 VERBOSE=false
 TEST_LANGUAGE=""
 TEST_CURVE=""
-RESULTS_FILE="curve-test-results.txt"
+RESULTS_FILE="$SCRIPT_DIR/curve-test-results.txt"
 
 # Colors for output
 RED='\033[0;31m'

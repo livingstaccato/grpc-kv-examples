@@ -157,18 +157,18 @@ if [[ -n "${VIRTUAL_ENV:-}" ]]; then
 fi
 
 # Run baseline tests for each language
-rm -f curve-test-results.txt
+rm -f "$SCRIPT_DIR/curve-test-results.txt"
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Testing $lang (baseline)...${NC}"
     APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
 done
 
 # Copy results
-if [[ -f "curve-test-results.txt" ]]; then
-    cp curve-test-results.txt "$BASELINE_DIR/"
+if [[ -f "$SCRIPT_DIR/curve-test-results.txt" ]]; then
+    cp "$SCRIPT_DIR/curve-test-results.txt" "$BASELINE_DIR/"
     echo -e "${GREEN}✓ Baseline results saved to $BASELINE_DIR/curve-test-results.txt${NC}"
 else
-    echo -e "${RED}Error: curve-test-results.txt not found!${NC}"
+    echo -e "${RED}Error: curve-test-results.txt not found in $SCRIPT_DIR!${NC}"
 fi
 
 # Capture baseline versions
@@ -230,7 +230,7 @@ fi
 echo -e "${YELLOW}[3/5] Running patched tests...${NC}"
 echo ""
 
-rm -f curve-test-results.txt
+rm -f "$SCRIPT_DIR/curve-test-results.txt"
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Activating patched $lang environment...${NC}"
 
@@ -248,11 +248,11 @@ for lang in "${TEST_LANGUAGES[@]}"; do
 done
 
 # Copy patched results
-if [[ -f "curve-test-results.txt" ]]; then
-    cp curve-test-results.txt "$PATCHED_DIR/"
+if [[ -f "$SCRIPT_DIR/curve-test-results.txt" ]]; then
+    cp "$SCRIPT_DIR/curve-test-results.txt" "$PATCHED_DIR/"
     echo -e "${GREEN}✓ Patched results saved to $PATCHED_DIR/curve-test-results.txt${NC}"
 else
-    echo -e "${RED}Error: curve-test-results.txt (patched) not found!${NC}"
+    echo -e "${RED}Error: curve-test-results.txt (patched) not found in $SCRIPT_DIR!${NC}"
 fi
 
 # Capture patched versions
