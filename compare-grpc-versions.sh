@@ -154,9 +154,10 @@ else
 fi
 
 # Run baseline tests for each language
+rm -f curve-test-results.txt
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Testing $lang (baseline)...${NC}"
-    ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
+    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
 done
 
 # Copy results
@@ -221,6 +222,7 @@ fi
 echo -e "${YELLOW}[3/5] Running patched tests...${NC}"
 echo ""
 
+rm -f curve-test-results.txt
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Activating patched $lang environment...${NC}"
 
@@ -231,7 +233,7 @@ for lang in "${TEST_LANGUAGES[@]}"; do
     }
 
     echo -e "${BLUE}Testing $lang (patched)...${NC}"
-    ./test-all-curves.sh --language "$lang" > "$PATCHED_DIR/${lang}.log" 2>&1 || true
+    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$PATCHED_DIR/${lang}.log" 2>&1 || true
 
     # Deactivate
     source ./utils/grpc-environment-manager.sh deactivate

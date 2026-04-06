@@ -261,14 +261,26 @@ print_summary() {
 
 # Save results to file
 save_results() {
-    {
-        echo "# EC Curve Compatibility Test Results"
-        echo "# Generated: $(date -Iseconds)"
-        echo ""
+    # If APPEND_RESULTS is true, don't write the header and use append mode
+    if [[ "${APPEND_RESULTS:-false}" == "true" ]]; then
         for key in "${!RESULTS[@]}"; do
-            echo "$key=${RESULTS[$key]}"
+            # Check if key already exists in file to avoid duplicates (last one wins)
+            if grep -q "^$key=" "$RESULTS_FILE" 2>/dev/null; then
+                sed -i "s|^$key=.*|$key=${RESULTS[$key]}|" "$RESULTS_FILE"
+            else
+                echo "$key=${RESULTS[$key]}" >> "$RESULTS_FILE"
+            fi
         done
-    } > "$RESULTS_FILE"
+    else
+        {
+            echo "# EC Curve Compatibility Test Results"
+            echo "# Generated: $(date -Iseconds)"
+            echo ""
+            for key in "${!RESULTS[@]}"; do
+                echo "$key=${RESULTS[$key]}"
+            done
+        } > "$RESULTS_FILE"
+    fi
     log "Results saved to $RESULTS_FILE"
 }
 
