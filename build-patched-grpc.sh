@@ -211,15 +211,22 @@ build_ruby() {
 
     # Build the gem
     cd src/ruby
+    export GRPC_CONFIG=opt
+    export GRPC_RUBY_BUILD_PROCS=2
     log "Running bundle install..."
     bundle install
-    log "Running rake native (limiting to 2 cores to save memory)..."
+    log "Running rake compile (limiting to 2 cores to save memory)..."
     free -m || true
-    if GRPC_RUBY_BUILD_PROCS=2 bundle exec rake native 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
-        success "Ruby gem built successfully"
+    if GRPC_RUBY_BUILD_PROCS=2 bundle exec rake compile 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
+        success "Ruby extension compiled successfully"
     else
-        error "Ruby gem build FAILED. Check $BUILD_DIR/ruby-build.log"
+        error "Ruby extension compilation FAILED. Check $BUILD_DIR/ruby-build.log"
     fi
+
+    log "Building the gem package..."
+    gem build grpc.gemspec
+    mkdir -p pkg
+    mv grpc-*.gem pkg/ || true
 
     ls -la pkg/*.gem || error "No gems found in pkg/"
 
