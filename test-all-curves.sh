@@ -325,7 +325,9 @@ main() {
                 continue
             fi
 
-            test_client "$lang" "$curve"
+            # Don't let a single client failure stop the whole suite
+            # We want to record failures in the results file
+            test_client "$lang" "$curve" || true
         done
 
         # Stop server
@@ -334,12 +336,12 @@ main() {
 
     # Print summary
     print_summary
-    save_results
 }
 
 # Cleanup on exit
 cleanup() {
     stop_server
+    save_results
 }
 trap cleanup EXIT
 

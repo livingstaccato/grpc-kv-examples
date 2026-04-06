@@ -164,7 +164,12 @@ for lang in "${TEST_LANGUAGES[@]}"; do
 done
 
 # Copy results
-cp curve-test-results.txt "$BASELINE_DIR/" 2>/dev/null || true
+if [[ -f "curve-test-results.txt" ]]; then
+    cp curve-test-results.txt "$BASELINE_DIR/"
+    echo -e "${GREEN}✓ Baseline results saved to $BASELINE_DIR/curve-test-results.txt${NC}"
+else
+    echo -e "${RED}Error: curve-test-results.txt not found!${NC}"
+fi
 
 # Capture baseline versions
 echo -e "${BLUE}Capturing baseline version information...${NC}"
@@ -243,7 +248,12 @@ for lang in "${TEST_LANGUAGES[@]}"; do
 done
 
 # Copy patched results
-cp curve-test-results.txt "$PATCHED_DIR/" 2>/dev/null || true
+if [[ -f "curve-test-results.txt" ]]; then
+    cp curve-test-results.txt "$PATCHED_DIR/"
+    echo -e "${GREEN}✓ Patched results saved to $PATCHED_DIR/curve-test-results.txt${NC}"
+else
+    echo -e "${RED}Error: curve-test-results.txt (patched) not found!${NC}"
+fi
 
 # Capture patched versions
 echo -e "${BLUE}Capturing patched version information...${NC}"
