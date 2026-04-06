@@ -212,12 +212,14 @@ build_ruby() {
     # Build the gem
     cd src/ruby
     export GRPC_CONFIG=opt
-    export GRPC_RUBY_BUILD_PROCS=2
+    export GRPC_RUBY_BUILD_PROCS=1
+    log "Installing rake-compiler..."
+    gem install rake-compiler
     log "Running bundle install..."
     bundle install
-    log "Running rake compile (limiting to 2 cores to save memory)..."
+    log "Running rake compile (serial build, verbose)..."
     free -m || true
-    if GRPC_RUBY_BUILD_PROCS=2 bundle exec rake compile 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
+    if bundle exec rake compile -- --verbose V=1 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
         success "Ruby extension compiled successfully"
     else
         error "Ruby extension compilation FAILED. Check $BUILD_DIR/ruby-build.log"
