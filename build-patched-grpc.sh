@@ -110,11 +110,6 @@ apply_patch() {
     sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' \
         src/core/tsi/ssl_transport_security.cc
 
-    # Disable Ruby gem build artifact cleanup which fails on some filesystems
-    log "Disabling Ruby build cleanup in extconf.rb..."
-    sed -i 's/rm -f #{grpc_lib_dir}\/\*\.a/:/g' src/ruby/ext/grpc/extconf.rb || true
-    sed -i 's/rm -rf #{grpc_obj_dir}/:/g' src/ruby/ext/grpc/extconf.rb || true
-
     # Check if it worked
     if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
         success "Patch applied successfully - P-384/P-521 support enabled"
@@ -221,6 +216,14 @@ build_ruby() {
 
     # Build the gem against system (our patched) libraries
     cd src/ruby
+    
+    log "Debugging extconf.rb..."
+    grep "rm -f" ext/grpc/extconf.rb || true
+    
+    # Disable cleanup more aggressively
+    sed -i 's/rm -f/echo skipping rm/g' ext/grpc/extconf.rb || true
+    sed -i 's/rm -rf/echo skipping rm/g' ext/grpc/extconf.rb || true
+
     export GRPC_RUBY_USE_SYSTEM_LIBRARIES=1
     export CMAKE_PREFIX_PATH="$BUILD_DIR/install"
     export LD_LIBRARY_PATH="$BUILD_DIR/install/lib:$LD_LIBRARY_PATH"
@@ -228,13 +231,13 @@ build_ruby() {
     log "Running bundle install..."
     bundle install
     
-    log "Running rake compile using patched system libraries..."
-    if bundle exec rake compile -- \
+    log "Running rake compile (no redirection, serial)..."
+    if GRPC_RUBY_BUILD_PROCS=1 bundle exec rake compile -- \
         --with-grpc-include="$BUILD_DIR/install/include" \
-        --with-grpc-lib="$BUILD_DIR/install/lib" 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
-        success "Ruby extension compiled successfully against patched libraries"
+        --with-grpc-lib="$BUILD_DIR/install/lib"; then
+        success "Ruby extension compiled successfully"
     else
-        error "Ruby extension compilation FAILED. Check $BUILD_DIR/ruby-build.log"
+        error "Ruby extension compilation FAILED"
     fi
 
     log "Building the gem package..."
