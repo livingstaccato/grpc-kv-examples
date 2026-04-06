@@ -254,8 +254,9 @@ build_ruby() {
     cd src/ruby
     log "Running bundle install..."
     bundle install
-    log "Running rake native (this may take 10-15 minutes)..."
-    if bundle exec rake native 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
+    log "Running rake native (limiting to 2 cores to save memory)..."
+    free -m || true
+    if GRPC_RUBY_BUILD_PROCS=2 bundle exec rake native 2>&1 | tee "$BUILD_DIR/ruby-build.log"; then
         success "Ruby gem built successfully"
     else
         error "Ruby gem build FAILED. Check $BUILD_DIR/ruby-build.log"
@@ -282,22 +283,26 @@ main() {
 
     check_prereqs
     df -h /workspace || true
+    free -m || true
     clone_grpc
     apply_patch
 
     if $BUILD_PYTHON; then
         build_python
         df -h /workspace || true
+        free -m || true
     fi
 
     if $BUILD_CPP; then
         build_cpp
         df -h /workspace || true
+        free -m || true
     fi
 
     if $BUILD_RUBY; then
         build_ruby
         df -h /workspace || true
+        free -m || true
     fi
 
     echo ""
