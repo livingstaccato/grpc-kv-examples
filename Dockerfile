@@ -184,7 +184,7 @@ RUN rustup update stable
 # ============================================================
 # Dart SDK (direct download - apt package has libc6 issues on 24.04)
 # ============================================================
-ENV DART_VERSION=3.6.1
+ENV DART_VERSION=3.7.0
 RUN wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip && \
     unzip -q dartsdk-linux-x64-release.zip -d /opt && \
     rm dartsdk-linux-x64-release.zip
