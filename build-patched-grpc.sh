@@ -172,7 +172,13 @@ build_python() {
 
     # Install build dependencies for gRPC v1.80.0
     log "Installing build dependencies..."
-    uv pip install 'Cython<3.0' setuptools wheel
+    # Using exact versions from gRPC 1.80.0 requirements
+    uv pip install "cython==3.1.1" "setuptools>=77.0.1" "wheel>=0.29" "build>=1.3.0"
+
+    # Verify installed versions
+    log "Installed build dependencies:"
+    cython --version || echo "Cython not found in PATH"
+    uv pip list | grep -E "cython|setuptools|wheel|build"
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
@@ -181,7 +187,8 @@ build_python() {
     export GRPC_BUILD_WITH_BORING_SSL_ASM=false
     export GRPC_PYTHON_LDFLAGS="-lstdc++"
     export GRPC_PYTHON_BUILD_WITH_CYTHON=1
-
+    # Force language level 3 for Cython
+    export GRPC_PYTHON_CYTHON_OPTIONS="--language-level=3"
     # Build and install directly
     log "Building grpcio from source (this takes 20-30 minutes)..."
     log "Build log: $BUILD_DIR/python-build.log"
