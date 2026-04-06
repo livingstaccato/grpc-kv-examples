@@ -20,6 +20,7 @@
 #
 
 set -e
+set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATCH_FILE="$SCRIPT_DIR/patches/grpc-ec-curves-p384-p521.patch"
@@ -280,6 +281,11 @@ main() {
     echo "  Python: source $BUILD_DIR/venv/bin/activate"
     echo "  C++:    export CMAKE_PREFIX_PATH=$BUILD_DIR/install"
     echo "  Ruby:   gem install $BUILD_DIR/grpc/src/ruby/pkg/*.gem"
+    echo ""
+}
+
+main
+/*.gem"
     echo ""
 }
 
