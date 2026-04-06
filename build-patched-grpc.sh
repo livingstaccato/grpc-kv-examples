@@ -99,6 +99,8 @@ clone_grpc() {
             --recurse-submodules --shallow-submodules \
             https://github.com/grpc/grpc.git
         cd grpc
+        # Remove .git to save space
+        find . -name ".git" -type d -exec rm -rf {} + || true
     fi
 
     success "gRPC source ready"
@@ -230,9 +232,15 @@ build_cpp() {
         error "C++ gRPC build FAILED. Check $BUILD_DIR/cpp-build.log"
     fi
 
-    if $DO_INSTALL; then
-        make install
+    log "Running make install..."
+    if make install 2>&1 | tee -a "$BUILD_DIR/cpp-build.log"; then
         success "C++ gRPC installed to $BUILD_DIR/install"
+        # Clean up build directory to save space (gRPC build is HUGE)
+        log "Cleaning up C++ build directory..."
+        rm -rf "$BUILD_DIR/grpc/cmake/build"
+        df -h /workspace || true
+    else
+        error "C++ gRPC install FAILED. Check $BUILD_DIR/cpp-build.log"
     fi
 }
 
@@ -273,19 +281,23 @@ main() {
     echo ""
 
     check_prereqs
+    df -h /workspace || true
     clone_grpc
     apply_patch
 
     if $BUILD_PYTHON; then
         build_python
+        df -h /workspace || true
     fi
 
     if $BUILD_CPP; then
         build_cpp
+        df -h /workspace || true
     fi
 
     if $BUILD_RUBY; then
         build_ruby
+        df -h /workspace || true
     fi
 
     echo ""
