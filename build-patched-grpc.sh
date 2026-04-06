@@ -110,6 +110,11 @@ apply_patch() {
     sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' \
         src/core/tsi/ssl_transport_security.cc
 
+    # Disable Ruby gem build artifact cleanup which fails on some filesystems
+    log "Disabling Ruby build cleanup in extconf.rb..."
+    sed -i 's/rm -f #{grpc_lib_dir}\/\*\.a/:/g' src/ruby/ext/grpc/extconf.rb || true
+    sed -i 's/rm -rf #{grpc_obj_dir}/:/g' src/ruby/ext/grpc/extconf.rb || true
+
     # Check if it worked
     if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
         success "Patch applied successfully - P-384/P-521 support enabled"
