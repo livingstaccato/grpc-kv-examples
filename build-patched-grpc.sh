@@ -217,12 +217,14 @@ build_ruby() {
     # Build the gem against system (our patched) libraries
     cd src/ruby
     
-    log "Debugging extconf.rb..."
-    grep "rm -f" ext/grpc/extconf.rb || true
+    log "Aggressively patching extconf.rb to remove failing cleanup..."
+    # Remove the lines that add the cleanup targets to the Makefile
+    sed -i '/rm_grpc_core_libs/,/hijack_makefile/d' ext/grpc/extconf.rb || true
+    # Also ensure we don't try to strip if it's causing issues
+    sed -i 's/strip_tool = .*/strip_tool = ":"/' ext/grpc/extconf.rb || true
     
-    # Disable cleanup more aggressively
-    sed -i 's/rm -f/echo skipping rm/g' ext/grpc/extconf.rb || true
-    sed -i 's/rm -rf/echo skipping rm/g' ext/grpc/extconf.rb || true
+    log "Verified extconf.rb contents (cleanup should be gone):"
+    grep "rm -f" ext/grpc/extconf.rb || echo "Cleanup logic successfully removed"
 
     export GRPC_RUBY_USE_SYSTEM_LIBRARIES=1
     export CMAKE_PREFIX_PATH="$BUILD_DIR/install"
