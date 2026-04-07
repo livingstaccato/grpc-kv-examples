@@ -317,6 +317,11 @@ build_ruby() {
     if $DO_INSTALL; then
         local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"
         mkdir -p "$RUBY_GEMS_DIR"
+        
+        # Install dependencies into our local gem home
+        log "Installing dependencies to $RUBY_GEMS_DIR..."
+        GEM_HOME="$RUBY_GEMS_DIR" gem install google-protobuf
+        
         log "Installing gem $GEM_FILE to $RUBY_GEMS_DIR using patched libraries..."
         
         # This tells gem install to use our patched libraries during compilation

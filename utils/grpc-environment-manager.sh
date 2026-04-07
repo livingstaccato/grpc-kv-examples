@@ -68,7 +68,9 @@ activate_ruby() {
 
     # Set GEM_HOME to use patched gem
     export GEM_HOME="$RUBY_GEMS_DIR"
-    export GEM_PATH="$GEM_HOME"
+    # Capture current GEM_PATH or use default if empty
+    local CURRENT_GEM_PATH="${GEM_PATH:-$(ruby -e 'puts Gem.path.join(":")')}"
+    export GEM_PATH="$GEM_HOME:$CURRENT_GEM_PATH"
     export PATH="$GEM_HOME/bin:$PATH"
 
     echo -e "${GREEN}✓ Activated patched Ruby gRPC${NC}"
@@ -119,6 +121,7 @@ deactivate_env() {
             ;;
         ruby)
             unset GEM_HOME
+            unset GEM_PATH
             # Restore PATH (simplified - removes our GEM_HOME/bin)
             export PATH=$(echo "$PATH" | sed "s|$BUILD_DIR/ruby-gems/bin:||g")
             echo -e "${GREEN}✓ Deactivated patched Ruby environment${NC}"
