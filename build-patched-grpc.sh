@@ -234,7 +234,11 @@ build_ruby() {
     log "Running bundle install..."
     bundle install
     
-    log "Running rake compile (no redirection, serial)..."
+    log "Running rake compile (serial, disable -Werror)..."
+    # Set environment variables to disable -Werror
+    export CFLAGS="-Wno-unused-parameter -Wno-error"
+    export CXXFLAGS="-Wno-unused-parameter -Wno-error"
+    
     if GRPC_RUBY_BUILD_PROCS=1 bundle exec rake compile -- \
         --with-grpc-include="$BUILD_DIR/install/include" \
         --with-grpc-lib="$BUILD_DIR/install/lib"; then

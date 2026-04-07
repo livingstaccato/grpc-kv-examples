@@ -154,21 +154,22 @@ echo ""
 # Ensure we're using system gRPC
 if [[ -n "${VIRTUAL_ENV:-}" ]]; then
     echo -e "${YELLOW}Deactivating virtual environment...${NC}"
-    deactivate || true
+    if command -v deactivate &>/dev/null; then
+        deactivate || true
+    else
+        # If it's a uv/bin/python venv, we might just need to unset vars
+        unset VIRTUAL_ENV
+        export PATH=${PATH//${VIRTUAL_ENV:-}\/bin:/}
+    fi
 fi
 
-# Run baseline tests for each language
-# Ensure fresh results file
+# Run baseline tests for all target languages at once
 export RESULTS_FILE="$SCRIPT_DIR/baseline-results.txt"
 rm -f "$RESULTS_FILE"
 
-for lang in "${TEST_LANGUAGES[@]}"; do
-    echo -e "${BLUE}Testing $lang (baseline)...${NC}"
-    # We pass the custom results file to test-all-curves.sh via env or arg if supported
-    # But for now, since we updated it to use RESULTS_FILE if defined? 
-    # Wait, I didn't update it to use env var! I'll do that next.
-    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
-done
+echo -e "${BLUE}Testing languages: ${TEST_LANGUAGES[*]} (baseline)...${NC}"
+LANG_ARGS=$(IFS=,; echo "${TEST_LANGUAGES[*]}")
+./test-all-curves.sh --language "$LANG_ARGS" > "$BASELINE_DIR/baseline-suite.log" 2>&1 || true
 
 # Copy results to the expected location for the report generator
 if [[ -f "$RESULTS_FILE" ]]; then
@@ -176,7 +177,6 @@ if [[ -f "$RESULTS_FILE" ]]; then
     echo -e "${GREEN}✓ Baseline results saved to $BASELINE_DIR/curve-test-results.txt${NC}"
 else
     echo -e "${RED}Error: $RESULTS_FILE not found!${NC}"
-    ls -la "$SCRIPT_DIR"
 fi
 
 # Capture baseline versions
@@ -252,6 +252,7 @@ for lang in "${TEST_LANGUAGES[@]}"; do
     }
 
     echo -e "${BLUE}Testing $lang (patched)...${NC}"
+    # Use the exported RESULTS_FILE and ensure APPEND_RESULTS is true for subsequent languages
     APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$PATCHED_DIR/${lang}.log" 2>&1 || true
 
     # Deactivate
@@ -264,7 +265,6 @@ if [[ -f "$RESULTS_FILE" ]]; then
     echo -e "${GREEN}✓ Patched results saved to $PATCHED_DIR/curve-test-results.txt${NC}"
 else
     echo -e "${RED}Error: $RESULTS_FILE not found!${NC}"
-    ls -la "$SCRIPT_DIR"
 fi
 
 # Capture patched versions

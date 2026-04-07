@@ -313,7 +313,11 @@ main() {
     # Determine languages to test
     local langs_to_test
     if [ -n "$TEST_LANGUAGE" ]; then
-        langs_to_test=("$TEST_LANGUAGE")
+        if [[ "$TEST_LANGUAGE" == *","* ]]; then
+            IFS=',' read -ra langs_to_test <<< "$TEST_LANGUAGE"
+        else
+            langs_to_test=("$TEST_LANGUAGE")
+        fi
     else
         langs_to_test=(go python ruby nodejs java rust dart csharp cpp)
     fi
