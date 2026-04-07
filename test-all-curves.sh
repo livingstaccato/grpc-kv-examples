@@ -101,11 +101,11 @@ start_server() {
     export PLUGIN_SERVER_CERT="$(cat certs/ec-${curve_id}-mtls-server.crt)"
     export PLUGIN_SERVER_KEY="$(cat certs/ec-${curve_id}-mtls-server.key)"
     export PLUGIN_CLIENT_CERT="$(cat certs/ec-${curve_id}-mtls-client.crt)"
-    export PLUGIN_HOST="localhost"
+    export PLUGIN_HOST="127.0.0.1"
     export PLUGIN_PORT="$SERVER_PORT"
 
     cd go
-    go run go-kv-server.go &
+    ./go-kv-server &
     SERVER_PID=$!
     cd ..
 
@@ -161,7 +161,7 @@ test_client() {
     export PLUGIN_SERVER_CERT="$(cat certs/ec-${curve_id}-mtls-server.crt)"
     export PLUGIN_CLIENT_CERT="$(cat certs/ec-${curve_id}-mtls-client.crt)"
     export PLUGIN_CLIENT_KEY="$(cat certs/ec-${curve_id}-mtls-client.key)"
-    export PLUGIN_HOST="localhost"
+    export PLUGIN_HOST="127.0.0.1"
     export PLUGIN_PORT="$SERVER_PORT"
 
     # For Rust, use PKCS#8 key if available
