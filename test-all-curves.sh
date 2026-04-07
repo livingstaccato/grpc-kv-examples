@@ -27,7 +27,8 @@ SERVER_PORT=50051
 VERBOSE=false
 TEST_LANGUAGE=""
 TEST_CURVE=""
-RESULTS_FILE="$SCRIPT_DIR/curve-test-results.txt"
+# Use environment variable if set, otherwise default to script directory
+RESULTS_FILE="${RESULTS_FILE:-$SCRIPT_DIR/curve-test-results.txt}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -261,8 +262,13 @@ print_summary() {
 
 # Save results to file
 save_results() {
+    log "Saving results to $RESULTS_FILE (Append: ${APPEND_RESULTS:-false})..."
     # If APPEND_RESULTS is true, don't write the header and use append mode
     if [[ "${APPEND_RESULTS:-false}" == "true" ]]; then
+        if [ ! -f "$RESULTS_FILE" ]; then
+            log "Creating new results file for appending..."
+            echo "# EC Curve Compatibility Test Results (Appended)" > "$RESULTS_FILE"
+        fi
         for key in "${!RESULTS[@]}"; do
             # Check if key already exists in file to avoid duplicates (last one wins)
             if grep -q "^$key=" "$RESULTS_FILE" 2>/dev/null; then
@@ -281,7 +287,12 @@ save_results() {
             done
         } > "$RESULTS_FILE"
     fi
-    log "Results saved to $RESULTS_FILE"
+    if [ -f "$RESULTS_FILE" ]; then
+        log "Results successfully saved to $RESULTS_FILE"
+        log "File size: $(stat -c%s "$RESULTS_FILE") bytes"
+    else
+        log "${RED}FAILED to save results to $RESULTS_FILE${NC}"
+    fi
 }
 
 # Main test loop

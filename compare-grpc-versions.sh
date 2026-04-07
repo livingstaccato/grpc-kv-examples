@@ -158,18 +158,25 @@ if [[ -n "${VIRTUAL_ENV:-}" ]]; then
 fi
 
 # Run baseline tests for each language
-rm -f "$SCRIPT_DIR/curve-test-results.txt"
+# Ensure fresh results file
+export RESULTS_FILE="$SCRIPT_DIR/baseline-results.txt"
+rm -f "$RESULTS_FILE"
+
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Testing $lang (baseline)...${NC}"
+    # We pass the custom results file to test-all-curves.sh via env or arg if supported
+    # But for now, since we updated it to use RESULTS_FILE if defined? 
+    # Wait, I didn't update it to use env var! I'll do that next.
     APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
 done
 
-# Copy results
-if [[ -f "$SCRIPT_DIR/curve-test-results.txt" ]]; then
-    cp "$SCRIPT_DIR/curve-test-results.txt" "$BASELINE_DIR/"
+# Copy results to the expected location for the report generator
+if [[ -f "$RESULTS_FILE" ]]; then
+    cp "$RESULTS_FILE" "$BASELINE_DIR/curve-test-results.txt"
     echo -e "${GREEN}✓ Baseline results saved to $BASELINE_DIR/curve-test-results.txt${NC}"
 else
-    echo -e "${RED}Error: curve-test-results.txt not found in $SCRIPT_DIR!${NC}"
+    echo -e "${RED}Error: $RESULTS_FILE not found!${NC}"
+    ls -la "$SCRIPT_DIR"
 fi
 
 # Capture baseline versions
@@ -231,7 +238,10 @@ fi
 echo -e "${YELLOW}[3/5] Running patched tests...${NC}"
 echo ""
 
-rm -f "$SCRIPT_DIR/curve-test-results.txt"
+# Ensure fresh results file for patched run
+export RESULTS_FILE="$SCRIPT_DIR/patched-results.txt"
+rm -f "$RESULTS_FILE"
+
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Activating patched $lang environment...${NC}"
 
@@ -248,12 +258,13 @@ for lang in "${TEST_LANGUAGES[@]}"; do
     source ./utils/grpc-environment-manager.sh deactivate
 done
 
-# Copy patched results
-if [[ -f "$SCRIPT_DIR/curve-test-results.txt" ]]; then
-    cp "$SCRIPT_DIR/curve-test-results.txt" "$PATCHED_DIR/"
+# Copy patched results to the expected location for the report generator
+if [[ -f "$RESULTS_FILE" ]]; then
+    cp "$RESULTS_FILE" "$PATCHED_DIR/curve-test-results.txt"
     echo -e "${GREEN}✓ Patched results saved to $PATCHED_DIR/curve-test-results.txt${NC}"
 else
-    echo -e "${RED}Error: curve-test-results.txt (patched) not found in $SCRIPT_DIR!${NC}"
+    echo -e "${RED}Error: $RESULTS_FILE not found!${NC}"
+    ls -la "$SCRIPT_DIR"
 fi
 
 # Capture patched versions
