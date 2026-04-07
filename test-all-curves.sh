@@ -108,6 +108,8 @@ start_server() {
     export PLUGIN_CLIENT_CERT="$(cat certs/ec-${curve_id}-mtls-client.crt)"
     export PLUGIN_HOST="127.0.0.1"
     export PLUGIN_PORT="$SERVER_PORT"
+    export PLUGIN_PYTHON_SERVER_ENDPOINT="127.0.0.1:$SERVER_PORT"
+    export PLUGIN_RUBY_SERVER_ENDPOINT="127.0.0.1:$SERVER_PORT"
 
     # Kill anything on the port first
     if command -v fuser &>/dev/null; then
@@ -201,6 +203,8 @@ test_client() {
     export PLUGIN_CLIENT_KEY="$(cat certs/ec-${curve_id}-mtls-client.key)"
     export PLUGIN_HOST="127.0.0.1"
     export PLUGIN_PORT="$SERVER_PORT"
+    export PLUGIN_PYTHON_SERVER_ENDPOINT="127.0.0.1:$SERVER_PORT"
+    export PLUGIN_RUBY_SERVER_ENDPOINT="127.0.0.1:$SERVER_PORT"
 
     # Small sleep before client starts to let server settle
     sleep 1

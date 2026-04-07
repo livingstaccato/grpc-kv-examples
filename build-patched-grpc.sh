@@ -115,79 +115,53 @@ apply_patch() {
     log "Applying EC curves patch..."
     cd "$BUILD_DIR/grpc"
 
-    if [ ! -f "$PATCH_FILE" ]; then
-        error "Patch file not found: $PATCH_FILE"
+    local TARGET_FILE="src/core/tsi/ssl_transport_security.cc"
+    if [ ! -f "$TARGET_FILE" ]; then
+        error "Target file not found: $TARGET_FILE"
     fi
 
-    # Check if already patched
-    if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
-        log "Patch already applied, skipping"
-        return
-    fi
+    # 1. Update kSslEcCurveNames definition guard and content
+    log "Updating kSslEcCurveNames definition..."
+    # First, make sure the guard includes BoringSSL
+    sed -i 's/#if OPENSSL_VERSION_NUMBER >= 0x30000000/#if OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' "$TARGET_FILE"
+    # Then update the content (handling potential spacing variants)
+    sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' "$TARGET_FILE"
+    sed -i 's/NID_X9_62_prime256v1 }/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1 }/g' "$TARGET_FILE"
 
-    log "Patching src/core/tsi/ssl_transport_security.cc..."
-    
-    if [ ! -f "src/core/tsi/ssl_transport_security.cc" ]; then
-        error "Target file not found: src/core/tsi/ssl_transport_security.cc"
-    fi
+    # 2. Update legacy path guard to EXCLUDE BoringSSL
+    log "Updating legacy path guard..."
+    sed -i 's/#if OPENSSL_VERSION_NUMBER < 0x30000000L/#if OPENSSL_VERSION_NUMBER < 0x30000000L \&\& !defined(OPENSSL_IS_BORINGSSL)/g' "$TARGET_FILE"
 
-    # Try different variants of the Curve list to be robust
-    if grep -q "NID_X9_62_prime256v1}" src/core/tsi/ssl_transport_security.cc; then
-        sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' \
-            src/core/tsi/ssl_transport_security.cc
-    elif grep -q "NID_X9_62_prime256v1 }" src/core/tsi/ssl_transport_security.cc; then
-        sed -i 's/NID_X9_62_prime256v1 }/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1 }/g' \
-            src/core/tsi/ssl_transport_security.cc
-    else
-        warn "Could not find standard curve list pattern. Trying more general pattern..."
-        sed -i 's/NID_X9_62_prime256v1/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1/g' \
-            src/core/tsi/ssl_transport_security.cc
-    fi
+    # 3. Update modern path usage to include BoringSSL and correct size
+    log "Updating modern path usage logic..."
+    # Guard update for modern usage
+    sed -i 's/OPENSSL_VERSION_NUMBER >= 0x30000000/OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' "$TARGET_FILE"
+    # Size parameter update
+    sed -i 's/kSslEcCurveNames, 1)/kSslEcCurveNames, sizeof(kSslEcCurveNames)\/sizeof(kSslEcCurveNames[0]))/g' "$TARGET_FILE"
 
-    # Disable Ruby gem build artifact cleanup which fails on some filesystems
+    # 4. Disable Ruby gem build artifact cleanup which fails on some filesystems
     if [ -f "src/ruby/ext/grpc/extconf.rb" ]; then
         log "Disabling Ruby build cleanup in src/ruby/ext/grpc/extconf.rb..."
         sed -i 's/rm_grpc_core_libs = .*/rm_grpc_core_libs = "true"/' src/ruby/ext/grpc/extconf.rb || true
         sed -i 's/rm_obj_cmd = .*/rm_obj_cmd = "true"/' src/ruby/ext/grpc/extconf.rb || true
         sed -i 's/strip_tool = .*/strip_tool = "true"/' src/ruby/ext/grpc/extconf.rb || true
-    elif [ -f "ext/grpc/extconf.rb" ]; then
-        log "Disabling Ruby build cleanup in ext/grpc/extconf.rb..."
-        sed -i 's/rm_grpc_core_libs = .*/rm_grpc_core_libs = "true"/' ext/grpc/extconf.rb || true
-        sed -i 's/rm_obj_cmd = .*/rm_obj_cmd = "true"/' ext/grpc/extconf.rb || true
-        sed -i 's/strip_tool = .*/strip_tool = "true"/' ext/grpc/extconf.rb || true
     fi
 
-    # Insert BoringSSL check for set1_groups and other modern APIs
-    # BoringSSL defines version as 1.1.1 equivalent (0x1010107f) but supports modern APIs
-    log "Applying BoringSSL compatibility logic to version checks..."
-    
-    # Target 1: Where it uses legacy ECDH setup
-    sed -i 's/OPENSSL_VERSION_NUMBER < 0x30000000L/OPENSSL_VERSION_NUMBER < 0x30000000L \&\& !defined(OPENSSL_IS_BORINGSSL)/g' \
-        src/core/tsi/ssl_transport_security.cc
-        
-    # Target 2: Where it defines modern structures (like kSslEcCurveNames)
-    sed -i 's/OPENSSL_VERSION_NUMBER >= 0x30000000/OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' \
-        src/core/tsi/ssl_transport_security.cc
-
-    # Check if it worked
-    if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
+    # Verification
+    if grep -q "NID_secp521r1" "$TARGET_FILE"; then
         success "Patch applied successfully - P-384/P-521 support enabled"
     else
-        error "Failed to apply curve list patch"
+        error "Failed to apply patch - NID_secp521r1 not found in $TARGET_FILE"
     fi
     
-    if grep -q "OPENSSL_IS_BORINGSSL" src/core/tsi/ssl_transport_security.cc; then
-        success "BoringSSL API check added successfully"
-        # Also need to update the size parameter in set1_groups call
-        log "Updating SSL_CTX_set1_groups count parameter..."
-        sed -i 's/kSslEcCurveNames, 1)/kSslEcCurveNames, sizeof(kSslEcCurveNames)\/sizeof(kSslEcCurveNames[0]))/g' \
-            src/core/tsi/ssl_transport_security.cc
+    if grep -q "defined(OPENSSL_IS_BORINGSSL)" "$TARGET_FILE"; then
+        success "BoringSSL compatibility logic inserted"
     else
-        warn "Failed to add BoringSSL API check - fix might not work as expected"
+        warn "BoringSSL check not found - patch might be incomplete"
     fi
 
-    log "Verifying patch contents..."
-    grep -nE "OPENSSL_IS_BORINGSSL|NID_secp384r1|kSslEcCurveNames" src/core/tsi/ssl_transport_security.cc || true
+    log "Final patch verification (line numbers):"
+    grep -nE "OPENSSL_IS_BORINGSSL|NID_secp384r1|kSslEcCurveNames" "$TARGET_FILE" || true
 }
 
 build_python() {
