@@ -122,10 +122,28 @@ start_server() {
 }
 
 stop_server() {
-    if [ -n "$SERVER_PID" ] && kill -0 $SERVER_PID 2>/dev/null; then
+    if [ -n "$SERVER_PID" ]; then
+        log_verbose "Stopping server (PID: $SERVER_PID)..."
         kill $SERVER_PID 2>/dev/null || true
+        # Give it a moment to stop gracefully
+        for i in {1..5}; do
+            if ! kill -0 $SERVER_PID 2>/dev/null; then
+                log_verbose "${BLUE}Server stopped gracefully${NC}"
+                SERVER_PID=""
+                return 0
+            fi
+            sleep 0.5
+        done
+        # If still running, kill it forcefully
+        log_verbose "${YELLOW}Server still running, sending SIGKILL...${NC}"
+        kill -9 $SERVER_PID 2>/dev/null || true
         wait $SERVER_PID 2>/dev/null || true
-        log_verbose "${BLUE}Server stopped${NC}"
+        SERVER_PID=""
+    fi
+    
+    # Extra insurance: kill anything on the port
+    if command -v fuser &>/dev/null; then
+        fuser -k $SERVER_PORT/tcp 2>/dev/null || true
     fi
 }
 
@@ -191,10 +209,9 @@ test_client() {
         else
             result="FAIL"
             log "${RED}[FAIL]${NC} $name + $curve_name ($tls_backend)"
-        fi
-
-        if $VERBOSE; then
-            echo "$output" | head -20
+            # Always show output on FAIL to help debug
+            echo -e "${RED}Client output:${NC}"
+            echo "$output" | head -50
         fi
     fi
 
