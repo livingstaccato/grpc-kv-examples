@@ -147,25 +147,32 @@ echo ""
 # Create directories
 mkdir -p "$BASELINE_DIR" "$PATCHED_DIR" "$REPORTS_DIR"
 
-# Step 1: Run baseline tests (unpatched)
+# Step 1: Run baseline tests (unpatched gRPC)
 echo -e "${YELLOW}[1/5] Running baseline tests (unpatched gRPC)...${NC}"
 echo ""
 
-# Ensure we're using system gRPC for baseline
-if [[ -n "${VIRTUAL_ENV:-}" ]]; then
-    echo -e "${YELLOW}Deactivating virtual environment...${NC}"
-    # Just unset the variable, don't try to strip PATH which might remove /usr/local/bin
+# In the Docker container, the venv at /opt/venv contains the stock gRPC.
+# We should keep it active for the baseline tests.
+# If we're already in a patched venv (though unlikely here), we'd want to deactivate.
+if [[ "${VIRTUAL_ENV:-}" == *"build/patched-grpc"* ]]; then
+    echo -e "${YELLOW}Deactivating patched virtual environment for baseline...${NC}"
     unset VIRTUAL_ENV
+    # Restore original path if we can find it, otherwise just rely on system path
 fi
 
 # Ensure go is available (needed for the server)
 if ! command -v go &>/dev/null; then
-    echo -e "${RED}Error: go not found in PATH${NC}"
-    echo "PATH=$PATH"
-    # Try to find it in common locations
+    echo -e "${BLUE}Attempting to locate go binary...${NC}"
+    # Check common locations from Dockerfile
     if [[ -f "/usr/local/go/bin/go" ]]; then
         export PATH="/usr/local/go/bin:$PATH"
     fi
+fi
+
+if ! command -v go &>/dev/null; then
+    echo -e "${RED}Error: go not found in PATH${NC}"
+    echo "PATH=$PATH"
+    exit 1
 fi
 
 # Run baseline tests for all target languages at once

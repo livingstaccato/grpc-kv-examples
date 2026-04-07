@@ -110,13 +110,7 @@ RUN uv python install 3.12 && \
     uv venv "$VIRTUAL_ENV" --python 3.12
 ENV PATH="$VIRTUAL_ENV/bin:${PATH}"
 
-# Install Python gRPC packages into system and venv
-RUN uv pip install --system \
-    grpcio \
-    grpcio-tools \
-    protobuf \
-    cryptography
-
+# Install Python gRPC packages
 RUN uv pip install \
     grpcio \
     grpcio-tools \
