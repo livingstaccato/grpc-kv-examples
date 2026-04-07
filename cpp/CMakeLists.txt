@@ -20,7 +20,8 @@ message(STATUS "Using grpc_cpp_plugin: ${GRPC_CPP_PLUGIN}")
 
 # Proto file
 set(PROTO_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../proto/kv.proto")
-set(PROTO_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+set(PROTO_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/proto")
+file(MAKE_DIRECTORY ${PROTO_SRC_DIR})
 
 # Generate protobuf and gRPC sources
 set(PROTO_SRCS "${PROTO_SRC_DIR}/kv.pb.cc")

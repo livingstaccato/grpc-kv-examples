@@ -157,12 +157,17 @@ apply_patch() {
         sed -i 's/strip_tool = .*/strip_tool = "true"/' ext/grpc/extconf.rb || true
     fi
 
-    # Insert BoringSSL check for set1_groups
-    if ! grep -q "OPENSSL_IS_BORINGSSL" src/core/tsi/ssl_transport_security.cc; then
-        log "Adding BoringSSL check to src/core/tsi/ssl_transport_security.cc..."
-        sed -i 's/OPENSSL_VERSION_NUMBER >= 0x30000000/OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' \
-            src/core/tsi/ssl_transport_security.cc
-    fi
+    # Insert BoringSSL check for set1_groups and other modern APIs
+    # BoringSSL defines version as 1.1.1 equivalent (0x1010107f) but supports modern APIs
+    log "Applying BoringSSL compatibility logic to version checks..."
+    
+    # Target 1: Where it uses legacy ECDH setup
+    sed -i 's/OPENSSL_VERSION_NUMBER < 0x30000000L/OPENSSL_VERSION_NUMBER < 0x30000000L \&\& !defined(OPENSSL_IS_BORINGSSL)/g' \
+        src/core/tsi/ssl_transport_security.cc
+        
+    # Target 2: Where it defines modern structures (like kSslEcCurveNames)
+    sed -i 's/OPENSSL_VERSION_NUMBER >= 0x30000000/OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' \
+        src/core/tsi/ssl_transport_security.cc
 
     # Check if it worked
     if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
@@ -320,7 +325,7 @@ build_ruby() {
         
         # Install dependencies into our local gem home
         log "Installing dependencies to $RUBY_GEMS_DIR..."
-        GEM_HOME="$RUBY_GEMS_DIR" gem install google-protobuf
+        GEM_HOME="$RUBY_GEMS_DIR" GEM_PATH="$RUBY_GEMS_DIR:$(ruby -e 'puts Gem.path.join(":")')" gem install google-protobuf --no-document
         
         log "Installing gem $GEM_FILE to $RUBY_GEMS_DIR using patched libraries..."
         
