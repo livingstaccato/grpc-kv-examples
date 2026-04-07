@@ -2,13 +2,11 @@
 
 # Variables
 CERT_DIR="./certs"
+DAYS=3650 # 10 years to avoid frequent expiry issues
 
-DAYS=365
-
-# RSA_BITS=2048
-# ECDSA_CURVE="secp521r1"
-ECDSA_CURVE="secp384r1"
-# ECDSA_CURVE="secp256r1"
+# Allow override from argument
+ECDSA_CURVE="${1:-secp384r1}"
+RSA_BITS="${RSA_BITS:-}"
 
 # Create certificate directory
 mkdir -p "$CERT_DIR"

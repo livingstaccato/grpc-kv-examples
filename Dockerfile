@@ -221,6 +221,12 @@ RUN cd /workspace/dart && dart pub get || true
 # Rust dependencies (build)
 RUN cd /workspace/rust && cargo build --release || true
 
+# Regenerate certificates to ensure they are valid for the current date
+RUN mkdir -p /workspace/certs && \
+    for curve in secp256r1 secp384r1 secp521r1; do \
+        /workspace/tools/gen-certs.sh $curve; \
+    done
+
 # Create PKCS#8 versions of EC keys for Rust compatibility
 RUN for curve in secp256r1 secp384r1 secp521r1; do \
     openssl pkcs8 -topk8 -nocrypt \
