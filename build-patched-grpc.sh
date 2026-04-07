@@ -265,9 +265,21 @@ build_cpp() {
     log "Running make install..."
     if make install 2>&1 | tee -a "$BUILD_DIR/cpp-build.log"; then
         success "C++ gRPC installed to $BUILD_DIR/install"
+        
+        # Pre-compile the C++ client example against the patched gRPC
+        log "Pre-compiling C++ client example with patched gRPC..."
+        export CMAKE_PREFIX_PATH="$BUILD_DIR/install"
+        cd "$SCRIPT_DIR/cpp"
+        ./build.sh
+        # Copy the binary to the install prefix for easier transport/caching
+        mkdir -p "$BUILD_DIR/install/bin"
+        cp build/kv-client "$BUILD_DIR/install/bin/"
+        success "C++ client pre-compiled successfully"
+        
         # Clean up build directory to save space (gRPC build is HUGE)
         log "Cleaning up C++ build directory..."
-        rm -rf "$BUILD_DIR/grpc/cmake/build"
+        cd "$BUILD_DIR/grpc/cmake/build"
+        rm -rf *
         df -h /workspace || true
     else
         error "C++ gRPC install FAILED. Check $BUILD_DIR/cpp-build.log"

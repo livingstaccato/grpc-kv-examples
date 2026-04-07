@@ -40,6 +40,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
+
       - name: Cache ccache
         uses: actions/cache@v5
         with:
@@ -60,7 +71,6 @@ jobs:
         if: steps.cache-python.outputs.cache-hit != 'true'
         run: |
           mkdir -p .ccache
-          docker build -t grpc-curve-test:latest .
           docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
           docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --python --install"
           mkdir -p build/patched-grpc
@@ -76,6 +86,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
 
       - name: Cache ccache
         uses: actions/cache@v5
@@ -97,7 +118,6 @@ jobs:
         if: steps.cache-cpp.outputs.cache-hit != 'true'
         run: |
           mkdir -p .ccache
-          docker build -t grpc-curve-test:latest .
           docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
           docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --cpp --install"
           mkdir -p build/patched-grpc
@@ -113,6 +133,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
 
       - name: Restore C++ (needed for Ruby build)
         uses: actions/cache/restore@v5
@@ -141,7 +172,6 @@ jobs:
         if: steps.cache-ruby.outputs.cache-hit != 'true'
         run: |
           mkdir -p .ccache
-          docker build -t grpc-curve-test:latest .
           docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
           
           # Inject C++ artifacts
@@ -166,6 +196,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
+
       - name: Restore Python
         uses: actions/cache/restore@v5
         with:
@@ -186,7 +227,6 @@ jobs:
 
       - name: Run Comparison
         run: |
-          docker build -t grpc-curve-test:latest .
           docker run --name proof-container -d -t grpc-curve-test:latest
           
           # Inject all restored artifacts
