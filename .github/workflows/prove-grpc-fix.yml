@@ -159,7 +159,7 @@ jobs:
   run-proof:
     name: Run Proof & Report
     needs: [build-python, build-cpp, build-ruby]
-    if: always() && needs.build-python.result == 'success' && needs.build-cpp.result == 'success'
+    if: always() && !cancelled() && needs.build-python.result == 'success' && needs.build-cpp.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -190,20 +190,22 @@ jobs:
           docker run --name proof-container -d -t grpc-curve-test:latest
           
           # Inject all restored artifacts
-          docker exec proof-container mkdir -p /workspace/build/patched-grpc
+          docker exec proof-container mkdir -p /workspace/build/patched-grpc/venv
+          docker exec proof-container mkdir -p /workspace/build/patched-grpc/install
+          
           docker cp build/patched-grpc/venv proof-container:/workspace/build/patched-grpc/
           docker cp build/patched-grpc/install proof-container:/workspace/build/patched-grpc/
           
           # Inject Ruby gems if they exist
           if [ -d "build/patched-grpc/ruby-gems" ]; then
+            docker exec proof-container mkdir -p /workspace/build/patched-grpc/ruby-gems
             docker cp build/patched-grpc/ruby-gems proof-container:/workspace/build/patched-grpc/
+            LANGS="python,ruby,cpp"
+          else
+            LANGS="python,cpp"
           fi
           
-          # Run tests for all languages that we have artifacts for
-          LANGS="python,cpp"
-          if [ -d "build/patched-grpc/ruby-gems" ]; then
-            LANGS="python,ruby,cpp"
-          fi
+          # Run tests
           docker exec proof-container ./compare-grpc-versions.sh --language $LANGS --skip-build
           
           # Extract results
@@ -216,8 +218,9 @@ jobs:
           name: grpc-curve-comparison-report
           path: |
             reports/*.md
-            results/baseline/*.log
-            results/patched/*.log
+            results/**/*.log
+            results/**/*.txt
+            results/**/*.json
 
       - name: Display Summary
         run: |

@@ -196,11 +196,12 @@ build_python() {
     log "Installing build dependencies..."
     # Using exact versions from gRPC 1.80.0 requirements
     uv pip install "cython==3.1.1" "setuptools>=77.0.1" "wheel>=0.29" "build>=1.3.0"
-
-    # Verify installed versions
-    log "Installed build dependencies:"
-    cython --version || echo "Cython not found in PATH"
-    uv pip list | grep -E "cython|setuptools|wheel|build"
+    
+    # Also install project requirements
+    if [ -f "$SCRIPT_DIR/requirements.txt" ]; then
+        log "Installing project requirements..."
+        uv pip install -r "$SCRIPT_DIR/requirements.txt"
+    fi
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
