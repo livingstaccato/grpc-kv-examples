@@ -45,13 +45,23 @@ keyUsage = critical, Digital Signature, Key Encipherment, Key Agreement
 subjectKeyIdentifier = hash
 
 [alt_names]
-DNS.1 = $cn
+DNS.1 = localhost
+IP.1 = 127.0.0.1
 EOF
 
     key_file="$CERT_DIR/$name.key"
+    
+    # Determine appropriate hash algorithm based on curve
+    local digest="sha256"
+    if [[ "$ECDSA_CURVE" == "secp384r1" ]]; then
+        digest="sha384"
+    elif [[ "$ECDSA_CURVE" == "secp521r1" ]]; then
+        digest="sha512"
+    fi
 
     if [[ $algo == "rsa" ]]; then
         openssl genrsa -out "$key_file" $RSA_BITS
+        digest="sha256"
     elif [[ $algo == "ecdsa" ]]; then
         openssl ecparam -name $ECDSA_CURVE -genkey -noout -out "$key_file"
     else
@@ -62,7 +72,7 @@ EOF
     # Generate certificate signing request (CSR) and self-signed certificate
     openssl req -x509 -new -nodes \
         -key "$CERT_DIR/$name.key" \
-        -sha512 \
+        -$digest \
         -days $DAYS \
         -config "$CERT_DIR/$name.cnf" \
         -out "$CERT_DIR/$name.crt"
