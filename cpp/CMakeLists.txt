@@ -11,15 +11,16 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GRPC REQUIRED grpc++ grpc)
 find_package(OpenSSL REQUIRED)
 
-# Find grpc_cpp_plugin and use system protoc
+# Find tools
 find_program(GRPC_CPP_PLUGIN grpc_cpp_plugin)
-set(Protobuf_PROTOC_EXECUTABLE /usr/bin/protoc)
+find_program(Protobuf_PROTOC_EXECUTABLE protoc)
+
+message(STATUS "Using protoc: ${Protobuf_PROTOC_EXECUTABLE}")
+message(STATUS "Using grpc_cpp_plugin: ${GRPC_CPP_PLUGIN}")
 
 # Proto file
 set(PROTO_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../proto/kv.proto")
-set(PROTO_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/proto")
-
-file(MAKE_DIRECTORY ${PROTO_SRC_DIR})
+set(PROTO_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Generate protobuf and gRPC sources
 set(PROTO_SRCS "${PROTO_SRC_DIR}/kv.pb.cc")
@@ -39,8 +40,8 @@ add_custom_command(
 )
 
 # Proto library
-add_library(kv_proto ${PROTO_SRCS} ${GRPC_SRCS})
-target_include_directories(kv_proto PUBLIC ${PROTO_SRC_DIR} ${GRPC_INCLUDE_DIRS})
+add_library(kv_proto ${PROTO_SRCS} ${GRPC_SRCS} ${PROTO_HDRS} ${GRPC_HDRS})
+target_include_directories(kv_proto PUBLIC ${PROTO_SRC_DIR})
 target_link_libraries(kv_proto
     PUBLIC
     ${Protobuf_LIBRARIES}

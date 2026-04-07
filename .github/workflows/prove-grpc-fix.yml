@@ -225,9 +225,19 @@ jobs:
           path: build/patched-grpc/ruby-gems
           key: patched-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
 
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: .ccache
+          key: ccache-proof-${{ github.run_id }}
+          restore-keys: |
+            ccache-proof-
+            ccache-cpp-
+
       - name: Run Comparison
         run: |
-          docker run --name proof-container -d -t grpc-curve-test:latest
+          mkdir -p .ccache
+          docker run --name proof-container -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
           
           # Inject all restored artifacts
           docker exec proof-container mkdir -p /workspace/build/patched-grpc/venv
