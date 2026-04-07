@@ -96,6 +96,18 @@ clone_grpc() {
         find . -name ".git" -type d -exec rm -rf {} + || true
     fi
 
+    # Verify gemspec exists if we're doing anything with Ruby
+    if [ -f "grpc.gemspec" ]; then
+        success "Found grpc.gemspec in root"
+    else
+        warn "grpc.gemspec NOT found in root. Checking src/ruby..."
+        if [ -f "src/ruby/grpc.gemspec" ]; then
+            log "Found grpc.gemspec in src/ruby"
+        else
+            warn "grpc.gemspec not found anywhere!"
+        fi
+    fi
+
     success "gRPC source ready"
 }
 
@@ -115,15 +127,54 @@ apply_patch() {
 
     log "Patching src/core/tsi/ssl_transport_security.cc..."
     
-    # Simple search and replace for the curve list
-    sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' \
-        src/core/tsi/ssl_transport_security.cc
+    if [ ! -f "src/core/tsi/ssl_transport_security.cc" ]; then
+        error "Target file not found: src/core/tsi/ssl_transport_security.cc"
+    fi
+
+    # Try different variants of the Curve list to be robust
+    if grep -q "NID_X9_62_prime256v1}" src/core/tsi/ssl_transport_security.cc; then
+        sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' \
+            src/core/tsi/ssl_transport_security.cc
+    elif grep -q "NID_X9_62_prime256v1 }" src/core/tsi/ssl_transport_security.cc; then
+        sed -i 's/NID_X9_62_prime256v1 }/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1 }/g' \
+            src/core/tsi/ssl_transport_security.cc
+    else
+        warn "Could not find standard curve list pattern. Trying more general pattern..."
+        sed -i 's/NID_X9_62_prime256v1/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1/g' \
+            src/core/tsi/ssl_transport_security.cc
+    fi
+
+    # Disable Ruby gem build artifact cleanup which fails on some filesystems
+    if [ -f "src/ruby/ext/grpc/extconf.rb" ]; then
+        log "Disabling Ruby build cleanup in src/ruby/ext/grpc/extconf.rb..."
+        sed -i 's/rm_grpc_core_libs = .*/rm_grpc_core_libs = "true"/' src/ruby/ext/grpc/extconf.rb || true
+        sed -i 's/rm_obj_cmd = .*/rm_obj_cmd = "true"/' src/ruby/ext/grpc/extconf.rb || true
+        sed -i 's/strip_tool = .*/strip_tool = "true"/' src/ruby/ext/grpc/extconf.rb || true
+    elif [ -f "ext/grpc/extconf.rb" ]; then
+        log "Disabling Ruby build cleanup in ext/grpc/extconf.rb..."
+        sed -i 's/rm_grpc_core_libs = .*/rm_grpc_core_libs = "true"/' ext/grpc/extconf.rb || true
+        sed -i 's/rm_obj_cmd = .*/rm_obj_cmd = "true"/' ext/grpc/extconf.rb || true
+        sed -i 's/strip_tool = .*/strip_tool = "true"/' ext/grpc/extconf.rb || true
+    fi
+
+    # Insert BoringSSL check for set1_groups
+    if ! grep -q "OPENSSL_IS_BORINGSSL" src/core/tsi/ssl_transport_security.cc; then
+        log "Adding BoringSSL check to src/core/tsi/ssl_transport_security.cc..."
+        sed -i 's/OPENSSL_VERSION_NUMBER >= 0x30000000/OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' \
+            src/core/tsi/ssl_transport_security.cc
+    fi
 
     # Check if it worked
     if grep -q "NID_secp384r1" src/core/tsi/ssl_transport_security.cc; then
         success "Patch applied successfully - P-384/P-521 support enabled"
     else
-        error "Failed to apply patch"
+        error "Failed to apply curve list patch"
+    fi
+    
+    if grep -q "OPENSSL_IS_BORINGSSL" src/core/tsi/ssl_transport_security.cc; then
+        success "BoringSSL API check added successfully"
+    else
+        warn "Failed to add BoringSSL API check - fix might not work as expected"
     fi
 
     log "Verifying patch contents..."
@@ -231,15 +282,16 @@ build_ruby() {
 
     # Instead of rake compile which is brittle, use gem install directly
     # with flags to point to our patched libraries
-    cd src/ruby
+    export GRPC_RUBY_USE_SYSTEM_LIBRARIES=1
     
     log "Building the gem package..."
+    # grpc.gemspec is in the root of the repo in v1.80.0
     gem build grpc.gemspec
     mkdir -p pkg
     mv grpc-*.gem pkg/ || true
     
     local GEM_FILE=$(ls pkg/grpc-*.gem | head -n 1)
-    [ -n "$GEM_FILE" ] || error "No gem file found in pkg/"
+    [ -n "$GEM_FILE" ] || error "No gem file found in root/"
 
     if $DO_INSTALL; then
         local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"
@@ -247,6 +299,15 @@ build_ruby() {
         log "Installing gem to $RUBY_GEMS_DIR using patched libraries..."
         
         # This tells gem install to use our patched libraries during compilation
+        # Set environment variables to disable -Werror and use ccache
+        export CFLAGS="-Wno-unused-parameter -Wno-error"
+        export CXXFLAGS="-Wno-unused-parameter -Wno-error"
+        
+        if command -v ccache &> /dev/null; then
+            export CC="ccache gcc"
+            export CXX="ccache g++"
+        fi
+
         GEM_HOME="$RUBY_GEMS_DIR" gem install "$GEM_FILE" -- \
             --with-grpc-include="$BUILD_DIR/install/include" \
             --with-grpc-lib="$BUILD_DIR/install/lib" \

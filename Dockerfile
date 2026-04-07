@@ -68,6 +68,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     zip \
+    psmisc \
     ca-certificates \
     gnupg \
     lsb-release \

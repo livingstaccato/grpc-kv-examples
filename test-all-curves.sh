@@ -104,24 +104,59 @@ start_server() {
     export PLUGIN_HOST="127.0.0.1"
     export PLUGIN_PORT="$SERVER_PORT"
 
+    # Kill anything on the port first
+    if command -v fuser &>/dev/null; then
+        fuser -k $SERVER_PORT/tcp 2>/dev/null || true
+        sleep 2 # Wait for port to be released by OS
+    fi
+
     cd go
-    ./go-kv-server &
+    rm -f server.log
+    ./go-kv-server > server.log 2>&1 &
     SERVER_PID=$!
     cd ..
 
-    # Wait for server to start
-    sleep 2
+    # Wait for server to start with retries
+    for i in {1..15}; do
+        sleep 1
+        if [ -n "$SERVER_PID" ] && kill -0 $SERVER_PID 2>/dev/null; then
+            # Server is running, but is it listening?
+            if grep -q "Server listening on" go/server.log 2>/dev/null; then
+                log_verbose "${GREEN}Server started and listening (PID: $SERVER_PID)${NC}"
+                return 0
+            fi
+        fi
+        
+        # Check if it failed
+        if grep -q "bind: address already in use" go/server.log 2>/dev/null; then
+            log "${YELLOW}Port conflict detected, retrying... ($i/15)${NC}"
+            if command -v fuser &>/dev/null; then
+                fuser -k $SERVER_PORT/tcp 2>/dev/null || true
+            fi
+            sleep 2
+            cd go
+            ./go-kv-server > server.log 2>&1 &
+            SERVER_PID=$!
+            cd ..
+        elif grep -q "Certificate validation failed" go/server.log 2>/dev/null; then
+            log "${RED}ERROR: Server failed certificate validation${NC}"
+            cat go/server.log
+            return 1
+        fi
+    done
 
-    if ! kill -0 $SERVER_PID 2>/dev/null; then
-        log "${RED}ERROR: Server failed to start${NC}"
-        return 1
-    fi
-
-    log_verbose "${GREEN}Server started (PID: $SERVER_PID)${NC}"
-    return 0
+    log "${RED}ERROR: Server failed to start after retries${NC}"
+    return 1
 }
 
 stop_server() {
+    # Extra insurance: kill anything on the port first
+    if command -v fuser &>/dev/null; then
+        log_verbose "Clearing port $SERVER_PORT..."
+        fuser -k $SERVER_PORT/tcp 2>/dev/null || true
+        sleep 1
+    fi
+
     if [ -n "$SERVER_PID" ]; then
         log_verbose "Stopping server (PID: $SERVER_PID)..."
         kill $SERVER_PID 2>/dev/null || true
@@ -141,10 +176,8 @@ stop_server() {
         SERVER_PID=""
     fi
     
-    # Extra insurance: kill anything on the port
-    if command -v fuser &>/dev/null; then
-        fuser -k $SERVER_PORT/tcp 2>/dev/null || true
-    fi
+    # Extra fail-safe: kill by process name
+    killall -9 go-kv-server 2>/dev/null || true
 }
 
 # Test a language client
@@ -163,6 +196,9 @@ test_client() {
     export PLUGIN_CLIENT_KEY="$(cat certs/ec-${curve_id}-mtls-client.key)"
     export PLUGIN_HOST="127.0.0.1"
     export PLUGIN_PORT="$SERVER_PORT"
+
+    # Small sleep before client starts to let server settle
+    sleep 1
 
     # For Rust, use PKCS#8 key if available
     if [ "$lang_key" = "rust" ] && [ -f "certs/ec-${curve_id}-mtls-client.pkcs8.key" ]; then
@@ -347,6 +383,10 @@ main() {
         # Start server
         if ! start_server "$curve"; then
             log "${RED}Failed to start server for $curve${NC}"
+            # Record server failure for all languages
+            for lang in "${langs_to_test[@]}"; do
+                RESULTS["${lang}_${curve}"]="SERVER_FAIL"
+            done
             continue
         fi
 
