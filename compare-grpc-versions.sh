@@ -275,7 +275,8 @@ for lang in "${TEST_LANGUAGES[@]}"; do
 
     echo -e "${BLUE}Testing $lang (patched)...${NC}"
     # Use the exported RESULTS_FILE and ensure APPEND_RESULTS is true for subsequent languages
-    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$PATCHED_DIR/${lang}.log" 2>&1 || true
+    # Add --patched flag so the test runner knows we expect success now
+    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" --patched > "$PATCHED_DIR/${lang}.log" 2>&1 || true
 
     # Deactivate
     source ./utils/grpc-environment-manager.sh deactivate

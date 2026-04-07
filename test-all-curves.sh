@@ -25,6 +25,7 @@ cd "$SCRIPT_DIR"
 # Configuration
 SERVER_PORT=50051
 VERBOSE=false
+PATCHED=false
 TEST_LANGUAGE=""
 TEST_CURVE=""
 # Use environment variable if set, otherwise default to script directory
@@ -47,6 +48,10 @@ while [[ $# -gt 0 ]]; do
         --language|-l)
             TEST_LANGUAGE="$2"
             shift 2
+            ;;
+        --patched)
+            PATCHED=true
+            shift
             ;;
         --curve|-c)
             TEST_CURVE="$2"
@@ -238,8 +243,8 @@ test_client() {
         result="TIMEOUT"
         log "${YELLOW}[TIMEOUT]${NC} $name + $curve_name ($tls_backend)"
     else
-        # Check if this is expected failure (BoringSSL bug with P-384/P-521)
-        if [ "$has_bug" = "yes" ] && [ "$curve_name" != "p256" ]; then
+        # Check if this is expected failure (BoringSSL bug with P-384/P-521 in unpatched mode)
+        if [ "$PATCHED" = "false" ] && [ "$has_bug" = "yes" ] && [ "$curve_name" != "p256" ]; then
             result="EXPECTED_FAIL"
             log "${YELLOW}[EXPECTED FAIL]${NC} $name + $curve_name ($tls_backend) - needs patched gRPC"
         else
