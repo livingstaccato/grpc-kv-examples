@@ -229,55 +229,29 @@ build_ruby() {
         error "C++ gRPC build not found at $BUILD_DIR/install. Build C++ first."
     fi
 
-    # Build the gem against system (our patched) libraries
+    # Instead of rake compile which is brittle, use gem install directly
+    # with flags to point to our patched libraries
     cd src/ruby
     
-    log "Patching extconf.rb to disable failing cleanup..."
-    # Replace the command strings instead of deleting blocks to maintain Ruby syntax
-    sed -i 's/rm_grpc_core_libs = .*/rm_grpc_core_libs = "true"/' ext/grpc/extconf.rb || true
-    sed -i 's/rm_obj_cmd = .*/rm_obj_cmd = "true"/' ext/grpc/extconf.rb || true
-    # Also ensure we don't try to strip if it's causing issues
-    sed -i 's/strip_tool = .*/strip_tool = "true"/' ext/grpc/extconf.rb || true
-    
-    log "Verified extconf.rb contents (cleanup should be disabled):"
-    grep -E "rm_grpc_core_libs|rm_obj_cmd|strip_tool" ext/grpc/extconf.rb
-
-    export GRPC_RUBY_USE_SYSTEM_LIBRARIES=1
-    export CMAKE_PREFIX_PATH="$BUILD_DIR/install"
-    export LD_LIBRARY_PATH="$BUILD_DIR/install/lib:$LD_LIBRARY_PATH"
-    
-    log "Running bundle install..."
-    bundle install
-    
-    log "Running rake compile (serial, disable -Werror)..."
-    # Set environment variables to disable -Werror and use ccache
-    export CFLAGS="-Wno-unused-parameter -Wno-error"
-    export CXXFLAGS="-Wno-unused-parameter -Wno-error"
-    
-    if command -v ccache &> /dev/null; then
-        export CC="ccache gcc"
-        export CXX="ccache g++"
-    fi
-    
-    if GRPC_RUBY_BUILD_PROCS=1 bundle exec rake compile -- \
-        --with-grpc-include="$BUILD_DIR/install/include" \
-        --with-grpc-lib="$BUILD_DIR/install/lib"; then
-        success "Ruby extension compiled successfully"
-    else
-        error "Ruby extension compilation FAILED"
-    fi
-
     log "Building the gem package..."
     gem build grpc.gemspec
     mkdir -p pkg
     mv grpc-*.gem pkg/ || true
-
-    ls -la pkg/*.gem || error "No gems found in pkg/"
+    
+    local GEM_FILE=$(ls pkg/grpc-*.gem | head -n 1)
+    [ -n "$GEM_FILE" ] || error "No gem file found in pkg/"
 
     if $DO_INSTALL; then
         local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"
         mkdir -p "$RUBY_GEMS_DIR"
-        GEM_HOME="$RUBY_GEMS_DIR" gem install pkg/*.gem
+        log "Installing gem to $RUBY_GEMS_DIR using patched libraries..."
+        
+        # This tells gem install to use our patched libraries during compilation
+        GEM_HOME="$RUBY_GEMS_DIR" gem install "$GEM_FILE" -- \
+            --with-grpc-include="$BUILD_DIR/install/include" \
+            --with-grpc-lib="$BUILD_DIR/install/lib" \
+            --with-grpc-config=opt
+            
         success "Patched Ruby gRPC gem installed to $RUBY_GEMS_DIR"
     fi
 }

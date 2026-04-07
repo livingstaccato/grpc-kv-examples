@@ -151,15 +151,20 @@ mkdir -p "$BASELINE_DIR" "$PATCHED_DIR" "$REPORTS_DIR"
 echo -e "${YELLOW}[1/5] Running baseline tests (unpatched gRPC)...${NC}"
 echo ""
 
-# Ensure we're using system gRPC
+# Ensure we're using system gRPC for baseline
 if [[ -n "${VIRTUAL_ENV:-}" ]]; then
     echo -e "${YELLOW}Deactivating virtual environment...${NC}"
-    if command -v deactivate &>/dev/null; then
-        deactivate || true
-    else
-        # If it's a uv/bin/python venv, we might just need to unset vars
-        unset VIRTUAL_ENV
-        export PATH=${PATH//${VIRTUAL_ENV:-}\/bin:/}
+    # Just unset the variable, don't try to strip PATH which might remove /usr/local/bin
+    unset VIRTUAL_ENV
+fi
+
+# Ensure go is available (needed for the server)
+if ! command -v go &>/dev/null; then
+    echo -e "${RED}Error: go not found in PATH${NC}"
+    echo "PATH=$PATH"
+    # Try to find it in common locations
+    if [[ -f "/usr/local/go/bin/go" ]]; then
+        export PATH="/usr/local/go/bin:$PATH"
     fi
 fi
 

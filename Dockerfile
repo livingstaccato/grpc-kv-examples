@@ -92,6 +92,7 @@ RUN wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
     rm go${GO_VERSION}.linux-amd64.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
+RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 ENV GOPATH="/root/go"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
@@ -109,9 +110,13 @@ RUN uv python install 3.12 && \
     uv venv "$VIRTUAL_ENV" --python 3.12
 ENV PATH="$VIRTUAL_ENV/bin:${PATH}"
 
-# Install Python gRPC packages
-# In unpatched mode: stock grpcio with P-256 only bug
-# In patched mode: build grpcio from source with the fix
+# Install Python gRPC packages into system and venv
+RUN uv pip install --system \
+    grpcio \
+    grpcio-tools \
+    protobuf \
+    cryptography
+
 RUN uv pip install \
     grpcio \
     grpcio-tools \
