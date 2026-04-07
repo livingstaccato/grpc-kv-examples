@@ -69,6 +69,15 @@ check_prereqs() {
         curl -LsSf https://astral.sh/uv/install.sh | sh || true
         export PATH="$HOME/.cargo/bin:$PATH"
     fi
+
+    # Setup ccache
+    if command -v ccache &> /dev/null; then
+        log "Enabling ccache for faster builds..."
+        export PATH="/usr/lib/ccache:$PATH"
+        export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+        export CMAKE_C_COMPILER_LAUNCHER=ccache
+        ccache --max-size=2G
+    fi
 }
 
 clone_grpc() {
@@ -151,6 +160,12 @@ build_python() {
     export GRPC_PYTHON_BUILD_WITH_CYTHON=1
     # Force language level 3 for Cython
     export GRPC_PYTHON_CYTHON_OPTIONS="--language-level=3"
+    
+    # Use ccache for extension compilation
+    if command -v ccache &> /dev/null; then
+        export CC="ccache gcc"
+        export CXX="ccache g++"
+    fi
 
     # Build and install directly
     log "Building grpcio from source (this takes 20-30 minutes)..."
@@ -235,9 +250,14 @@ build_ruby() {
     bundle install
     
     log "Running rake compile (serial, disable -Werror)..."
-    # Set environment variables to disable -Werror
+    # Set environment variables to disable -Werror and use ccache
     export CFLAGS="-Wno-unused-parameter -Wno-error"
     export CXXFLAGS="-Wno-unused-parameter -Wno-error"
+    
+    if command -v ccache &> /dev/null; then
+        export CC="ccache gcc"
+        export CXX="ccache g++"
+    fi
     
     if GRPC_RUBY_BUILD_PROCS=1 bundle exec rake compile -- \
         --with-grpc-include="$BUILD_DIR/install/include" \

@@ -40,6 +40,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: .ccache
+          key: ccache-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-
+            ccache-python-
+
       - name: Cache Patched Python
         id: cache-python
         uses: actions/cache@v5
@@ -50,8 +59,9 @@ jobs:
       - name: Build Patched Python
         if: steps.cache-python.outputs.cache-hit != 'true'
         run: |
+          mkdir -p .ccache
           docker build -t grpc-curve-test:latest .
-          docker run --name builder -d -t grpc-curve-test:latest
+          docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
           docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --python --install"
           mkdir -p build/patched-grpc
           docker cp builder:/workspace/build/patched-grpc/venv build/patched-grpc/
@@ -67,6 +77,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: .ccache
+          key: ccache-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-
+            ccache-cpp-
+
       - name: Cache Patched C++
         id: cache-cpp
         uses: actions/cache@v5
@@ -77,8 +96,9 @@ jobs:
       - name: Build Patched C++
         if: steps.cache-cpp.outputs.cache-hit != 'true'
         run: |
+          mkdir -p .ccache
           docker build -t grpc-curve-test:latest .
-          docker run --name builder -d -t grpc-curve-test:latest
+          docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
           docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --cpp --install"
           mkdir -p build/patched-grpc
           docker cp builder:/workspace/build/patched-grpc/install build/patched-grpc/
@@ -101,6 +121,15 @@ jobs:
           key: patched-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
           fail-on-cache-miss: true
 
+      - name: Cache ccache
+        uses: actions/cache@v5
+        with:
+          path: .ccache
+          key: ccache-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-
+            ccache-ruby-
+
       - name: Cache Patched Ruby
         id: cache-ruby
         uses: actions/cache@v5
@@ -111,8 +140,9 @@ jobs:
       - name: Build Patched Ruby
         if: steps.cache-ruby.outputs.cache-hit != 'true'
         run: |
+          mkdir -p .ccache
           docker build -t grpc-curve-test:latest .
-          docker run --name builder -d -t grpc-curve-test:latest
+          docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
           
           # Inject C++ artifacts
           docker exec builder mkdir -p /workspace/build/patched-grpc
