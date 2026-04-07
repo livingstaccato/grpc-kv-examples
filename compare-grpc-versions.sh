@@ -161,17 +161,27 @@ if [[ "${VIRTUAL_ENV:-}" == *"build/patched-grpc"* ]]; then
 fi
 
 # Ensure go is available (needed for the server)
+echo -e "${BLUE}Checking for go binary...${NC}"
+which go || echo "go not found in PATH"
+go version || echo "go version failed"
+
 if ! command -v go &>/dev/null; then
-    echo -e "${BLUE}Attempting to locate go binary...${NC}"
+    echo -e "${BLUE}Attempting to locate go binary in common locations...${NC}"
     # Check common locations from Dockerfile
     if [[ -f "/usr/local/go/bin/go" ]]; then
+        echo "Found go at /usr/local/go/bin/go, adding to PATH"
         export PATH="/usr/local/go/bin:$PATH"
+    elif [[ -f "/usr/local/bin/go" ]]; then
+        echo "Found go at /usr/local/bin/go, adding to PATH"
+        export PATH="/usr/local/bin:$PATH"
     fi
 fi
 
 if ! command -v go &>/dev/null; then
     echo -e "${RED}Error: go not found in PATH${NC}"
     echo "PATH=$PATH"
+    ls -la /usr/local/go/bin/go || true
+    ls -la /usr/local/bin/go || true
     exit 1
 fi
 
