@@ -207,7 +207,7 @@ WORKDIR /workspace
 COPY . /workspace/
 
 # Make scripts executable
-RUN chmod +x /workspace/*.sh /workspace/utils/*.sh /workspace/tools/*.sh
+RUN chmod +x /workspace/*.sh /workspace/utils/*.sh /workspace/tools/*.sh /workspace/cpp/build.sh
 
 # Install language-specific dependencies
 # Go dependencies

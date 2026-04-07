@@ -54,17 +54,21 @@ activate_python() {
 }
 
 activate_ruby() {
-    local GEM_PATH="$BUILD_DIR/grpc/pkg"
+    local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"
 
-    if [[ ! -d "$GEM_PATH" ]] || ! ls "$GEM_PATH"/*.gem &>/dev/null; then
-        echo -e "${RED}Error: Patched Ruby gem not found at $GEM_PATH${NC}"
-        echo "Run: ./build-patched-grpc.sh --ruby --install"
-        return 1
+    if [[ ! -d "$RUBY_GEMS_DIR" ]]; then
+        # Fallback to checking for the .gem file to install it
+        local GEM_PATH="$BUILD_DIR/grpc/pkg"
+        if [[ ! -d "$GEM_PATH" ]] || ! ls "$GEM_PATH"/*.gem &>/dev/null; then
+            echo -e "${RED}Error: Patched Ruby gem not found at $GEM_PATH and $RUBY_GEMS_DIR doesn't exist${NC}"
+            echo "Run: ./build-patched-grpc.sh --ruby --install"
+            return 1
+        fi
     fi
 
     # Set GEM_HOME to use patched gem
-    export GEM_HOME="$BUILD_DIR/ruby-gems"
-    export GEM_PATH="$GEM_HOME:${GEM_PATH:-}"
+    export GEM_HOME="$RUBY_GEMS_DIR"
+    export GEM_PATH="$GEM_HOME"
     export PATH="$GEM_HOME/bin:$PATH"
 
     echo -e "${GREEN}✓ Activated patched Ruby gRPC${NC}"
