@@ -173,6 +173,10 @@ apply_patch() {
     
     if grep -q "OPENSSL_IS_BORINGSSL" src/core/tsi/ssl_transport_security.cc; then
         success "BoringSSL API check added successfully"
+        # Also need to update the size parameter in set1_groups call
+        log "Updating SSL_CTX_set1_groups count parameter..."
+        sed -i 's/kSslEcCurveNames, 1)/kSslEcCurveNames, sizeof(kSslEcCurveNames)\/sizeof(kSslEcCurveNames[0]))/g' \
+            src/core/tsi/ssl_transport_security.cc
     else
         warn "Failed to add BoringSSL API check - fix might not work as expected"
     fi

@@ -68,15 +68,15 @@ CURVES[p521]="secp521r1"
 # Language configurations
 # Format: "name|dir|build_cmd|client_cmd|tls_backend|has_bug"
 declare -A LANGUAGES
-LANGUAGES[go]="Go|go|true|go run go-kv-client.go|crypto/tls|no"
-LANGUAGES[python]="Python|python|true|python3 example-py-client.py|gRPC/BoringSSL|yes"
-LANGUAGES[ruby]="Ruby|ruby|true|ruby rb-kv-client.rb|gRPC/BoringSSL|yes"
-LANGUAGES[nodejs]="Node.js|nodejs|npm install|node kv-client.js|OpenSSL|no"
-LANGUAGES[java]="Java|java|gradle build|gradle run --args=client|Netty/JDK|no"
-LANGUAGES[rust]="Rust|rust|cargo build --release|./target/release/kv-client|rustls|no"
-LANGUAGES[dart]="Dart|dart|dart pub get|dart run bin/client.dart|Native TLS|no"
-LANGUAGES[csharp]="C#|csharp|dotnet build|dotnet run|SslStream|no"
-LANGUAGES[cpp]="C++|cpp|rm -rf build && cmake -B build -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH:-} && cmake --build build|./build/kv-client|gRPC/BoringSSL|yes"
+LANGUAGES[go]='Go|go|true|go run go-kv-client.go|crypto/tls|no'
+LANGUAGES[python]='Python|python|true|python3 example-py-client.py|gRPC/BoringSSL|yes'
+LANGUAGES[ruby]='Ruby|ruby|true|ruby rb-kv-client.rb|gRPC/BoringSSL|yes'
+LANGUAGES[nodejs]='Node.js|nodejs|npm install|node kv-client.js|OpenSSL|no'
+LANGUAGES[java]='Java|java|gradle build|gradle run --args=client|Netty/JDK|no'
+LANGUAGES[rust]='Rust|rust|cargo build --release|./target/release/kv-client|rustls|no'
+LANGUAGES[dart]='Dart|dart|dart pub get|dart run bin/client.dart|Native TLS|no'
+LANGUAGES[csharp]='C#|csharp|dotnet build|dotnet run|SslStream|no'
+LANGUAGES[cpp]='C++|cpp|rm -rf build && cmake -B build -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH:-} && cmake --build build|./build/kv-client|gRPC/BoringSSL|yes'
 
 # Results tracking
 declare -A RESULTS
