@@ -210,7 +210,7 @@ RUN chmod +x /workspace/*.sh /workspace/utils/*.sh /workspace/tools/*.sh
 
 # Install language-specific dependencies
 # Go dependencies
-RUN cd /workspace/go && go mod download || true
+RUN cd /workspace/go && go mod tidy && go mod download || true
 
 # Node.js dependencies
 RUN cd /workspace/nodejs && npm install || true
