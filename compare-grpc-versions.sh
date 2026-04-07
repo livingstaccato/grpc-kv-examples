@@ -227,7 +227,7 @@ if [[ "$SKIP_BUILD" == "false" ]]; then
                 fi
                 ;;
             ruby)
-                if [[ ! -d "build/patched-grpc/grpc/src/ruby/pkg" ]] || [[ "$QUICK_MODE" == "false" ]]; then
+                if [[ ! -d "build/patched-grpc/grpc/pkg" ]] || [[ "$QUICK_MODE" == "false" ]]; then
                     BUILD_NEEDED=true
                     echo -e "${BLUE}Building patched Ruby gRPC (this takes ~15-20 minutes)...${NC}"
                     ./build-patched-grpc.sh --ruby --install 2>&1 | tee "$PATCHED_DIR/ruby-build.log"

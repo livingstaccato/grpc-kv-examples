@@ -295,13 +295,17 @@ build_ruby() {
     mkdir -p pkg
     mv grpc-*.gem pkg/ || true
     
-    local GEM_FILE=$(ls pkg/grpc-*.gem | head -n 1)
-    [ -n "$GEM_FILE" ] || error "No gem file found in root/"
+    log "Contents of pkg directory:"
+    ls -la pkg/
+    
+    local GEM_FILE=$(ls pkg/grpc-*.gem 2>/dev/null | head -n 1 || ls grpc-*.gem 2>/dev/null | head -n 1)
+    [ -n "$GEM_FILE" ] || error "No gem file found!"
+    log "Found gem file: $GEM_FILE"
 
     if $DO_INSTALL; then
         local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"
         mkdir -p "$RUBY_GEMS_DIR"
-        log "Installing gem to $RUBY_GEMS_DIR using patched libraries..."
+        log "Installing gem $GEM_FILE to $RUBY_GEMS_DIR using patched libraries..."
         
         # This tells gem install to use our patched libraries during compilation
         # Set environment variables to disable -Werror and use ccache

@@ -54,7 +54,7 @@ activate_python() {
 }
 
 activate_ruby() {
-    local GEM_PATH="$BUILD_DIR/grpc/src/ruby/pkg"
+    local GEM_PATH="$BUILD_DIR/grpc/pkg"
 
     if [[ ! -d "$GEM_PATH" ]] || ! ls "$GEM_PATH"/*.gem &>/dev/null; then
         echo -e "${RED}Error: Patched Ruby gem not found at $GEM_PATH${NC}"
