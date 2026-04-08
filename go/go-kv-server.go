@@ -264,15 +264,14 @@ func createClientConfigProvider(logger *log.Logger, baseConfig *tls.Config) func
         logger.Printf("🔍 🔑 Supported curves: %v", info.SupportedCurves)
         logger.Printf("🔍 🔒 Cipher suites: %v", info.CipherSuites)
         
-        # Check if P-521 (Curve ID 25) is in the list
-        has_p521 := false
+        hasP521 := false
         for _, curve := range info.SupportedCurves {
             if curve == tls.CurveP521 {
-                has_p521 = true
+                hasP521 = true
                 break
             }
         }
-        logger.Printf("🔍 🔍 Client supports P-521 (ID 25): %v", has_p521)
+        logger.Printf("🔍 🔍 Client supports P-521 (ID 25): %v", hasP521)
         
         return baseConfig, nil
     }
