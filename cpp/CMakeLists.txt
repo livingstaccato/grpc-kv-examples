@@ -13,12 +13,15 @@ if(CMAKE_PREFIX_PATH)
     message(STATUS "Using gRPC from PREFIX: ${CMAKE_PREFIX_PATH}")
     set(Protobuf_DIR "${CMAKE_PREFIX_PATH}/lib/cmake/protobuf")
     set(gRPC_DIR "${CMAKE_PREFIX_PATH}/lib/cmake/grpc")
+    set(absl_DIR "${CMAKE_PREFIX_PATH}/lib/cmake/absl")
 endif()
 
 # Find Protobuf first as gRPC depends on it
 find_package(Protobuf REQUIRED)
 # Find gRPC
 find_package(gRPC REQUIRED)
+# Find Abseil
+find_package(absl REQUIRED)
 
 # Find tools
 find_program(GRPC_CPP_PLUGIN grpc_cpp_plugin)
@@ -58,6 +61,7 @@ target_link_libraries(kv_proto
     PUBLIC
     ${Protobuf_LIBRARIES}
     gRPC::grpc++
+    absl::cord_internal
 )
 
 # Client executable
@@ -67,6 +71,7 @@ target_include_directories(kv-client PRIVATE ${PROTO_SRC_DIR})
 target_link_libraries(kv-client
     kv_proto
     gRPC::grpc++
+    absl::cord_internal
     OpenSSL::SSL
     OpenSSL::Crypto
     Threads::Threads
