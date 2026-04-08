@@ -61,7 +61,14 @@ target_link_libraries(kv_proto
     PUBLIC
     ${Protobuf_LIBRARIES}
     gRPC::grpc++
+    absl::cord
     absl::cord_internal
+    absl::cordz_info
+    absl::cordz_functions
+    absl::cordz_handle
+    absl::synchronization
+    absl::stacktrace
+    absl::symbolize
 )
 
 # Client executable
@@ -71,7 +78,16 @@ target_include_directories(kv-client PRIVATE ${PROTO_SRC_DIR})
 target_link_libraries(kv-client
     kv_proto
     gRPC::grpc++
+    gRPC::grpc
+    gRPC::gpr
+    absl::cord
     absl::cord_internal
+    absl::cordz_info
+    absl::cordz_functions
+    absl::cordz_handle
+    absl::synchronization
+    absl::stacktrace
+    absl::symbolize
     OpenSSL::SSL
     OpenSSL::Crypto
     Threads::Threads
