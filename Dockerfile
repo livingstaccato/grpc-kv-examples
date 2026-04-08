@@ -76,14 +76,13 @@ RUN apt-get update && apt-get install -y \
     # SSL/TLS libraries
     libssl-dev \
     openssl \
-    # Protobuf
-    protobuf-compiler \
-    libprotobuf-dev \
-    # gRPC C++ dependencies
-    libgrpc-dev \
-    libgrpc++-dev \
-    protobuf-compiler-grpc \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Protobuf compiler (modern version)
+RUN PB_VERSION=29.3 && \
+    wget -q https://github.com/protocolbuffers/protobuf/releases/download/v${PB_VERSION}/protoc-${PB_VERSION}-linux-x86_64.zip && \
+    unzip -q protoc-${PB_VERSION}-linux-x86_64.zip -d /usr/local && \
+    rm protoc-${PB_VERSION}-linux-x86_64.zip
 
 # ============================================================
 # Go (1.21+)

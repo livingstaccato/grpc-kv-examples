@@ -112,7 +112,7 @@ clone_grpc() {
 }
 
 apply_patch() {
-    log "Applying EC curves patch..."
+    log "Applying EC curves patch using Python robust patcher..."
     cd "$BUILD_DIR/grpc"
 
     local TARGET_FILE="src/core/tsi/ssl_transport_security.cc"
@@ -120,24 +120,43 @@ apply_patch() {
         error "Target file not found: $TARGET_FILE"
     fi
 
-    # 1. Update kSslEcCurveNames definition guard and content
-    log "Updating kSslEcCurveNames definition..."
-    # First, make sure the guard includes BoringSSL
-    sed -i 's/#if OPENSSL_VERSION_NUMBER >= 0x30000000/#if OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' "$TARGET_FILE"
-    # Then update the content (handling potential spacing variants)
-    sed -i 's/NID_X9_62_prime256v1}/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1}/g' "$TARGET_FILE"
-    sed -i 's/NID_X9_62_prime256v1 }/NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1 }/g' "$TARGET_FILE"
+    # Use Python for robust regex-based patching
+    python3 <<EOF
+import re
+import sys
 
-    # 2. Update legacy path guard to EXCLUDE BoringSSL
-    log "Updating legacy path guard..."
-    sed -i 's/#if OPENSSL_VERSION_NUMBER < 0x30000000L/#if OPENSSL_VERSION_NUMBER < 0x30000000L \&\& !defined(OPENSSL_IS_BORINGSSL)/g' "$TARGET_FILE"
+with open('$TARGET_FILE', 'r') as f:
+    content = f.read()
 
-    # 3. Update modern path usage to include BoringSSL and correct size
-    log "Updating modern path usage logic..."
-    # Guard update for modern usage
-    sed -i 's/OPENSSL_VERSION_NUMBER >= 0x30000000/OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)/g' "$TARGET_FILE"
-    # Size parameter update
-    sed -i 's/kSslEcCurveNames, 1)/kSslEcCurveNames, sizeof(kSslEcCurveNames)\/sizeof(kSslEcCurveNames[0]))/g' "$TARGET_FILE"
+# 1. Update kSslEcCurveNames definition guard and content
+# Handle different indentation and spacing
+pattern1 = r'#if OPENSSL_VERSION_NUMBER >= 0x30000000\s+static const int kSslEcCurveNames\[\] = {NID_X9_62_prime256v1};'
+replacement1 = '#if OPENSSL_VERSION_NUMBER >= 0x30000000 || defined(OPENSSL_IS_BORINGSSL)\nstatic const int kSslEcCurveNames[] = {NID_X9_62_prime256v1, NID_secp384r1, NID_secp521r1};'
+content = re.sub(pattern1, replacement1, content)
+
+# 2. Update legacy path guard to EXCLUDE BoringSSL
+content = content.replace(
+    '#if OPENSSL_VERSION_NUMBER < 0x30000000L',
+    '#if OPENSSL_VERSION_NUMBER < 0x30000000L && !defined(OPENSSL_IS_BORINGSSL)'
+)
+
+# 3. Update modern path usage to include BoringSSL
+# Look for the #else block that usually follows the legacy path
+content = content.replace(
+    '#else\n    if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, 1)) {',
+    '#else\n    if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))) {'
+)
+
+# Alternative for cases where #else might have different content or spacing
+content = re.sub(
+    r'SSL_CTX_set1_groups\(context, kSslEcCurveNames, 1\)',
+    'SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))',
+    content
+)
+
+with open('$TARGET_FILE', 'w') as f:
+    f.write(content)
+EOF
 
     # 4. Disable Ruby gem build artifact cleanup which fails on some filesystems
     if [ -f "src/ruby/ext/grpc/extconf.rb" ]; then
@@ -145,6 +164,11 @@ apply_patch() {
         sed -i 's/rm_grpc_core_libs = .*/rm_grpc_core_libs = "true"/' src/ruby/ext/grpc/extconf.rb || true
         sed -i 's/rm_obj_cmd = .*/rm_obj_cmd = "true"/' src/ruby/ext/grpc/extconf.rb || true
         sed -i 's/strip_tool = .*/strip_tool = "true"/' src/ruby/ext/grpc/extconf.rb || true
+    elif [ -f "ext/grpc/extconf.rb" ]; then
+        log "Disabling Ruby build cleanup in ext/grpc/extconf.rb..."
+        sed -i 's/rm_grpc_core_libs = .*/rm_grpc_core_libs = "true"/' ext/grpc/extconf.rb || true
+        sed -i 's/rm_obj_cmd = .*/rm_obj_cmd = "true"/' ext/grpc/extconf.rb || true
+        sed -i 's/strip_tool = .*/strip_tool = "true"/' ext/grpc/extconf.rb || true
     fi
 
     # Verification
