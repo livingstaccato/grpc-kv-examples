@@ -14,15 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v3
 
       - name: Build and Cache Docker Image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v5
         with:
           context: .
           load: true
@@ -30,247 +30,84 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Job 2: Build Patched Python gRPC
-  build-python:
-    name: Build Patched Python
+  # Job 2: Build the patched gRPC (cached by patch/script hash)
+  build-patched:
+    name: Build Patched gRPC
     needs: build-env
     runs-on: ubuntu-latest
-    timeout-minutes: 60
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Load Docker Image
-        uses: docker/build-push-action@v7
+        uses: actions/checkout@v4
         with:
-          context: .
-          load: true
-          tags: grpc-curve-test:latest
-          cache-from: type=gha
+          submodules: recursive
 
-      - name: Cache ccache
-        uses: actions/cache@v5
+      - name: Cache Patched Build Artifacts
+        id: cache-patched
+        uses: actions/cache@v4
         with:
-          path: .ccache
-          key: ccache-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-
-            ccache-python-
+          path: build/patched-grpc
+          key: patched-grpc-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'requirements.txt', 'Dockerfile') }}
 
-      - name: Cache Patched Python
-        id: cache-python
-        uses: actions/cache@v5
-        with:
-          path: build/patched-grpc/venv
-          key: patched-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'requirements.txt') }}
-
-      - name: Build Patched Python
-        if: steps.cache-python.outputs.cache-hit != 'true'
+      - name: Build Patched gRPC (All Languages)
+        if: steps.cache-patched.outputs.cache-hit != 'true'
         run: |
-          mkdir -p .ccache
-          docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
-          docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --python --install"
-          mkdir -p build/patched-grpc
-          docker cp builder:/workspace/build/patched-grpc/venv build/patched-grpc/
+          # Start the container
+          docker build -t grpc-curve-test:latest .
+          docker run --name builder -d -t grpc-curve-test:latest
+          
+          # Build all patched languages
+          docker exec builder ./build-patched-grpc.sh --all --install
+          
+          # Copy results out for caching
+          mkdir -p build
+          docker cp builder:/workspace/build/patched-grpc build/
+          
+          # Cleanup
           docker rm -f builder
 
-  # Job 3: Build Patched C++ gRPC
-  build-cpp:
-    name: Build Patched C++
-    needs: build-env
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Load Docker Image
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          load: true
-          tags: grpc-curve-test:latest
-          cache-from: type=gha
-
-      - name: Cache ccache
-        uses: actions/cache@v5
-        with:
-          path: .ccache
-          key: ccache-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-
-            ccache-cpp-
-
-      - name: Cache Patched C++
-        id: cache-cpp
-        uses: actions/cache@v5
-        with:
-          path: build/patched-grpc/install
-          key: patched-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
-
-      - name: Build Patched C++
-        if: steps.cache-cpp.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p .ccache
-          docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
-          docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --cpp --install"
-          mkdir -p build/patched-grpc
-          docker cp builder:/workspace/build/patched-grpc/install build/patched-grpc/
-          docker rm -f builder
-
-  # Job 4: Build Patched Ruby gRPC
-  build-ruby:
-    name: Build Patched Ruby
-    needs: [build-env, build-cpp]
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Load Docker Image
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          load: true
-          tags: grpc-curve-test:latest
-          cache-from: type=gha
-
-      - name: Restore C++ (needed for Ruby build)
-        uses: actions/cache/restore@v5
-        with:
-          path: build/patched-grpc/install
-          key: patched-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
-          fail-on-cache-miss: true
-
-      - name: Cache ccache
-        uses: actions/cache@v5
-        with:
-          path: .ccache
-          key: ccache-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-${{ github.run_id }}
-          restore-keys: |
-            ccache-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}-
-            ccache-ruby-
-
-      - name: Cache Patched Ruby
-        id: cache-ruby
-        uses: actions/cache@v5
-        with:
-          path: build/patched-grpc/ruby-gems
-          key: patched-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
-
-      - name: Build Patched Ruby
-        if: steps.cache-ruby.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p .ccache
-          docker run --name builder -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
-          
-          # Inject C++ artifacts
-          docker exec builder mkdir -p /workspace/build/patched-grpc
-          docker cp build/patched-grpc/install builder:/workspace/build/patched-grpc/
-          
-          # Build Ruby gem against C++ artifacts
-          docker exec builder /bin/bash -o pipefail -c "./build-patched-grpc.sh --ruby --install"
-          
-          mkdir -p build/patched-grpc
-          docker cp builder:/workspace/build/patched-grpc/ruby-gems build/patched-grpc/
-          docker rm -f builder
-
-  # Job 5: Run the comparison and generate the report
+  # Job 3: Run the comparison and generate the report
   run-proof:
     name: Run Proof & Report
-    needs: [build-python, build-cpp, build-ruby]
-    if: always() && !cancelled() && needs.build-python.result == 'success' && needs.build-cpp.result == 'success'
+    needs: build-patched
     runs-on: ubuntu-latest
-    timeout-minutes: 60
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Load Docker Image
-        uses: docker/build-push-action@v7
+        uses: actions/checkout@v4
         with:
-          context: .
-          load: true
-          tags: grpc-curve-test:latest
-          cache-from: type=gha
+          submodules: recursive
 
-      - name: Restore Python
-        uses: actions/cache/restore@v5
+      - name: Restore Patched Build Artifacts
+        uses: actions/cache/restore@v4
         with:
-          path: build/patched-grpc/venv
-          key: patched-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'requirements.txt') }}
+          path: build/patched-grpc
+          key: patched-grpc-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'requirements.txt', 'Dockerfile') }}
+          fail-on-cache-miss: true
 
-      - name: Restore C++
-        uses: actions/cache/restore@v5
-        with:
-          path: build/patched-grpc/install
-          key: patched-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
-
-      - name: Restore Ruby (optional)
-        uses: actions/cache/restore@v5
-        with:
-          path: build/patched-grpc/ruby-gems
-          key: patched-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh') }}
-
-      - name: Cache ccache
-        uses: actions/cache@v5
-        with:
-          path: .ccache
-          key: ccache-proof-${{ github.run_id }}
-          restore-keys: |
-            ccache-proof-
-            ccache-cpp-
-
-      - name: Run Comparison
+      - name: Run Comparison (Baseline vs Patched)
         run: |
-          mkdir -p .ccache
-          docker run --name proof-container -d -t -v $(pwd)/.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache grpc-curve-test:latest
+          # Build/load the image (should be fast due to Docker cache)
+          docker build -t grpc-curve-test:latest .
           
-          # Inject all restored artifacts
-          docker exec proof-container mkdir -p /workspace/build/patched-grpc/venv
-          docker exec proof-container mkdir -p /workspace/build/patched-grpc/install
+          # Start container and inject patched artifacts
+          docker run --name proof-container -d -t grpc-curve-test:latest
+          docker cp build/patched-grpc proof-container:/workspace/build/
           
-          docker cp build/patched-grpc/venv proof-container:/workspace/build/patched-grpc/
-          docker cp build/patched-grpc/install proof-container:/workspace/build/patched-grpc/
-          
-          # Inject Ruby gems if they exist
-          if [ -d "build/patched-grpc/ruby-gems" ]; then
-            docker exec proof-container mkdir -p /workspace/build/patched-grpc/ruby-gems
-            docker cp build/patched-grpc/ruby-gems proof-container:/workspace/build/patched-grpc/
-            LANGS="python,ruby,cpp"
-          else
-            LANGS="python,cpp"
-          fi
-          
-          # Run tests
-          docker exec -e BUILD_DIR=/workspace/build/patched-grpc proof-container ./compare-grpc-versions.sh --language $LANGS --skip-build
+          # Run the comparison (skipping build as we injected it)
+          # This step now only runs tests, which is fast!
+          docker exec proof-container ./compare-grpc-versions.sh --language all --skip-build
           
           # Extract results
           docker cp proof-container:/workspace/reports .
           docker cp proof-container:/workspace/results .
 
       - name: Upload Comparison Report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: grpc-curve-comparison-report
           path: |
             reports/*.md
-            results/**/*.log
-            results/**/*.txt
-            results/**/*.json
+            results/baseline/*.log
+            results/patched/*.log
 
       - name: Display Summary
         run: |

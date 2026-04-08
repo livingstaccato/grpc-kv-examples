@@ -801,3 +801,8 @@ certs
 logs/
 
 *.db
+
+# Local CI artifact downloads
+fetched_reports*/
+reports/
+results/

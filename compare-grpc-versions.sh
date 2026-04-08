@@ -27,7 +27,6 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Directories
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RESULTS_DIR="results"
 BASELINE_DIR="$RESULTS_DIR/baseline"
 PATCHED_DIR="$RESULTS_DIR/patched"
@@ -108,25 +107,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate language
-if [[ "$LANGUAGE" == "all" ]]; then
-    TEST_LANGUAGES=("python" "ruby" "cpp")
-elif [[ "$LANGUAGE" == *","* ]]; then
-    IFS=',' read -ra TEST_LANGUAGES <<< "$LANGUAGE"
-else
-    TEST_LANGUAGES=("$LANGUAGE")
-fi
-
-for lang in "${TEST_LANGUAGES[@]}"; do
-    case "$lang" in
-        python|ruby|cpp)
-            ;;
-        *)
-            echo -e "${RED}Error: Invalid language '$lang'${NC}"
-            echo "Must be one of: python, ruby, cpp, all"
-            exit 1
-            ;;
-    esac
-done
+case "$LANGUAGE" in
+    python|ruby|cpp|all)
+        ;;
+    *)
+        echo -e "${RED}Error: Invalid language '$LANGUAGE'${NC}"
+        echo "Must be one of: python, ruby, cpp, all"
+        exit 1
+        ;;
+esac
 
 # Set default output file if not specified
 if [[ -z "$OUTPUT_FILE" ]]; then
@@ -139,7 +128,7 @@ echo -e "${CYAN}║        gRPC Elliptic Curve Patch Comparison Tool          �
 echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${BLUE}Configuration:${NC}"
-echo "  Language(s): ${TEST_LANGUAGES[*]}"
+echo "  Language(s): $LANGUAGE"
 echo "  Quick mode: $QUICK_MODE"
 echo "  Output: $OUTPUT_FILE"
 echo ""
@@ -147,33 +136,31 @@ echo ""
 # Create directories
 mkdir -p "$BASELINE_DIR" "$PATCHED_DIR" "$REPORTS_DIR"
 
-# Step 1: Run baseline tests (unpatched gRPC)
+# Step 1: Run baseline tests (unpatched)
 echo -e "${YELLOW}[1/5] Running baseline tests (unpatched gRPC)...${NC}"
 echo ""
 
-# Ensure we are using system/stock gRPC for baseline
-source ./utils/grpc-environment-manager.sh deactivate >/dev/null 2>&1 || true
-
-# Ensure go is available
-if ! command -v go &>/dev/null; then
-    export PATH="/usr/local/go/bin:/usr/local/bin:$PATH"
+# Ensure we're using system gRPC
+if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+    echo -e "${YELLOW}Deactivating virtual environment...${NC}"
+    deactivate || true
 fi
 
-# Run tests for all target languages at once
-export RESULTS_FILE="$SCRIPT_DIR/baseline-results.txt"
-rm -f "$RESULTS_FILE"
-
-echo -e "${BLUE}Testing languages: ${TEST_LANGUAGES[*]} (baseline)...${NC}"
-LANG_ARGS=$(IFS=,; echo "${TEST_LANGUAGES[*]}")
-./test-all-curves.sh --language "$LANG_ARGS" > "$BASELINE_DIR/baseline-suite.log" 2>&1 || true
-
-# Copy results to the expected location for the report generator
-if [[ -f "$RESULTS_FILE" ]]; then
-    cp "$RESULTS_FILE" "$BASELINE_DIR/curve-test-results.txt"
-    echo -e "${GREEN}✓ Baseline results saved to $BASELINE_DIR/curve-test-results.txt${NC}"
+# Determine which languages to test
+if [[ "$LANGUAGE" == "all" ]]; then
+    TEST_LANGUAGES=("python" "ruby" "cpp")
 else
-    echo -e "${RED}Error: $RESULTS_FILE not found!${NC}"
+    TEST_LANGUAGES=("$LANGUAGE")
 fi
+
+# Run baseline tests for each language
+for lang in "${TEST_LANGUAGES[@]}"; do
+    echo -e "${BLUE}Testing $lang (baseline)...${NC}"
+    ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
+done
+
+# Copy results
+cp curve-test-results.txt "$BASELINE_DIR/" 2>/dev/null || true
 
 # Capture baseline versions
 echo -e "${BLUE}Capturing baseline version information...${NC}"
@@ -194,14 +181,14 @@ if [[ "$SKIP_BUILD" == "false" ]]; then
             python)
                 if [[ ! -d "build/patched-grpc/venv" ]] || [[ "$QUICK_MODE" == "false" ]]; then
                     BUILD_NEEDED=true
-                    echo -e "${BLUE}Building patched Python gRPC (this takes ~20-25 minutes)...${NC}"
-                    ./build-patched-grpc.sh --python --install 2>&1 | tee "$PATCHED_DIR/python-build.log"
+                    echo -e "${BLUE}Building patched Python gRPC (this takes ~20-30 minutes)...${NC}"
+                    ./build-patched-grpc.sh --python 2>&1 | tee "$PATCHED_DIR/python-build.log"
                 else
                     echo -e "${GREEN}✓ Patched Python gRPC already exists (skipping build)${NC}"
                 fi
                 ;;
             ruby)
-                if [[ ! -d "build/patched-grpc/grpc/pkg" ]] || [[ "$QUICK_MODE" == "false" ]]; then
+                if [[ ! -d "build/patched-grpc/grpc/src/ruby/pkg" ]] || [[ "$QUICK_MODE" == "false" ]]; then
                     BUILD_NEEDED=true
                     echo -e "${BLUE}Building patched Ruby gRPC (this takes ~15-20 minutes)...${NC}"
                     ./build-patched-grpc.sh --ruby --install 2>&1 | tee "$PATCHED_DIR/ruby-build.log"
@@ -234,10 +221,6 @@ fi
 echo -e "${YELLOW}[3/5] Running patched tests...${NC}"
 echo ""
 
-# Ensure fresh results file for patched run
-export RESULTS_FILE="$SCRIPT_DIR/patched-results.txt"
-rm -f "$RESULTS_FILE"
-
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Activating patched $lang environment...${NC}"
 
@@ -248,20 +231,14 @@ for lang in "${TEST_LANGUAGES[@]}"; do
     }
 
     echo -e "${BLUE}Testing $lang (patched)...${NC}"
-    # Add --patched flag so the test runner knows we expect success now
-    APPEND_RESULTS=true RESULTS_FILE="$RESULTS_FILE" ./test-all-curves.sh --language "$lang" --patched > "$PATCHED_DIR/${lang}.log" 2>&1 || true
+    ./test-all-curves.sh --language "$lang" > "$PATCHED_DIR/${lang}.log" 2>&1 || true
 
     # Deactivate
-    source ./utils/grpc-environment-manager.sh deactivate >/dev/null 2>&1 || true
+    source ./utils/grpc-environment-manager.sh deactivate
 done
 
-# Copy patched results to the expected location for the report generator
-if [[ -f "$RESULTS_FILE" ]]; then
-    cp "$RESULTS_FILE" "$PATCHED_DIR/curve-test-results.txt"
-    echo -e "${GREEN}✓ Patched results saved to $PATCHED_DIR/curve-test-results.txt${NC}"
-else
-    echo -e "${RED}Error: $RESULTS_FILE not found!${NC}"
-fi
+# Copy patched results
+cp curve-test-results.txt "$PATCHED_DIR/" 2>/dev/null || true
 
 # Capture patched versions
 echo -e "${BLUE}Capturing patched version information...${NC}"
@@ -280,7 +257,9 @@ echo ""
 
 ./utils/generate-comparison-report.sh "$BASELINE_DIR" "$PATCHED_DIR" "$OUTPUT_FILE"
 
-# Step 5: Final summary
+echo ""
+
+# Step 5: Display summary
 echo -e "${YELLOW}[5/5] Comparison complete!${NC}"
 echo ""
 echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -291,7 +270,15 @@ echo -e "${GREEN}✓ Baseline results:${NC} $BASELINE_DIR/"
 echo -e "${GREEN}✓ Patched results:${NC} $PATCHED_DIR/"
 echo -e "${GREEN}✓ Comparison report:${NC} $OUTPUT_FILE"
 echo ""
+echo -e "${BLUE}To view the report:${NC}"
+echo "  cat $OUTPUT_FILE"
+echo ""
+echo -e "${BLUE}To view detailed logs:${NC}"
+echo "  Baseline: ls -la $BASELINE_DIR/"
+echo "  Patched:  ls -la $PATCHED_DIR/"
+echo ""
 
+# Extract and display key metrics from report
 if [[ -f "$OUTPUT_FILE" ]]; then
     echo -e "${CYAN}Key Metrics:${NC}"
     grep "Tests Fixed:" "$OUTPUT_FILE" || true
