@@ -137,7 +137,7 @@ content = re.sub(pattern1, replacement1, content)
 # 2. Update legacy path guard to EXCLUDE BoringSSL
 content = content.replace(
     '#if OPENSSL_VERSION_NUMBER < 0x30000000L',
-    '#if OPENSSL_VERSION_NUMBER < 0x30000000L && !defined(OPENSSL_IS_BORINGSSL)'
+    '#if (OPENSSL_VERSION_NUMBER < 0x30000000L) && !defined(OPENSSL_IS_BORINGSSL)'
 )
 
 # 3. Update modern path usage to include BoringSSL
