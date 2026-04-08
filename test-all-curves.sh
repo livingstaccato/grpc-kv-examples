@@ -81,7 +81,7 @@ LANGUAGES[java]='Java|java|gradle build|gradle run --args=client|Netty/JDK|no'
 LANGUAGES[rust]='Rust|rust|cargo build --release|./target/release/kv-client|rustls|no'
 LANGUAGES[dart]='Dart|dart|dart pub get|dart run bin/client.dart|Native TLS|no'
 LANGUAGES[csharp]='C#|csharp|dotnet build|dotnet run|SslStream|no'
-LANGUAGES[cpp]='C++|cpp|./build.sh|./build/kv-client|gRPC/BoringSSL|yes'
+LANGUAGES[cpp]='C++|cpp|./build.sh|export LD_LIBRARY_PATH=${BUILD_DIR:-$PWD/build/patched-grpc}/install/lib:${LD_LIBRARY_PATH:-} && ./build/kv-client|gRPC/BoringSSL|yes'
 
 # Results tracking
 declare -A RESULTS

@@ -256,7 +256,7 @@ jobs:
           fi
           
           # Run tests
-          docker exec proof-container ./compare-grpc-versions.sh --language $LANGS --skip-build
+          docker exec -e BUILD_DIR=/workspace/build/patched-grpc proof-container ./compare-grpc-versions.sh --language $LANGS --skip-build
           
           # Extract results
           docker cp proof-container:/workspace/reports .

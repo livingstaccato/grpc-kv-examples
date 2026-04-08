@@ -45,6 +45,12 @@ if command -v ruby &> /dev/null; then
 fi
 
 # C++ version (check installed package)
+CPP_PATCHED_PATH="/workspace/build/patched-grpc/install"
+if [[ -d "$CPP_PATCHED_PATH" ]]; then
+    # If patched C++ exists, use it even if not active (we want to know what's available)
+    export PKG_CONFIG_PATH="$CPP_PATCHED_PATH/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+fi
+
 if command -v pkg-config &> /dev/null && pkg-config --exists grpc++ 2>/dev/null; then
     CPP_VERSION=$(pkg-config --modversion grpc++ 2>/dev/null || echo "not-installed")
     CPP_PREFIX=$(pkg-config --variable=prefix grpc++ 2>/dev/null || echo "not-found")
