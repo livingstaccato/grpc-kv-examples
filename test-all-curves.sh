@@ -257,6 +257,8 @@ test_client() {
             # Always show output on FAIL to help debug
             echo -e "${RED}Client output:${NC}"
             echo "$output" | head -50
+            echo -e "${RED}Server log (go/server.log):${NC}"
+            cat go/server.log | tail -n 20
         fi
     fi
 

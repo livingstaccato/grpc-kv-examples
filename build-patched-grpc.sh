@@ -139,6 +139,10 @@ content = content.replace(
     '#if OPENSSL_VERSION_NUMBER < 0x30000000L',
     '#if (OPENSSL_VERSION_NUMBER < 0x30000000L) && !defined(OPENSSL_IS_BORINGSSL)'
 )
+content = content.replace(
+    '#if OPENSSL_VERSION_NUMBER < 0x30000000',
+    '#if (OPENSSL_VERSION_NUMBER < 0x30000000) && !defined(OPENSSL_IS_BORINGSSL)'
+)
 
 # 3. Update modern path usage to include BoringSSL
 # Look for the #else block that usually follows the legacy path
