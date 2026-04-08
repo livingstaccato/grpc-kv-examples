@@ -171,7 +171,7 @@ build_python() {
 
     # Install build dependencies for gRPC v1.80.0
     log "Installing build dependencies..."
-    uv pip install 'Cython<3.0' setuptools wheel
+    uv pip install 'Cython>=3.0' setuptools wheel
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
