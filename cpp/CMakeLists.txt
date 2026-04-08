@@ -4,20 +4,23 @@ project(grpc-kv-cpp CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find required packages
-find_package(Threads REQUIRED)
-find_package(Protobuf REQUIRED)
-find_package(gRPC REQUIRED)
+# Use PkgConfig to get all dependencies correctly, especially for static builds
+find_package(PkgConfig REQUIRED)
 
-# Find OpenSSL for mTLS
-find_package(OpenSSL REQUIRED)
+# Add the patched install path to pkg-config search path if it exists
+if(CMAKE_PREFIX_PATH)
+    set(ENV{PKG_CONFIG_PATH} "${CMAKE_PREFIX_PATH}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+    message(STATUS "PKG_CONFIG_PATH: $ENV{PKG_CONFIG_PATH}")
+endif()
+
+# Use IMPORTED_TARGET to get all transitive dependencies (absl, re2, etc.) correctly
+pkg_check_modules(GRPC REQUIRED IMPORTED_TARGET grpc++)
+pkg_check_modules(PROTOBUF REQUIRED IMPORTED_TARGET protobuf)
+pkg_check_modules(OPENSSL REQUIRED IMPORTED_TARGET openssl)
 
 # Find tools
 find_program(GRPC_CPP_PLUGIN grpc_cpp_plugin)
-get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc IMPORTED_LOCATION)
-if(NOT Protobuf_PROTOC_EXECUTABLE)
-    find_program(Protobuf_PROTOC_EXECUTABLE protoc)
-endif()
+find_program(Protobuf_PROTOC_EXECUTABLE protoc)
 
 message(STATUS "Using protoc: ${Protobuf_PROTOC_EXECUTABLE}")
 message(STATUS "Using grpc_cpp_plugin: ${GRPC_CPP_PLUGIN}")
@@ -47,19 +50,14 @@ add_custom_command(
 # Proto library
 add_library(kv_proto ${PROTO_SRCS} ${GRPC_SRCS} ${PROTO_HDRS} ${GRPC_HDRS})
 target_include_directories(kv_proto PUBLIC ${PROTO_SRC_DIR})
-target_link_libraries(kv_proto
-    PUBLIC
-    protobuf::libprotobuf
-    gRPC::grpc++
-)
+target_link_libraries(kv_proto PUBLIC PkgConfig::GRPC PkgConfig::PROTOBUF)
 
 # Client executable
 add_executable(kv-client src/client.cpp)
 target_include_directories(kv-client PRIVATE ${PROTO_SRC_DIR})
 target_link_libraries(kv-client
     kv_proto
-    gRPC::grpc++
-    OpenSSL::SSL
-    OpenSSL::Crypto
+    PkgConfig::GRPC
+    PkgConfig::OPENSSL
     Threads::Threads
 )

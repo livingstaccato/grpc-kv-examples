@@ -78,6 +78,7 @@ RUN apt-get update && apt-get install -y \
     openssl \
     libre2-dev \
     libc-ares-dev \
+    libabsl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Protobuf compiler (modern version)
