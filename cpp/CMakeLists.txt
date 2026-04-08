@@ -7,13 +7,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find required packages
 find_package(Threads REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GRPC REQUIRED grpc++ grpc)
+find_package(gRPC REQUIRED)
+
+# Find OpenSSL for mTLS
 find_package(OpenSSL REQUIRED)
 
 # Find tools
 find_program(GRPC_CPP_PLUGIN grpc_cpp_plugin)
-find_program(Protobuf_PROTOC_EXECUTABLE protoc)
+get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc IMPORTED_LOCATION)
+if(NOT Protobuf_PROTOC_EXECUTABLE)
+    find_program(Protobuf_PROTOC_EXECUTABLE protoc)
+endif()
 
 message(STATUS "Using protoc: ${Protobuf_PROTOC_EXECUTABLE}")
 message(STATUS "Using grpc_cpp_plugin: ${GRPC_CPP_PLUGIN}")
@@ -45,27 +49,16 @@ add_library(kv_proto ${PROTO_SRCS} ${GRPC_SRCS} ${PROTO_HDRS} ${GRPC_HDRS})
 target_include_directories(kv_proto PUBLIC ${PROTO_SRC_DIR})
 target_link_libraries(kv_proto
     PUBLIC
-    ${Protobuf_LIBRARIES}
-    ${GRPC_LIBRARIES}
-)
-
-# Server executable
-add_executable(kv-server src/server.cpp)
-target_include_directories(kv-server PRIVATE ${PROTO_SRC_DIR} ${GRPC_INCLUDE_DIRS})
-target_link_libraries(kv-server
-    kv_proto
-    ${GRPC_LIBRARIES}
-    OpenSSL::SSL
-    OpenSSL::Crypto
-    Threads::Threads
+    protobuf::libprotobuf
+    gRPC::grpc++
 )
 
 # Client executable
 add_executable(kv-client src/client.cpp)
-target_include_directories(kv-client PRIVATE ${PROTO_SRC_DIR} ${GRPC_INCLUDE_DIRS})
+target_include_directories(kv-client PRIVATE ${PROTO_SRC_DIR})
 target_link_libraries(kv-client
     kv_proto
-    ${GRPC_LIBRARIES}
+    gRPC::grpc++
     OpenSSL::SSL
     OpenSSL::Crypto
     Threads::Threads
