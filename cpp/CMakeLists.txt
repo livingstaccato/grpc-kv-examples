@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Use PkgConfig to get all dependencies correctly, especially for static builds
 find_package(PkgConfig REQUIRED)
+find_package(Threads REQUIRED)
 
 # Add the patched install path to pkg-config search path if it exists
 if(CMAKE_PREFIX_PATH)
