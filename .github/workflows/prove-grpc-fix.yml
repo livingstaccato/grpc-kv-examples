@@ -15,8 +15,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -30,16 +28,28 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Job 2: Build the patched gRPC (cached by patch/script hash)
+  # Job 2: Build patched gRPC for all languages
+  # Each language runs in its own container to avoid disk pressure
+  # (~14GB limit on runners; Python+C++Ruby compiled together exceeds it)
   build-patched:
     name: Build Patched gRPC
     needs: build-env
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v5
         with:
-          submodules: recursive
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
 
       - name: Cache Patched Build Artifacts
         id: cache-patched
@@ -48,22 +58,33 @@ jobs:
           path: build/patched-grpc
           key: patched-grpc-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'requirements.txt', 'Dockerfile') }}
 
-      - name: Build Patched gRPC (All Languages)
+      - name: Build Patched Python
         if: steps.cache-patched.outputs.cache-hit != 'true'
         run: |
-          # Start the container
-          docker build -t grpc-curve-test:latest .
-          docker run --name builder -d -t grpc-curve-test:latest
-          
-          # Build all patched languages
-          docker exec builder ./build-patched-grpc.sh --all --install
-          
-          # Copy results out for caching
-          mkdir -p build
-          docker cp builder:/workspace/build/patched-grpc build/
-          
-          # Cleanup
-          docker rm -f builder
+          # Each language gets its own container so disk never exceeds ~14GB limit
+          docker run --name py-builder -d -t grpc-curve-test:latest
+          docker exec py-builder ./build-patched-grpc.sh --python --install
+          mkdir -p build/patched-grpc
+          docker cp py-builder:/workspace/build/patched-grpc/venv build/patched-grpc/
+          docker rm -f py-builder
+
+      - name: Build Patched C++
+        if: steps.cache-patched.outputs.cache-hit != 'true'
+        run: |
+          docker run --name cpp-builder -d -t grpc-curve-test:latest
+          docker exec cpp-builder ./build-patched-grpc.sh --cpp --install
+          mkdir -p build/patched-grpc
+          docker cp cpp-builder:/workspace/build/patched-grpc/install build/patched-grpc/
+          docker rm -f cpp-builder
+
+      - name: Build Patched Ruby
+        if: steps.cache-patched.outputs.cache-hit != 'true'
+        run: |
+          docker run --name ruby-builder -d -t grpc-curve-test:latest
+          docker exec ruby-builder ./build-patched-grpc.sh --ruby --install
+          mkdir -p build/patched-grpc
+          docker cp ruby-builder:/workspace/build/patched-grpc/ruby-gems build/patched-grpc/ || true
+          docker rm -f ruby-builder
 
   # Job 3: Run the comparison and generate the report
   run-proof:
@@ -73,8 +94,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v5
         with:
-          submodules: recursive
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
 
       - name: Restore Patched Build Artifacts
         uses: actions/cache/restore@v4
@@ -85,20 +115,23 @@ jobs:
 
       - name: Run Comparison (Baseline vs Patched)
         run: |
-          # Build/load the image (should be fast due to Docker cache)
-          docker build -t grpc-curve-test:latest .
-          
-          # Start container and inject patched artifacts
           docker run --name proof-container -d -t grpc-curve-test:latest
-          docker cp build/patched-grpc proof-container:/workspace/build/
-          
-          # Run the comparison (skipping build as we injected it)
-          # This step now only runs tests, which is fast!
+
+          # Inject all patched artifacts
+          docker exec proof-container mkdir -p /workspace/build/patched-grpc
+          docker cp build/patched-grpc/venv       proof-container:/workspace/build/patched-grpc/
+          docker cp build/patched-grpc/install     proof-container:/workspace/build/patched-grpc/
+          if [ -d "build/patched-grpc/ruby-gems" ]; then
+            docker cp build/patched-grpc/ruby-gems proof-container:/workspace/build/patched-grpc/
+          fi
+
+          # Run the comparison (build already done, just test)
           docker exec proof-container ./compare-grpc-versions.sh --language all --skip-build
-          
+
           # Extract results
-          docker cp proof-container:/workspace/reports .
-          docker cp proof-container:/workspace/results .
+          docker cp proof-container:/workspace/reports . || true
+          docker cp proof-container:/workspace/results . || true
+          docker rm -f proof-container
 
       - name: Upload Comparison Report
         uses: actions/upload-artifact@v4
@@ -111,4 +144,4 @@ jobs:
 
       - name: Display Summary
         run: |
-          cat reports/comparison-*.md >> $GITHUB_STEP_SUMMARY
+          cat reports/comparison-*.md >> $GITHUB_STEP_SUMMARY || true
