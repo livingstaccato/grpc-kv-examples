@@ -11,19 +11,17 @@ find_package(OpenSSL REQUIRED)
 # If CMAKE_PREFIX_PATH is set (patched build), we want to use the config files there
 if(CMAKE_PREFIX_PATH)
     message(STATUS "Using gRPC from PREFIX: ${CMAKE_PREFIX_PATH}")
-    # Help CMake find the gRPC and Protobuf config files
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}")
+    set(Protobuf_DIR "${CMAKE_PREFIX_PATH}/lib/cmake/protobuf")
+    set(gRPC_DIR "${CMAKE_PREFIX_PATH}/lib/cmake/grpc")
 endif()
 
-# Find gRPC and Protobuf using CONFIG mode (most reliable for static builds)
-find_package(gRPC CONFIG REQUIRED)
-find_package(Protobuf CONFIG REQUIRED)
+# Find Protobuf first as gRPC depends on it
+find_package(Protobuf REQUIRED)
+# Find gRPC
+find_package(gRPC REQUIRED)
 
 # Find tools
 find_program(GRPC_CPP_PLUGIN grpc_cpp_plugin)
-if(TARGET protobuf::protoc)
-    get_target_property(Protobuf_PROTOC_EXECUTABLE protobuf::protoc IMPORTED_LOCATION)
-endif()
 if(NOT Protobuf_PROTOC_EXECUTABLE)
     find_program(Protobuf_PROTOC_EXECUTABLE protoc)
 endif()
@@ -58,7 +56,7 @@ add_library(kv_proto ${PROTO_SRCS} ${GRPC_SRCS} ${PROTO_HDRS} ${GRPC_HDRS})
 target_include_directories(kv_proto PUBLIC ${PROTO_SRC_DIR})
 target_link_libraries(kv_proto
     PUBLIC
-    protobuf::libprotobuf
+    ${Protobuf_LIBRARIES}
     gRPC::grpc++
 )
 
@@ -66,13 +64,9 @@ target_link_libraries(kv_proto
 add_executable(kv-client src/client.cpp)
 target_include_directories(kv-client PRIVATE ${PROTO_SRC_DIR})
 
-# For static builds, we link gRPC and its core components.
-# The CONFIG targets should automatically handle transitive dependencies like upb and absl.
 target_link_libraries(kv-client
     kv_proto
     gRPC::grpc++
-    gRPC::grpc
-    gRPC::gpr
     OpenSSL::SSL
     OpenSSL::Crypto
     Threads::Threads
