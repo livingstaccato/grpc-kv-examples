@@ -151,41 +151,15 @@ mkdir -p "$BASELINE_DIR" "$PATCHED_DIR" "$REPORTS_DIR"
 echo -e "${YELLOW}[1/5] Running baseline tests (unpatched gRPC)...${NC}"
 echo ""
 
-# In the Docker container, the venv at /opt/venv contains the stock gRPC.
-# We should keep it active for the baseline tests.
-# If we're already in a patched venv (though unlikely here), we'd want to deactivate.
-if [[ "${VIRTUAL_ENV:-}" == *"build/patched-grpc"* ]]; then
-    echo -e "${YELLOW}Deactivating patched virtual environment for baseline...${NC}"
-    unset VIRTUAL_ENV
-    # Restore original path if we can find it, otherwise just rely on system path
-fi
+# Ensure we are using system/stock gRPC for baseline
+source ./utils/grpc-environment-manager.sh deactivate >/dev/null 2>&1 || true
 
-# Ensure go is available (needed for the server)
-echo -e "${BLUE}Checking for go binary...${NC}"
-which go || echo "go not found in PATH"
-go version || echo "go version failed"
-
+# Ensure go is available
 if ! command -v go &>/dev/null; then
-    echo -e "${BLUE}Attempting to locate go binary in common locations...${NC}"
-    # Check common locations from Dockerfile
-    if [[ -f "/usr/local/go/bin/go" ]]; then
-        echo "Found go at /usr/local/go/bin/go, adding to PATH"
-        export PATH="/usr/local/go/bin:$PATH"
-    elif [[ -f "/usr/local/bin/go" ]]; then
-        echo "Found go at /usr/local/bin/go, adding to PATH"
-        export PATH="/usr/local/bin:$PATH"
-    fi
+    export PATH="/usr/local/go/bin:/usr/local/bin:$PATH"
 fi
 
-if ! command -v go &>/dev/null; then
-    echo -e "${RED}Error: go not found in PATH${NC}"
-    echo "PATH=$PATH"
-    ls -la /usr/local/go/bin/go || true
-    ls -la /usr/local/bin/go || true
-    exit 1
-fi
-
-# Run baseline tests for all target languages at once
+# Run tests for all target languages at once
 export RESULTS_FILE="$SCRIPT_DIR/baseline-results.txt"
 rm -f "$RESULTS_FILE"
 
@@ -220,8 +194,8 @@ if [[ "$SKIP_BUILD" == "false" ]]; then
             python)
                 if [[ ! -d "build/patched-grpc/venv" ]] || [[ "$QUICK_MODE" == "false" ]]; then
                     BUILD_NEEDED=true
-                    echo -e "${BLUE}Building patched Python gRPC (this takes ~20-30 minutes)...${NC}"
-                    ./build-patched-grpc.sh --python 2>&1 | tee "$PATCHED_DIR/python-build.log"
+                    echo -e "${BLUE}Building patched Python gRPC (this takes ~20-25 minutes)...${NC}"
+                    ./build-patched-grpc.sh --python --install 2>&1 | tee "$PATCHED_DIR/python-build.log"
                 else
                     echo -e "${GREEN}✓ Patched Python gRPC already exists (skipping build)${NC}"
                 fi
@@ -274,12 +248,11 @@ for lang in "${TEST_LANGUAGES[@]}"; do
     }
 
     echo -e "${BLUE}Testing $lang (patched)...${NC}"
-    # Use the exported RESULTS_FILE and ensure APPEND_RESULTS is true for subsequent languages
     # Add --patched flag so the test runner knows we expect success now
-    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" --patched > "$PATCHED_DIR/${lang}.log" 2>&1 || true
+    APPEND_RESULTS=true RESULTS_FILE="$RESULTS_FILE" ./test-all-curves.sh --language "$lang" --patched > "$PATCHED_DIR/${lang}.log" 2>&1 || true
 
     # Deactivate
-    source ./utils/grpc-environment-manager.sh deactivate
+    source ./utils/grpc-environment-manager.sh deactivate >/dev/null 2>&1 || true
 done
 
 # Copy patched results to the expected location for the report generator
@@ -307,9 +280,7 @@ echo ""
 
 ./utils/generate-comparison-report.sh "$BASELINE_DIR" "$PATCHED_DIR" "$OUTPUT_FILE"
 
-echo ""
-
-# Step 5: Display summary
+# Step 5: Final summary
 echo -e "${YELLOW}[5/5] Comparison complete!${NC}"
 echo ""
 echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -320,15 +291,7 @@ echo -e "${GREEN}✓ Baseline results:${NC} $BASELINE_DIR/"
 echo -e "${GREEN}✓ Patched results:${NC} $PATCHED_DIR/"
 echo -e "${GREEN}✓ Comparison report:${NC} $OUTPUT_FILE"
 echo ""
-echo -e "${BLUE}To view the report:${NC}"
-echo "  cat $OUTPUT_FILE"
-echo ""
-echo -e "${BLUE}To view detailed logs:${NC}"
-echo "  Baseline: ls -la $BASELINE_DIR/"
-echo "  Patched:  ls -la $PATCHED_DIR/"
-echo ""
 
-# Extract and display key metrics from report
 if [[ -f "$OUTPUT_FILE" ]]; then
     echo -e "${CYAN}Key Metrics:${NC}"
     grep "Tests Fixed:" "$OUTPUT_FILE" || true

@@ -154,6 +154,33 @@ content = re.sub(
     content
 )
 
+# 4. Definitive block replacement for the ECDH setup in populate_ssl_context
+# This is more robust than separate replaces as it handles the whole logic at once
+ecdh_setup_pattern = r'#if OPENSSL_VERSION_NUMBER < 0x30000000L\s+EC_KEY\* ecdh = EC_KEY_new_by_curve_name\(NID_X9_62_prime256v1\);\s+if \(!SSL_CTX_set_tmp_ecdh\(context, ecdh\)\) {\s+gpr_log\(GPR_ERROR, "Could not set ephemeral ECDH key."\);\s+EC_KEY_free\(ecdh\);\s+return TSI_INTERNAL_ERROR;\s+}\s+SSL_CTX_set_options\(context, SSL_OP_SINGLE_ECDH_USE\);\s+EC_KEY_free\(ecdh\);\s+#else\s+if \(!SSL_CTX_set1_groups\(context, kSslEcCurveNames, 1\)\) {\s+gpr_log\(GPR_ERROR, "Could not set ephemeral ECDH key."\);\s+return TSI_INTERNAL_ERROR;\s+}\s+SSL_CTX_set_options\(context, SSL_OP_SINGLE_ECDH_USE\);\s+#endif'
+
+new_ecdh_setup = """#if (OPENSSL_VERSION_NUMBER < 0x30000000L) && !defined(OPENSSL_IS_BORINGSSL)
+    EC_KEY* ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+    if (!SSL_CTX_set_tmp_ecdh(context, ecdh)) {
+      gpr_log(GPR_ERROR, "Could not set ephemeral ECDH key.");
+      EC_KEY_free(ecdh);
+      return TSI_INTERNAL_ERROR;
+    }
+    SSL_CTX_set_options(context, SSL_OP_SINGLE_ECDH_USE);
+    EC_KEY_free(ecdh);
+#else
+    if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))) {
+      gpr_log(GPR_ERROR, "Could not set ephemeral ECDH key.");
+      return TSI_INTERNAL_ERROR;
+    }
+    SSL_CTX_set_options(context, SSL_OP_SINGLE_ECDH_USE);
+#endif"""
+
+if re.search(ecdh_setup_pattern, content):
+    log("Found exact ECDH setup pattern, applying definitive replacement")
+    content = re.sub(ecdh_setup_pattern, new_ecdh_setup, content)
+else:
+    print("Warning: Could not find exact ecdh_setup_pattern for block replacement")
+
 with open('$TARGET_FILE', 'w') as f:
     f.write(content)
 EOF
@@ -172,10 +199,10 @@ EOF
     fi
 
     # Verification
-    if grep -q "NID_secp521r1" "$TARGET_FILE"; then
-        success "Patch applied successfully - P-384/P-521 support enabled"
+    if grep -q "NID_secp521r1" "$TARGET_FILE" && grep -q "sizeof(kSslEcCurveNames)" "$TARGET_FILE"; then
+        success "Patch applied successfully - P-384/P-521 support enabled with correct size"
     else
-        error "Failed to apply patch - NID_secp521r1 not found in $TARGET_FILE"
+        error "Failed to apply complete patch - verification failed in $TARGET_FILE"
     fi
     
     if grep -q "defined(OPENSSL_IS_BORINGSSL)" "$TARGET_FILE"; then
