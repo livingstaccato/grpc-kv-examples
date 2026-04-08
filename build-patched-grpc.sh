@@ -273,7 +273,10 @@ build_cpp() {
         log "Pre-compiling C++ client example with patched gRPC..."
         export CMAKE_PREFIX_PATH="$BUILD_DIR/install"
         cd "$SCRIPT_DIR/cpp"
+        # Make sure build script is executable
+        chmod +x ./build.sh
         ./build.sh
+        
         # Copy the binary to the install prefix for easier transport/caching
         mkdir -p "$BUILD_DIR/install/bin"
         cp build/kv-client "$BUILD_DIR/install/bin/"
