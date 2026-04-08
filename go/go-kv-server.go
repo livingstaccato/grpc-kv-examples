@@ -240,11 +240,6 @@ func createTLSConfig(cert tls.Certificate, certPool *x509.CertPool, logger *log.
             tls.CurveP384,
             tls.CurveP521,
         },
-        CipherSuites: []uint16{
-            tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-            tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-            tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
-        },
     }
 
     config.VerifyPeerCertificate = createCertificateVerifier(logger)
@@ -312,20 +307,13 @@ func createUnaryInterceptor(logger *log.Logger) grpc.UnaryServerInterceptor {
 
 func logTLSConfig(config *tls.Config, logger *log.Logger) {
     logger.Printf("🔒 🛡️ TLS Configuration:")
-    logger.Printf("🔑 📝 Cipher suites:")
-    for _, suite := range config.CipherSuites {
-        var name string
-        switch suite {
-        case tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
-            name = "ECDHE-ECDSA-AES256-GCM-SHA384"
-        case tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:
-            name = "ECDHE-ECDSA-AES128-GCM-SHA256"
-        case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
-            name = "ECDHE-ECDSA-CHACHA20-POLY1305"
-        default:
-            name = fmt.Sprintf("Unknown (0x%04x)", suite)
+    if len(config.CipherSuites) > 0 {
+        logger.Printf("🔑 📝 Explicit cipher suites:")
+        for _, suite := range config.CipherSuites {
+            logger.Printf("  • %s", tls.CipherSuiteName(suite))
         }
-        logger.Printf("  • %s", name)
+    } else {
+        logger.Printf("🔑 📝 Using Go default cipher suites")
     }
     logger.Printf("🔐 🔄 Client auth mode: %v", config.ClientAuth)
     logger.Printf("🔒 📊 Min TLS version: %s", getTLSVersionString(config.MinVersion))
