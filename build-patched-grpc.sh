@@ -294,7 +294,17 @@ build_ruby() {
     # Build the gem — limit parallelism to avoid OOM on constrained runners
     cd src/ruby
     bundle install
-    rake native COMPILE_JOBS=2
+
+    log "Disk space before rake native:"
+    df -h .
+
+    rake native COMPILE_JOBS=2 2>&1 | tee "$BUILD_DIR/ruby-build.log"
+    # Capture real exit status (tee masks it otherwise)
+    rake_exit=${PIPESTATUS[0]}
+    [ $rake_exit -eq 0 ] || error "rake native failed with exit $rake_exit"
+
+    log "Disk space after rake native:"
+    df -h .
 
     success "Ruby gem built"
     ls -la pkg/*.gem
