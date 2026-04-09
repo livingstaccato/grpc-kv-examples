@@ -115,10 +115,10 @@ apply_patch() {
         error "Source file not found: $SSL_FILE"
     fi
 
-    # Check if already patched
-    if grep -q "NID_secp384r1" "$SSL_FILE"; then
-        log "Patch already applied, skipping..."
-        success "Patch verified - P-384/P-521 support enabled"
+    # Check if already patched (both the curve names and verify sigalgs patches)
+    if grep -q "NID_secp384r1" "$SSL_FILE" && grep -q "SSL_CTX_set_verify_algorithm_prefs" "$SSL_FILE"; then
+        log "Patches already applied, skipping..."
+        success "Patches verified - P-384/P-521 support enabled"
         return 0
     fi
 
@@ -144,16 +144,75 @@ apply_patch() {
     # To:     if (!SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))) {
     sed -i 's/SSL_CTX_set1_groups(context, kSslEcCurveNames, 1)/SSL_CTX_set1_groups(context, kSslEcCurveNames, sizeof(kSslEcCurveNames)\/sizeof(kSslEcCurveNames[0]))/' "$SSL_FILE"
 
-    # Verify patch
-    if grep -q "NID_secp384r1" "$SSL_FILE"; then
-        success "Patch applied successfully - P-384/P-521 support enabled"
+    # Patch 5: Add P-521 to BoringSSL's verify signature algorithms.
+    # BoringSSL excludes SSL_SIGN_ECDSA_SECP521R1_SHA512 from kVerifySignatureAlgorithms
+    # by default. We must call SSL_CTX_set_verify_algorithm_prefs() to add it explicitly.
+    # Inserts a block after SSL_CTX_set_options() in the BoringSSL/OpenSSL3.0 path,
+    # identified by the unique sizeof(kSslEcCurveNames) marker from Patch 4.
+    python3 - "$SSL_FILE" <<'PYEOF'
+import sys
+
+ssl_file = sys.argv[1]
+with open(ssl_file, 'r') as f:
+    content = f.read()
+
+if 'SSL_CTX_set_verify_algorithm_prefs' in content:
+    print("P-521 sigalgs patch already applied")
+    sys.exit(0)
+
+# Unique marker only present in the BoringSSL/modern path (from Patch 4)
+marker = 'sizeof(kSslEcCurveNames)/sizeof(kSslEcCurveNames[0]))'
+if marker not in content:
+    print("ERROR: Could not find kSslEcCurveNames sizeof marker")
+    sys.exit(1)
+
+# Find the SSL_CTX_set_options call after the marker
+marker_pos = content.find(marker)
+options_str = 'SSL_CTX_set_options(context, SSL_OP_SINGLE_ECDH_USE);'
+options_pos = content.find(options_str, marker_pos)
+if options_pos == -1:
+    print("ERROR: Could not find SSL_CTX_set_options after marker")
+    sys.exit(1)
+
+line_end = content.find('\n', options_pos)
+
+sigalgs_block = '''
+#ifdef OPENSSL_IS_BORINGSSL
+    {
+      // BoringSSL omits SSL_SIGN_ECDSA_SECP521R1_SHA512 from its default
+      // kVerifySignatureAlgorithms. Add it explicitly for P-521 mTLS support.
+      static const uint16_t kSigAlgsWithP521[] = {
+          SSL_SIGN_ECDSA_SECP256R1_SHA256,
+          SSL_SIGN_ECDSA_SECP384R1_SHA384,
+          SSL_SIGN_ECDSA_SECP521R1_SHA512,
+          SSL_SIGN_RSA_PSS_RSAE_SHA256,
+          SSL_SIGN_RSA_PSS_RSAE_SHA384,
+          SSL_SIGN_RSA_PSS_RSAE_SHA512,
+      };
+      SSL_CTX_set_verify_algorithm_prefs(
+          context, kSigAlgsWithP521,
+          sizeof(kSigAlgsWithP521) / sizeof(kSigAlgsWithP521[0]));
+    }
+#endif  // OPENSSL_IS_BORINGSSL'''
+
+content = content[:line_end] + sigalgs_block + content[line_end:]
+
+with open(ssl_file, 'w') as f:
+    f.write(content)
+
+print("P-521 sigalgs patch applied successfully")
+PYEOF
+
+    # Verify patches
+    if grep -q "NID_secp384r1" "$SSL_FILE" && grep -q "SSL_CTX_set_verify_algorithm_prefs" "$SSL_FILE"; then
+        success "All patches applied - P-384/P-521 curve + sigalgs support enabled"
     else
-        error "Patch verification failed - NID_secp384r1 not found"
+        error "Patch verification failed"
     fi
 
     # Show what was changed
     log "Verifying patch contents..."
-    grep -n "kSslEcCurveNames\|OPENSSL_IS_BORINGSSL\|0x30000000" "$SSL_FILE" | head -10
+    grep -n "kSslEcCurveNames\|OPENSSL_IS_BORINGSSL\|set_verify_algorithm_prefs" "$SSL_FILE" | head -15
 }
 
 # Build Python grpcio
