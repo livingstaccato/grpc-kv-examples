@@ -139,6 +139,14 @@ jobs:
           tags: grpc-curve-test:latest
           cache-from: type=gha
 
+      - name: Add swap to prevent OOM during native gem link
+        run: |
+          sudo fallocate -l 4G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
       - name: Cache Patched Ruby Build
         id: cache-ruby
         uses: actions/cache@v4
@@ -149,7 +157,9 @@ jobs:
       - name: Build Patched Ruby
         if: steps.cache-ruby.outputs.cache-hit != 'true'
         run: |
+          # Run with single compile job to minimise peak RSS during native .so link
           docker run --name ruby-builder -d -t grpc-curve-test:latest
+          docker exec ruby-builder bash -c "sed -i 's/COMPILE_JOBS=2/COMPILE_JOBS=1/' build-patched-grpc.sh"
           docker exec ruby-builder ./build-patched-grpc.sh --ruby --install
           mkdir -p build/patched-grpc
           docker cp ruby-builder:/workspace/build/patched-grpc/ruby-gems build/patched-grpc/
