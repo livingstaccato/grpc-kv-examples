@@ -19,7 +19,7 @@
 #   ./build/patched-grpc/   - Built artifacts
 #
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATCH_FILE="$SCRIPT_DIR/patches/grpc-ec-curves-p384-p521.patch"
@@ -231,7 +231,8 @@ build_python() {
 
     # Install build dependencies for gRPC v1.80.0
     log "Installing build dependencies..."
-    uv pip install 'Cython>=3.0' setuptools wheel
+    # Include pip itself so 'python -m pip wheel' works (uv venv doesn't install pip by default)
+    uv pip install 'Cython>=3.0' setuptools wheel pip
 
     # Set environment for building
     export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=false
@@ -243,11 +244,11 @@ build_python() {
     log "Building grpcio wheel (this takes 20-30 minutes)..."
     local WHEEL_DIR="$BUILD_DIR/wheels"
     mkdir -p "$WHEEL_DIR"
-    if python -m pip wheel --no-build-isolation . -w "$WHEEL_DIR" 2>&1 | tee "$BUILD_DIR/python-build.log"; then
-        success "Python grpcio wheel built successfully!"
-    else
-        error "Python grpcio wheel build FAILED. Check $BUILD_DIR/python-build.log"
-    fi
+    # pipefail ensures the python exit code propagates through tee
+    python -m pip wheel --no-build-isolation . -w "$WHEEL_DIR" \
+        2>&1 | tee "$BUILD_DIR/python-build.log" \
+        && success "Python grpcio wheel built successfully!" \
+        || error "Python grpcio wheel build FAILED. Check $BUILD_DIR/python-build.log"
 
     ls -la "$WHEEL_DIR"/*.whl || error "No wheel produced"
 
