@@ -139,12 +139,15 @@ jobs:
           tags: grpc-curve-test:latest
           cache-from: type=gha
 
-      - name: Add swap to prevent OOM during native gem link
+      - name: Ensure swap exists (idempotent)
         run: |
-          sudo fallocate -l 4G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
+          # Runner may already have a swapfile — only create if not present
+          if ! swapon --show | grep -q /swapfile; then
+            sudo fallocate -l 4G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+          fi
           free -h
 
       - name: Cache Patched Ruby Build

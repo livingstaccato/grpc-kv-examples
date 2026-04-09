@@ -78,19 +78,26 @@ RUN apt-get update && apt-get install -y \
     openssl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Protobuf compiler (modern version)
+# Install Protobuf compiler (modern version) — pick arch-appropriate binary
 RUN PB_VERSION=29.3 && \
-    wget -q https://github.com/protocolbuffers/protobuf/releases/download/v${PB_VERSION}/protoc-${PB_VERSION}-linux-x86_64.zip && \
-    unzip -q protoc-${PB_VERSION}-linux-x86_64.zip -d /usr/local && \
-    rm protoc-${PB_VERSION}-linux-x86_64.zip
+    ARCH=$(dpkg --print-architecture) && \
+    case "$ARCH" in \
+        amd64) PB_ARCH="linux-x86_64" ;; \
+        arm64) PB_ARCH="linux-aarch_64" ;; \
+        *) PB_ARCH="linux-x86_64" ;; \
+    esac && \
+    wget -q https://github.com/protocolbuffers/protobuf/releases/download/v${PB_VERSION}/protoc-${PB_VERSION}-${PB_ARCH}.zip && \
+    unzip -q protoc-${PB_VERSION}-${PB_ARCH}.zip -d /usr/local && \
+    rm protoc-${PB_VERSION}-${PB_ARCH}.zip
 
 # ============================================================
 # Go (1.21+)
 # ============================================================
 ENV GO_VERSION=1.23.4
-RUN wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz && \
-    rm go${GO_VERSION}.linux-amd64.tar.gz
+RUN ARCH=$(dpkg --print-architecture) && \
+    wget -q https://go.dev/dl/go${GO_VERSION}.linux-${ARCH}.tar.gz && \
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-${ARCH}.tar.gz && \
+    rm go${GO_VERSION}.linux-${ARCH}.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
 RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 ENV GOPATH="/root/go"
