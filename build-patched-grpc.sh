@@ -228,10 +228,10 @@ build_ruby() {
 
     cd "$BUILD_DIR/grpc"
 
-    # Build the gem
+    # Build the gem — limit parallelism to avoid OOM on constrained runners
     cd src/ruby
     bundle install
-    rake native
+    rake native COMPILE_JOBS=2
 
     success "Ruby gem built"
     ls -la pkg/*.gem
