@@ -189,6 +189,10 @@ build_python() {
         error "Python grpcio build FAILED. Check $BUILD_DIR/python-build.log"
     fi
 
+    # Install runtime dependencies used by the Python client
+    log "Installing runtime dependencies..."
+    uv pip install grpcio-tools protobuf cryptography
+
     # Verify installation
     log "Verifying grpcio installation..."
     python -c "import grpc; print(f'grpcio version: {grpc.__version__}')" || error "grpcio import failed"
