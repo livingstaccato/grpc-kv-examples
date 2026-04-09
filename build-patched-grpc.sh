@@ -222,11 +222,12 @@ build_python() {
 
     cd "$BUILD_DIR/grpc"
 
-    # Create virtual environment for the build
-    log "Creating virtual environment..."
-    uv venv "$BUILD_DIR/venv"
-    export VIRTUAL_ENV="$BUILD_DIR/venv"
-    export PATH="$BUILD_DIR/venv/bin:$PATH"
+    # Use a temp venv only for the build toolchain — we ship a wheel, not the venv,
+    # so symlink preservation across artifact upload is a non-issue.
+    log "Creating build venv..."
+    uv venv "$BUILD_DIR/build-venv"
+    export VIRTUAL_ENV="$BUILD_DIR/build-venv"
+    export PATH="$BUILD_DIR/build-venv/bin:$PATH"
 
     # Install build dependencies for gRPC v1.80.0
     log "Installing build dependencies..."
@@ -238,26 +239,31 @@ build_python() {
     export GRPC_PYTHON_BUILD_SYSTEM_CARES=false
     export GRPC_BUILD_WITH_BORING_SSL_ASM=false
 
-    # Build and install directly
-    log "Building grpcio from source (this takes 20-30 minutes)..."
-    log "Build log: $BUILD_DIR/python-build.log"
-
-    if uv pip install --no-build-isolation . 2>&1 | tee "$BUILD_DIR/python-build.log"; then
-        success "Python grpcio built and installed successfully!"
+    # Build wheel (not install) — wheels are self-contained, no symlinks
+    log "Building grpcio wheel (this takes 20-30 minutes)..."
+    local WHEEL_DIR="$BUILD_DIR/wheels"
+    mkdir -p "$WHEEL_DIR"
+    if python -m pip wheel --no-build-isolation . -w "$WHEEL_DIR" 2>&1 | tee "$BUILD_DIR/python-build.log"; then
+        success "Python grpcio wheel built successfully!"
     else
-        error "Python grpcio build FAILED. Check $BUILD_DIR/python-build.log"
+        error "Python grpcio wheel build FAILED. Check $BUILD_DIR/python-build.log"
     fi
 
-    # Install runtime dependencies used by the Python client
-    log "Installing runtime dependencies..."
-    uv pip install grpcio-tools protobuf cryptography
+    ls -la "$WHEEL_DIR"/*.whl || error "No wheel produced"
 
-    # Verify installation
-    log "Verifying grpcio installation..."
-    python -c "import grpc; print(f'grpcio version: {grpc.__version__}')" || error "grpcio import failed"
+    # Install wheel + runtime deps into a fixed target dir that has 'patched-grpc' in the path.
+    # This lets the environment manager validate via grpc.__file__ without venv symlink issues.
+    local SITE_DIR="$BUILD_DIR/python-site"
+    mkdir -p "$SITE_DIR"
+    pip install --target "$SITE_DIR" "$WHEEL_DIR"/grpcio-*.whl grpcio-tools protobuf cryptography \
+        2>&1 | tail -5
 
-    success "Virtual environment with patched grpcio: $BUILD_DIR/venv"
-    log "Activate with: source $BUILD_DIR/venv/bin/activate"
+    # Quick sanity check
+    PYTHONPATH="$SITE_DIR" python3 -c "import grpc; print(f'grpcio {grpc.__version__} @ {grpc.__file__}')" \
+        || error "grpcio import failed from patched site"
+
+    success "Patched grpcio installed to: $SITE_DIR"
+    log "Use with: PYTHONPATH=$SITE_DIR"
 }
 
 # Build C++ gRPC

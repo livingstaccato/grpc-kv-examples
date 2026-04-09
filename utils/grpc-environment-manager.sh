@@ -23,32 +23,29 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 activate_python() {
-    local VENV_PATH="$BUILD_DIR/venv"
+    local SITE_DIR="$BUILD_DIR/python-site"
 
-    if [[ ! -d "$VENV_PATH" ]]; then
-        echo -e "${RED}Error: Patched Python venv not found at $VENV_PATH${NC}"
+    if [[ ! -d "$SITE_DIR" ]]; then
+        echo -e "${RED}Error: Patched Python site not found at $SITE_DIR${NC}"
         echo "Run: ./build-patched-grpc.sh --python"
         return 1
     fi
 
-    # Deactivate any existing venv first
-    if [[ -n "${VIRTUAL_ENV:-}" ]]; then
-        deactivate 2>/dev/null || true
-    fi
+    # Prepend patched site to PYTHONPATH so it takes priority over system grpc.
+    # Avoids venv symlink issues — the site dir contains only regular files.
+    export PYTHONPATH="$SITE_DIR${PYTHONPATH:+:$PYTHONPATH}"
 
-    # Activate patched venv
-    source "$VENV_PATH/bin/activate"
-
-    # Verify patch is applied
+    # Verify the patched grpc is importable from our site dir
     if python3 -c "import grpc; loc = grpc.__file__; exit(0 if 'patched-grpc' in loc else 1)" 2>/dev/null; then
         echo -e "${GREEN}✓ Activated patched Python gRPC${NC}"
         python3 -c "import grpc; print(f'  Version: {grpc.__version__}'); print(f'  Location: {grpc.__file__}')"
 
         # Save state
-        echo "{\"active\": true, \"language\": \"python\", \"venv\": \"$VENV_PATH\"}" > "$STATE_FILE"
+        echo "{\"active\": true, \"language\": \"python\", \"site\": \"$SITE_DIR\"}" > "$STATE_FILE"
         return 0
     else
-        echo -e "${RED}Error: Activated venv but gRPC is not from patched location${NC}"
+        echo -e "${RED}Error: grpc not importable from patched site $SITE_DIR${NC}"
+        python3 -c "import grpc; print(grpc.__file__)" 2>&1 || true
         return 1
     fi
 }
@@ -114,10 +111,10 @@ deactivate_env() {
 
     case "$LANG" in
         python)
-            if [[ -n "${VIRTUAL_ENV:-}" ]]; then
-                deactivate 2>/dev/null || true
-                echo -e "${GREEN}✓ Deactivated patched Python environment${NC}"
-            fi
+            local SITE_DIR="$BUILD_DIR/python-site"
+            export PYTHONPATH=$(echo "${PYTHONPATH:-}" | sed "s|${SITE_DIR}:||g; s|:${SITE_DIR}||g; s|^${SITE_DIR}$||g")
+            [[ -z "${PYTHONPATH:-}" ]] && unset PYTHONPATH || true
+            echo -e "${GREEN}✓ Deactivated patched Python environment${NC}"
             ;;
         ruby)
             unset GEM_HOME

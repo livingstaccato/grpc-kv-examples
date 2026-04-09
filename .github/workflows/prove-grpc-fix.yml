@@ -53,23 +53,25 @@ jobs:
         id: cache-python
         uses: actions/cache@v4
         with:
-          path: build/patched-grpc/venv
+          path: build/patched-grpc/python-site
           key: patched-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'Dockerfile') }}
 
       - name: Build Patched Python
         if: steps.cache-python.outputs.cache-hit != 'true'
         run: |
+          # Build inside container so the .so matches the container's glibc/arch
           docker run --name py-builder -d -t grpc-curve-test:latest
           docker exec py-builder ./build-patched-grpc.sh --python --install
           mkdir -p build/patched-grpc
-          docker cp py-builder:/workspace/build/patched-grpc/venv build/patched-grpc/
+          # Ship python-site (no symlinks) instead of the full venv
+          docker cp py-builder:/workspace/build/patched-grpc/python-site build/patched-grpc/
           docker rm -f py-builder
 
       - name: Upload Python artifact
         uses: actions/upload-artifact@v4
         with:
           name: patched-python
-          path: build/patched-grpc/venv
+          path: build/patched-grpc/python-site
           retention-days: 1
 
   # Job 2b: Build patched C++ — runs in parallel with Python and Ruby
@@ -220,7 +222,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: patched-python
-          path: build/patched-grpc/venv
+          path: build/patched-grpc/python-site
 
       - name: Download C++ artifact
         uses: actions/download-artifact@v4
@@ -241,7 +243,7 @@ jobs:
 
           # Inject all patched artifacts
           docker exec proof-container mkdir -p /workspace/build/patched-grpc
-          docker cp build/patched-grpc/venv       proof-container:/workspace/build/patched-grpc/
+          docker cp build/patched-grpc/python-site proof-container:/workspace/build/patched-grpc/
           docker cp build/patched-grpc/install     proof-container:/workspace/build/patched-grpc/
           if [ -d "build/patched-grpc/ruby-gems" ]; then
             docker cp build/patched-grpc/ruby-gems proof-container:/workspace/build/patched-grpc/
