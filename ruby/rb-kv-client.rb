@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# Must be set before requiring grpc to configure BoringSSL cipher suite support for P-521
+ENV['GRPC_SSL_CIPHER_SUITES'] ||= 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305'
+
 require 'grpc'
 require 'logger'
 require 'openssl'

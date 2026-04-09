@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
 import os
+
+# Must be set before importing grpc to configure BoringSSL cipher suite support for P-521
+os.environ['GRPC_SSL_CIPHER_SUITES'] = 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305'
+
 import grpc
 import logging
 import ssl
