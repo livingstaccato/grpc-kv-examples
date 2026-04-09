@@ -291,19 +291,20 @@ build_ruby() {
 
     cd "$BUILD_DIR/grpc"
 
-    # Build the gem — limit parallelism to avoid OOM on constrained runners
-    cd src/ruby
-    bundle install
+    # Rake and gemspec live at the gRPC repo root, not in src/ruby
+    # bundle install uses the Gemfile in src/ruby
+    cd src/ruby && bundle install && cd "$BUILD_DIR/grpc"
 
-    log "Disk space before rake native:"
+    log "Disk space before rake native gem:"
     df -h .
 
-    rake native COMPILE_JOBS=2 2>&1 | tee "$BUILD_DIR/ruby-build.log"
+    # Build native extension AND package the gem
+    rake native gem COMPILE_JOBS=2 2>&1 | tee "$BUILD_DIR/ruby-build.log"
     # Capture real exit status (tee masks it otherwise)
     rake_exit=${PIPESTATUS[0]}
-    [ $rake_exit -eq 0 ] || error "rake native failed with exit $rake_exit"
+    [ $rake_exit -eq 0 ] || error "rake native gem failed with exit $rake_exit"
 
-    log "Disk space after rake native:"
+    log "Disk space after rake native gem:"
     df -h .
 
     success "Ruby gem built"
@@ -312,7 +313,8 @@ build_ruby() {
     if $DO_INSTALL; then
         local RUBY_GEMS_DIR="$BUILD_DIR/ruby-gems"
         mkdir -p "$RUBY_GEMS_DIR"
-        GEM_HOME="$RUBY_GEMS_DIR" gem install pkg/*.gem
+        # Install only the native platform gem (not the pure-ruby fallback)
+        GEM_HOME="$RUBY_GEMS_DIR" gem install pkg/grpc-*.gem --ignore-dependencies
         success "Patched Ruby gRPC gem installed to $RUBY_GEMS_DIR"
     fi
 }
