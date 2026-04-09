@@ -28,14 +28,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Job 2: Build patched gRPC for all languages
-  # Each language runs in its own container to avoid disk pressure
-  # (~14GB limit on runners; Python+C++Ruby compiled together exceeds it)
-  build-patched:
-    name: Build Patched gRPC
+  # Job 2a: Build patched Python — runs in parallel with C++ and Ruby
+  build-python:
+    name: Build Patched Python
     needs: build-env
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -51,25 +49,59 @@ jobs:
           tags: grpc-curve-test:latest
           cache-from: type=gha
 
-      - name: Cache Patched Build Artifacts
-        id: cache-patched
+      - name: Cache Patched Python Build
+        id: cache-python
         uses: actions/cache@v4
         with:
-          path: build/patched-grpc
-          key: patched-grpc-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'requirements.txt', 'Dockerfile') }}
+          path: build/patched-grpc/venv
+          key: patched-python-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'Dockerfile') }}
 
       - name: Build Patched Python
-        if: steps.cache-patched.outputs.cache-hit != 'true'
+        if: steps.cache-python.outputs.cache-hit != 'true'
         run: |
-          # Each language gets its own container so disk never exceeds ~14GB limit
           docker run --name py-builder -d -t grpc-curve-test:latest
           docker exec py-builder ./build-patched-grpc.sh --python --install
           mkdir -p build/patched-grpc
           docker cp py-builder:/workspace/build/patched-grpc/venv build/patched-grpc/
           docker rm -f py-builder
 
+      - name: Upload Python artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: patched-python
+          path: build/patched-grpc/venv
+          retention-days: 1
+
+  # Job 2b: Build patched C++ — runs in parallel with Python and Ruby
+  build-cpp:
+    name: Build Patched C++
+    needs: build-env
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
+
+      - name: Cache Patched C++ Build
+        id: cache-cpp
+        uses: actions/cache@v4
+        with:
+          path: build/patched-grpc/install
+          key: patched-cpp-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'Dockerfile') }}
+
       - name: Build Patched C++
-        if: steps.cache-patched.outputs.cache-hit != 'true'
+        if: steps.cache-cpp.outputs.cache-hit != 'true'
         run: |
           docker run --name cpp-builder -d -t grpc-curve-test:latest
           docker exec cpp-builder ./build-patched-grpc.sh --cpp --install
@@ -77,22 +109,65 @@ jobs:
           docker cp cpp-builder:/workspace/build/patched-grpc/install build/patched-grpc/
           docker rm -f cpp-builder
 
+      - name: Upload C++ artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: patched-cpp
+          path: build/patched-grpc/install
+          retention-days: 1
+
+  # Job 2c: Build patched Ruby — runs in parallel with Python and C++
+  # Non-fatal: Ruby gem compilation is memory-intensive; Python + C++ are sufficient proof.
+  build-ruby:
+    name: Build Patched Ruby
+    needs: build-env
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
+
+      - name: Cache Patched Ruby Build
+        id: cache-ruby
+        uses: actions/cache@v4
+        with:
+          path: build/patched-grpc/ruby-gems
+          key: patched-ruby-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'Dockerfile') }}
+
       - name: Build Patched Ruby
-        # Non-fatal: Ruby gem compilation is ~30 min and memory-intensive.
-        # Python + C++ are sufficient proof; Ruby adds additional coverage.
-        if: steps.cache-patched.outputs.cache-hit != 'true'
-        continue-on-error: true
+        if: steps.cache-ruby.outputs.cache-hit != 'true'
         run: |
           docker run --name ruby-builder -d -t grpc-curve-test:latest
           docker exec ruby-builder ./build-patched-grpc.sh --ruby --install
           mkdir -p build/patched-grpc
-          docker cp ruby-builder:/workspace/build/patched-grpc/ruby-gems build/patched-grpc/ || true
+          docker cp ruby-builder:/workspace/build/patched-grpc/ruby-gems build/patched-grpc/
           docker rm -f ruby-builder
+
+      - name: Upload Ruby artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: patched-ruby
+          path: build/patched-grpc/ruby-gems
+          if-no-files-found: ignore
+          retention-days: 1
 
   # Job 3: Run the comparison and generate the report
   run-proof:
     name: Run Proof & Report
-    needs: build-patched
+    needs: [build-python, build-cpp, build-ruby]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -109,12 +184,24 @@ jobs:
           tags: grpc-curve-test:latest
           cache-from: type=gha
 
-      - name: Restore Patched Build Artifacts
-        uses: actions/cache/restore@v4
+      - name: Download Python artifact
+        uses: actions/download-artifact@v4
         with:
-          path: build/patched-grpc
-          key: patched-grpc-${{ hashFiles('patches/*.patch', 'build-patched-grpc.sh', 'requirements.txt', 'Dockerfile') }}
-          fail-on-cache-miss: true
+          name: patched-python
+          path: build/patched-grpc/venv
+
+      - name: Download C++ artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: patched-cpp
+          path: build/patched-grpc/install
+
+      - name: Download Ruby artifact (optional)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: patched-ruby
+          path: build/patched-grpc/ruby-gems
 
       - name: Run Comparison (Baseline vs Patched)
         run: |
