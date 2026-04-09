@@ -154,12 +154,14 @@ else
 fi
 
 # Run baseline tests for each language
+# Each run overwrites curve-test-results.txt, so copy per-language and merge at the end
+rm -f curve-test-results.txt
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Testing $lang (baseline)...${NC}"
-    ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
+    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" > "$BASELINE_DIR/${lang}.log" 2>&1 || true
 done
 
-# Copy results
+# Copy merged results
 cp curve-test-results.txt "$BASELINE_DIR/" 2>/dev/null || true
 
 # Capture baseline versions
@@ -221,6 +223,8 @@ fi
 echo -e "${YELLOW}[3/5] Running patched tests...${NC}"
 echo ""
 
+# Clear results file before patched runs so we start fresh
+rm -f curve-test-results.txt
 for lang in "${TEST_LANGUAGES[@]}"; do
     echo -e "${BLUE}Activating patched $lang environment...${NC}"
 
@@ -231,13 +235,15 @@ for lang in "${TEST_LANGUAGES[@]}"; do
     }
 
     echo -e "${BLUE}Testing $lang (patched)...${NC}"
-    ./test-all-curves.sh --language "$lang" > "$PATCHED_DIR/${lang}.log" 2>&1 || true
+    # Pass --patched so failures are classified as FAIL (not EXPECTED_FAIL)
+    # Use APPEND_RESULTS so each language's results accumulate into one file
+    APPEND_RESULTS=true ./test-all-curves.sh --language "$lang" --patched > "$PATCHED_DIR/${lang}.log" 2>&1 || true
 
     # Deactivate
     source ./utils/grpc-environment-manager.sh deactivate
 done
 
-# Copy patched results
+# Copy merged patched results
 cp curve-test-results.txt "$PATCHED_DIR/" 2>/dev/null || true
 
 # Capture patched versions
