@@ -13,7 +13,10 @@ mkdir -p build
 
 # Configure
 echo "[CPP-BUILD] Running CMake configuration..."
-cmake -B build -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:-}"
+# CMake expects semicolon-separated lists for -D flags; shell env uses colons.
+# Convert here so cmake can locate gRPC in the patched install prefix.
+CMAKE_PREFIX_SEMI="$(echo "${CMAKE_PREFIX_PATH:-}" | tr ':' ';' | sed 's/;$//')"
+cmake -B build ${CMAKE_PREFIX_SEMI:+-DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_SEMI"}
 
 # Build
 echo "[CPP-BUILD] Running CMake build..."

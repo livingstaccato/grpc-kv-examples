@@ -87,10 +87,12 @@ activate_cpp() {
         return 1
     fi
 
-    # Set CMake prefix path
-    export CMAKE_PREFIX_PATH="$INSTALL_PREFIX:${CMAKE_PREFIX_PATH:-}"
-    export LD_LIBRARY_PATH="$INSTALL_PREFIX/lib:${LD_LIBRARY_PATH:-}"
-    export PKG_CONFIG_PATH="$INSTALL_PREFIX/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+    # Set CMake prefix path (no trailing colon — avoids cmake path corruption)
+    export CMAKE_PREFIX_PATH="$INSTALL_PREFIX${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
+    export LD_LIBRARY_PATH="$INSTALL_PREFIX/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    export PKG_CONFIG_PATH="$INSTALL_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+    # Add bin to PATH so cmake find_program locates grpc_cpp_plugin and protoc
+    export PATH="$INSTALL_PREFIX/bin:$PATH"
 
     echo -e "${GREEN}✓ Activated patched C++ gRPC${NC}"
     echo "  Install prefix: $INSTALL_PREFIX"
