@@ -30,7 +30,9 @@
       "Bash(done)",
       "Bash(wc:*)",
       "Bash(ls:*)",
-      "Bash([ -d \"/Users/tim/code/gh/livingstaccato/grpc-kv-examples/$dir\" ])"
+      "Bash([ -d \"/Users/tim/code/gh/livingstaccato/grpc-kv-examples/$dir\" ])",
+      "Bash(gh run:*)",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

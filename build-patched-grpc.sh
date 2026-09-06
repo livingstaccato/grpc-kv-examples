@@ -24,7 +24,7 @@ set -eo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATCH_FILE="$SCRIPT_DIR/patches/grpc-ec-curves-p384-p521.patch"
 BUILD_DIR="$SCRIPT_DIR/build/patched-grpc"
-GRPC_VERSION="v1.80.0"  # Use a stable version
+GRPC_VERSION="master"  # Use a stable version
 
 BUILD_PYTHON=false
 BUILD_CPP=false
@@ -337,7 +337,7 @@ main() {
 
     check_prereqs
     clone_grpc
-    apply_patch
+    # apply_patch
 
     if $BUILD_PYTHON; then
         build_python
