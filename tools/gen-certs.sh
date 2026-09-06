@@ -38,7 +38,7 @@ CN = $cn
 subjectAltName = @alt_names
 
 [v3_ext]
-basicConstraints = critical, CA:TRUE
+basicConstraints = critical, CA:FALSE
 subjectAltName = @alt_names
 extendedKeyUsage = TLS Web Client Authentication, TLS Web Server Authentication
 keyUsage = critical, digitalSignature, keyAgreement, keyCertSign

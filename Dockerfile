@@ -152,7 +152,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 RUN apt-get update && apt-get install -y \
     openjdk-21-jdk \
     && rm -rf /var/lib/apt/lists/*
-ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+RUN ln -s /usr/lib/jvm/java-21-openjdk-$(dpkg --print-architecture) /usr/lib/jvm/java-21-openjdk-current
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-current
 
 # ============================================================
 # Gradle 8.x (for Java/Kotlin/Scala builds)
@@ -192,9 +193,11 @@ RUN rustup update stable
 # Dart SDK (direct download - apt package has libc6 issues on 24.04)
 # ============================================================
 ENV DART_VERSION=3.7.0
-RUN wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip && \
-    unzip -q dartsdk-linux-x64-release.zip -d /opt && \
-    rm dartsdk-linux-x64-release.zip
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then DART_ARCH="arm64"; else DART_ARCH="x64"; fi && \
+    wget -q https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-${DART_ARCH}-release.zip && \
+    unzip -q dartsdk-linux-${DART_ARCH}-release.zip -d /opt && \
+    rm dartsdk-linux-${DART_ARCH}-release.zip
 ENV PATH="/opt/dart-sdk/bin:${PATH}"
 
 # ============================================================
