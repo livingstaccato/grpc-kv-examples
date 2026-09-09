@@ -267,7 +267,11 @@ The test framework uses these environment variables:
 
 ## Upstream Status
 
-This bug has been identified in gRPC. The patch in this repository demonstrates the fix. For production use, track the upstream gRPC issue or apply this patch to your gRPC build.
+Fix submitted upstream: [grpc/grpc#42086](https://github.com/grpc/grpc/pull/42086) (draft).
+
+The default-path portion of this bug — BoringSSL only advertising P-256 when no explicit `key_exchange_groups` are configured — has since been fixed independently on `grpc/grpc` master (`kDefaultBoringSSLKeyExchangeGroups` in `ssl_transport_security.cc` now includes P-384/P-521 by default). That fix is **not yet in a released version** — `grpcio`/`grpc` gem 1.80.0, which this repo tests against, still has the bug (verified against the `v1.80.0` tag). PR #42086 is now scoped to the remaining gap: `GRPC_TLS_GROUP_SECP521R1` is missing from the explicit `key_exchange_groups` enum/API.
+
+For production use today, apply the patch in this repository to your gRPC build, or wait for a released gRPC version that includes the master fix above.
 
 ## Troubleshooting
 
