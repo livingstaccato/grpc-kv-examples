@@ -45,9 +45,6 @@ class GetRequest extends $pb.GeneratedMessage {
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
-  @$core.pragma('dart2js:noInline')
-  static GetRequest createEmptyInstance() => create();
-
   @$core.override
   GetRequest createEmptyInstance() => create();
 
@@ -106,8 +103,6 @@ class GetResponse extends $pb.GeneratedMessage {
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
-  static GetResponse createEmptyInstance() => create();
-
   @$core.override
   GetResponse createEmptyInstance() => create();
 
@@ -165,8 +160,6 @@ class PutRequest extends $pb.GeneratedMessage {
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
-  static PutRequest createEmptyInstance() => create();
-
   @$core.override
   PutRequest createEmptyInstance() => create();
 
@@ -215,8 +208,6 @@ class Empty extends $pb.GeneratedMessage {
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
-
-  static Empty createEmptyInstance() => create();
 
   @$core.override
   Empty createEmptyInstance() => create();
