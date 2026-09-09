@@ -49,9 +49,6 @@ class GetRequest extends $pb.GeneratedMessage {
   GetRequest createEmptyInstance() => create();
 
   @$core.pragma('dart2js:noInline')
-  static $pb.PbList<GetRequest> createRepeated() => $pb.PbList<GetRequest>();
-
-  @$core.pragma('dart2js:noInline')
   GetRequest copyWith(void Function(GetRequest) updates) =>
       super.copyWith((message) => updates(message as GetRequest)) as GetRequest;
 

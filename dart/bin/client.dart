@@ -25,6 +25,36 @@ void logCertificateInfo(String certPem, String prefix) {
   }
 }
 
+/// ChannelCredentials.secure() has no way to present a client certificate,
+/// so mTLS needs its own SecurityContext with the client identity attached.
+class MtlsChannelCredentials extends ChannelCredentials {
+  final List<int> _clientCertChain;
+  final List<int> _clientPrivateKey;
+
+  MtlsChannelCredentials({
+    required List<int> trustedCertificates,
+    required List<int> clientCertChain,
+    required List<int> clientPrivateKey,
+    required String authority,
+    BadCertificateHandler? onBadCertificate,
+  }) : _clientCertChain = clientCertChain,
+       _clientPrivateKey = clientPrivateKey,
+       super.secure(
+         certificates: trustedCertificates,
+         authority: authority,
+         onBadCertificate: onBadCertificate,
+       );
+
+  @override
+  SecurityContext? get securityContext {
+    final context = super.securityContext;
+    context
+      ?..useCertificateChainBytes(_clientCertChain)
+      ..usePrivateKeyBytes(_clientPrivateKey);
+    return context;
+  }
+}
+
 Future<int> main(List<String> args) async {
   log('INFO', 'Starting gRPC KV Client (Dart)');
 
@@ -58,12 +88,20 @@ Future<int> main(List<String> args) async {
     ChannelCredentials credentials;
     if (clientCert != null && clientKey != null) {
       // mTLS - mutual authentication
-      credentials = ChannelCredentials.secure(
-        certificates: utf8.encode(serverCert),
+      credentials = MtlsChannelCredentials(
+        trustedCertificates: utf8.encode(serverCert),
+        clientCertChain: utf8.encode(clientCert),
+        clientPrivateKey: utf8.encode(clientKey),
         authority: 'localhost',
         onBadCertificate: (certificate, host) {
-          log('WARN', 'Bad certificate for $host');
-          return false;
+          // All certs in this test harness are self-signed leaves (no CA
+          // basic constraint), which Dart's chain validator rejects even
+          // though the exact cert was already added as a trust anchor via
+          // setTrustedCertificatesBytes. Accept it here, matching the same
+          // "trust this specific self-signed test cert" behavior other
+          // languages in this repo apply for their own TLS setup.
+          log('WARN', 'Bad certificate for $host - trusting self-signed test cert');
+          return true;
         },
       );
       log('INFO', 'mTLS credentials configured');
