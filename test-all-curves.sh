@@ -209,8 +209,11 @@ test_client() {
     # Small sleep before client starts to let server settle
     sleep 1
 
-    # For Rust, use PKCS#8 key if available
-    if [ "$lang_key" = "rust" ] && [ -f "certs/ec-${curve_id}-mtls-client.pkcs8.key" ]; then
+    # Rust (rustls) and Java (Netty) both require PKCS#8 keys; the raw SEC1
+    # PEM from gen-certs.sh fails to parse in both ("failed to parse private
+    # key" / "Input stream does not contain valid private key").
+    if { [ "$lang_key" = "rust" ] || [ "$lang_key" = "java" ]; } \
+        && [ -f "certs/ec-${curve_id}-mtls-client.pkcs8.key" ]; then
         export PLUGIN_CLIENT_KEY="$(cat certs/ec-${curve_id}-mtls-client.pkcs8.key)"
     fi
 
