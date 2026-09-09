@@ -269,3 +269,63 @@ jobs:
       - name: Display Summary
         run: |
           cat reports/comparison-*.md >> $GITHUB_STEP_SUMMARY || true
+
+  # Job 4: Prove full cross-language compatibility (9 languages x 3 curves)
+  # against the patched build, i.e. exactly what grpc/grpc#42086 fixes.
+  full-compat:
+    name: Full Compatibility Matrix
+    needs: [build-python, build-cpp, build-ruby]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: grpc-curve-test:latest
+          cache-from: type=gha
+
+      - name: Download Python artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: patched-python
+          path: build/patched-grpc/python-site
+
+      - name: Download C++ artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: patched-cpp
+          path: build/patched-grpc/install
+
+      - name: Download Ruby artifact (optional)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: patched-ruby
+          path: build/patched-grpc/ruby-gems
+
+      # Injects the patched artifacts into a container and runs all 9
+      # language clients against all 3 curves (ci/run-full-compatibility.sh)
+      - name: Run Full Compatibility Matrix
+        run: ci/run-full-compatibility.sh
+
+      - name: Upload Compatibility Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-compatibility-results
+          path: |
+            curve-test-results.txt
+            full-compat-container.log
+
+      # Renders curve-test-results.txt as a pass/fail matrix in the job
+      # summary and fails the job if any combination didn't PASS
+      - name: Summarize Results
+        if: always()
+        run: ci/summarize-curve-results.sh

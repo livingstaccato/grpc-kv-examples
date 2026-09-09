@@ -326,6 +326,75 @@ build_ruby() {
     fi
 }
 
+# Add P-521 to BoringSSL's default verify signature algorithms.
+# BoringSSL excludes SSL_SIGN_ECDSA_SECP521R1_SHA512 from its default
+# kVerifySignatureAlgorithms. grpc/grpc's own default key-exchange-groups
+# fix (kDefaultBoringSSLKeyExchangeGroups, from feature/ec-curve-fix / PR
+# #42086) handles curve negotiation, but P-521 mTLS still fails signature
+# verification without this. Not part of the upstream PR — compensates for
+# a separate BoringSSL default that upstream hasn't addressed.
+apply_sigalgs_patch() {
+    log "Applying P-521 verify-sigalgs patch..."
+
+    cd "$BUILD_DIR/grpc"
+    local SSL_FILE="src/core/tsi/ssl_transport_security.cc"
+
+    [ -f "$SSL_FILE" ] || error "Source file not found: $SSL_FILE"
+
+    if grep -q "SSL_CTX_set_verify_algorithm_prefs" "$SSL_FILE"; then
+        log "Sigalgs patch already applied, skipping..."
+        return 0
+    fi
+
+    python3 - "$SSL_FILE" <<'PYEOF'
+import sys
+
+ssl_file = sys.argv[1]
+with open(ssl_file, 'r') as f:
+    content = f.read()
+
+marker = ("tsi_result SetKeyExchangeGroups(\n"
+          "    SSL_CTX* context,\n"
+          "    const std::vector<grpc_tls_key_exchange_group>& key_exchange_groups) {")
+marker_pos = content.find(marker)
+if marker_pos == -1:
+    print("ERROR: Could not find SetKeyExchangeGroups signature marker")
+    sys.exit(1)
+
+insert_pos = marker_pos + len(marker)
+
+sigalgs_block = '''
+#if defined(OPENSSL_IS_BORINGSSL)
+  {
+    // BoringSSL omits SSL_SIGN_ECDSA_SECP521R1_SHA512 from its default
+    // kVerifySignatureAlgorithms. Add it explicitly for P-521 mTLS support.
+    static const uint16_t kSigAlgsWithP521[] = {
+        SSL_SIGN_ECDSA_SECP256R1_SHA256,
+        SSL_SIGN_ECDSA_SECP384R1_SHA384,
+        SSL_SIGN_ECDSA_SECP521R1_SHA512,
+        SSL_SIGN_RSA_PSS_RSAE_SHA256,
+        SSL_SIGN_RSA_PSS_RSAE_SHA384,
+        SSL_SIGN_RSA_PSS_RSAE_SHA512,
+    };
+    SSL_CTX_set_verify_algorithm_prefs(
+        context, kSigAlgsWithP521,
+        sizeof(kSigAlgsWithP521) / sizeof(kSigAlgsWithP521[0]));
+  }
+#endif  // defined(OPENSSL_IS_BORINGSSL)'''
+
+content = content[:insert_pos] + sigalgs_block + content[insert_pos:]
+
+with open(ssl_file, 'w') as f:
+    f.write(content)
+
+print("P-521 sigalgs patch applied successfully")
+PYEOF
+
+    grep -q "SSL_CTX_set_verify_algorithm_prefs" "$SSL_FILE" \
+        || error "Sigalgs patch verification failed"
+    success "Sigalgs patch applied - P-521 verify support enabled"
+}
+
 # Main
 main() {
     echo ""
@@ -337,7 +406,7 @@ main() {
 
     check_prereqs
     clone_grpc
-    # apply_patch
+    apply_sigalgs_patch
 
     if $BUILD_PYTHON; then
         build_python
