@@ -30,7 +30,8 @@ fi
 # actions/upload-artifact + download-artifact round-trips through a zip that
 # doesn't reliably preserve the Unix execute bit, so protoc/grpc_cpp_plugin
 # arrive non-executable even though the build step produced them correctly.
-docker exec "$CONTAINER" chmod +x /workspace/build/patched-grpc/install/bin/*
+# The glob must expand inside the container, not on the runner's host shell.
+docker exec "$CONTAINER" sh -c 'chmod +x /workspace/build/patched-grpc/install/bin/*'
 
 docker exec "$CONTAINER" bash -c '
     set -e
