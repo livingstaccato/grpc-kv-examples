@@ -35,7 +35,17 @@ docker exec "$CONTAINER" bash -c '
     if [ -d build/patched-grpc/ruby-gems ]; then
         source ./utils/grpc-environment-manager.sh activate ruby
     fi
-    ./test-all-curves.sh --patched
+
+    # test-all-curves.sh swallows build_cmd output even under --verbose, so
+    # build these directly first to surface real errors for BUILD_FAILED cases.
+    echo "=== DIAGNOSTIC: C++ build ==="
+    (cd cpp && ./build.sh) || echo "=== C++ build FAILED (see above) ==="
+    echo "=== DIAGNOSTIC: Java build ==="
+    (cd java && gradle build) || echo "=== Java build FAILED (see above) ==="
+    echo "=== DIAGNOSTIC: Dart build ==="
+    (cd dart && dart pub get) || echo "=== Dart build FAILED (see above) ==="
+
+    ./test-all-curves.sh --patched --verbose
 ' 2>&1 | tee full-compat-container.log
 
 docker cp "$CONTAINER":/workspace/curve-test-results.txt ./curve-test-results.txt
